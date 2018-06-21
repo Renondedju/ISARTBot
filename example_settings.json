@@ -3,6 +3,6 @@
     "debug" : true,
 
     "bot"  : {
-        "token" : "token"
+        "token" : ""
     }
 }
