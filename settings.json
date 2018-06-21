@@ -1,0 +1,8 @@
+{
+    "logs"  : true,
+    "debug" : true,
+
+    "bot"  : {
+        "token" : "token"
+    }
+}
