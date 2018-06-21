@@ -4,7 +4,12 @@
 
 """
 
+import bot
+
 def main():
+
+    isart_bot = bot.Bot()
+
     pass
 
 if __name__ == '__main__':
