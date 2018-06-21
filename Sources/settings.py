@@ -23,12 +23,16 @@ class Settings():
         with open(path) as f:
             self.__settings["settings"] = json.load(f)
 
-    @property
-    def get(self):
+    def get(self, *args):
         """
         Get property : this is the only way to access loaded setting 
         """
-        return self.__settings["settings"]
+        
+        data = self.__settings["settings"]
+        for i in range(len(args)):
+            data = data[args[i]]
+
+        return data
 
     @property
     def path(self):
