@@ -25,7 +25,7 @@ class Settings():
 
     def get(self, *args):
         """
-        Get property : this is the only way to access loaded setting 
+        Return the requested element
         """
         
         data = self.__settings["settings"]
