@@ -64,6 +64,10 @@ class Bot(discord.ext.commands.Bot):
         self.add_check(self.globally_block_dms)
         self.run(self.__settings.get("bot", "token"))
 
+    @property
+    def settings(self):
+        return self.__settings
+
     async def on_ready(self):
         """
             Executed when the bot is connected
@@ -83,15 +87,3 @@ class Bot(discord.ext.commands.Bot):
         """
 
         return ctx.guild is not None
-
-    async def is_dev(self, ctx):
-        """ 
-            Checks if the author is one of the
-            authors specified in the settings.json file 
-        """
-
-        for id in self.__settings.get("bot", "developers_id"):
-            if id == ctx.author.id:
-                return True
-
-        return False
