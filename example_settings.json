@@ -1,0 +1,20 @@
+{
+    "logs"  : true,
+    "debug" : true,
+
+    "bot"  : {
+        "token"  : "",
+        "prefix" : "!",
+        "commands" : {
+            "command_name"  : false,
+            "command_name_2": true
+        },
+        "developers_id":
+        [
+            "213262036069515264",
+            "121712966855950336",
+            "179313613209600000",
+            "134388384192790528"
+        ]
+    }
+}
