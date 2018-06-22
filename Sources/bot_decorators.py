@@ -24,15 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import bot
+import sys
+sys.path.insert(0, "./Lib/discord.py")
 
-def main():
+import asyncio
+import discord
 
-    #Starting the bot
-    bot.Bot()
-    return
+def is_dev(ctx):
+    """ 
+        Checks if the author is one of the
+        authors specified in the settings.json file 
+    """
 
-if __name__ == '__main__':
+    for id in ctx.bot.settings.get("bot", "developers_id"):
+        if id == ctx.author.id:
+            return True
 
-    #Executing the bot
-    main()
+    return False

@@ -24,15 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import bot
+import sys
+sys.path.append("./Lib/discord.py")
+sys.path.append("../")
 
-def main():
+from bot_decorators import is_dev
+import logs
+import discord
+import asyncio
+import settings
+from discord.ext import commands
 
-    #Starting the bot
-    bot.Bot()
-    return
+class Test_commands():
 
-if __name__ == '__main__':
+    def __init__(self, bot):
 
-    #Executing the bot
-    main()
+        #Private
+        self.__bot = bot
+
+    @commands.group(pass_context=True)
+    async def test(self, ctx):
+        """
+            Creates a command group
+        """
+
+        if ctx.invoked_subcommand is None:
+            await ctx.send("{0.subcommand_passed} doesn't exists".format(ctx))
+
+    @test.command(name='dev')
+    @commands.check(is_dev)
+    async def _dev(self, ctx):
+        await ctx.send("You are a dev !")
+        return
+
+    @_dev.error
+    async def _dev_error(self, ctx, error):
+        await ctx.send("You are not a dev !")
+        return
+
+def setup(bot):
+    bot.add_cog(Test_commands(bot))
