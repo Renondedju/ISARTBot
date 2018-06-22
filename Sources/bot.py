@@ -34,24 +34,64 @@ import asyncio
 import settings
 from discord.ext import commands
 
-class Bot(discord.Client):
+class Bot(discord.ext.commands.Bot):
     """
     Main bot class.
 
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        """
+            Inits the bot
+        """
 
-        #Public
-        self.settings = settings.Settings()
-        self.logs     = logs.Logs(self.settings.get("logs"))
+        super().__init__(command_prefix = "!", *args, **kwargs)
+
+        #Private
+        self.__settings     = settings.Settings()
+        self.__commands     = self.__settings.get("bot", "commands")
+        self.__logs         = logs.Logs(self.__settings.get("logs"))
+        self.command_prefix = self.__settings.get("bot", "prefix")
 
         #Setup
-        self.run(self.settings.get("bot", "token"))
+        for name, enabled in self.__commands.items():
+            if (name != "" and enabled):
+                self.load_extension  ('commands.' + name)
+                self.__logs.print    ('Loaded the command ' + name)
+            else:
+                self.__logs.print    ('The command ' + name + ' is currently disabled')
+        
+        self.add_check(self.globally_block_dms)
+        self.run(self.__settings.get("bot", "token"))
 
     async def on_ready(self):
-        self.logs.print('Logged in as')
-        self.logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
-        self.logs.print('User ID  : {0}'    .format(self.user.id))
-        self.logs.print('------------')
+        """
+            Executed when the bot is connected
+            to discord and ready to operate
+        """
+
+        self.__logs.print('Logged in as')
+        self.__logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
+        self.__logs.print('User ID  : {0}'    .format(self.user.id))
+        self.__logs.print('------------')
+
+    ###Checks
+
+    async def globally_block_dms(self, ctx):
+        """
+            Prevents the bot from sending PM's
+        """
+
+        return ctx.guild is not None
+
+    async def is_dev(self, ctx):
+        """ 
+            Checks if the author is one of the
+            authors specified in the settings.json file 
+        """
+
+        for id in self.__settings.get("bot", "developers_id"):
+            if id == ctx.author.id:
+                return True
+
+        return False
