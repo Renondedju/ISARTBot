@@ -62,6 +62,7 @@ class Bot(discord.ext.commands.Bot):
                 self.__logs.print    ('The command ' + name + ' is currently disabled')
         
         self.add_check(self.globally_block_dms)
+        self.add_check(self.log_command)
         self.run(self.__settings.get("bot", "token"))
 
     @property
@@ -87,3 +88,14 @@ class Bot(discord.ext.commands.Bot):
         """
 
         return ctx.guild is not None
+
+    async def log_command(self, ctx):
+        """
+            Logs every command
+        """
+        author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
+        channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
+
+        self.__logs.print('{0}\t{1} : {2}'.format(author, channel, ctx.message.content))
+
+        return True
