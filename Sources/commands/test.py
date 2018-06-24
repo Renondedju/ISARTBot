@@ -73,6 +73,5 @@ class Test_commands():
         await ctx.send("You are not an admin !")
         return
 
-
 def setup(bot):
     bot.add_cog(Test_commands(bot))

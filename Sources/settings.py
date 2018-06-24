@@ -43,12 +43,16 @@ class Settings():
         with open(path) as f:
             self.__settings["settings"] = json.load(f)
 
-    def get(self, *args):
+    def get(self, *args, **kwargs):
         """
         Return the requested element
         """
-        
         data = self.__settings["settings"]
+        
+        command = kwargs.get('command', None)
+        if (command != None and command != ""):
+            data = data["bot"]["commands"][command]
+
         for i in range(len(args)):
             data = data[args[i]]
 
