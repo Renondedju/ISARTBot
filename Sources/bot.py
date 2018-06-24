@@ -32,6 +32,8 @@ import logs
 import discord
 import asyncio
 import settings
+import traceback
+import bot_decorators
 from discord.ext import commands
 
 class Bot(discord.ext.commands.Bot):
@@ -63,6 +65,8 @@ class Bot(discord.ext.commands.Bot):
         
         self.add_check(self.globally_block_dms)
         self.add_check(self.log_command)
+        self.add_check(self.check_enable)
+
         self.run(self.__settings.get("bot", "token"))
 
     @property
@@ -80,14 +84,67 @@ class Bot(discord.ext.commands.Bot):
         self.__logs.print('User ID  : {0}'    .format(self.user.id))
         self.__logs.print('------------')
 
+    async def on_command_error(self, ctx, error):
+        """
+            Handles unhandeled errors
+        """
+
+        # This prevents any commands with local handlers being handled here in on_command_error.
+        if hasattr(ctx.command, 'on_error'):
+            return
+        
+        ignored = (commands.CommandNotFound, commands.UserInputError)
+        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
+        # If nothing is found. We keep the exception passed to on_command_error.
+        error = getattr(error, 'original', error)
+        
+        # Anything in ignored will return and prevent anything happening.
+        if isinstance(error, ignored):
+            return
+
+        if isinstance(error, commands.NoPrivateMessage):
+            try:
+                return await ctx.author.send("Hey no DMs!")
+            except:
+                return
+        
+        # All other Errors not returned come here... And we can just print the default TraceBack.
+        self.__logs.print('Ignoring exception in command {}:'.format(ctx.command))
+        for err in traceback.format_exception(type(error), error, error.__traceback__):
+            self.__logs.print(err)
+
+        return
+
     ###Checks
 
     async def globally_block_dms(self, ctx):
         """
-            Prevents the bot from sending PM's
+            Checks if the messages provides from
+            a guild or a DM
         """
 
-        return ctx.guild is not None
+        result = not (ctx.guild is None)
+
+        if result is False:
+            raise commands.NoPrivateMessage()
+
+        return result
+
+    async def check_enable(self, ctx):
+        """
+            Checks if the command is enabled or not
+        """
+
+        if bot_decorators.is_dev(ctx):
+            return True
+        
+        enabled = ctx.bot.settings.get("enabled", command=ctx.command.name)
+
+        if (enabled is False):
+            await ctx.send("Sorry, but this command is disabled for now !")
+            raise commands.CommandNotFound()
+
+        return enabled
 
     async def log_command(self, ctx):
         """
