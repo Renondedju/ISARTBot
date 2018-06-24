@@ -25,6 +25,7 @@ SOFTWARE.
 """
 
 import json
+import re
 
 class Settings():
     """
@@ -41,7 +42,8 @@ class Settings():
         self.__path     = path
 
         with open(path) as f:
-            self.__settings["settings"] = json.load(f)
+            data = re.sub(r"//.*\n|\/\*[\s\S]*?(?:\*\/)", "", f.read())
+            self.__settings["settings"] = json.loads(data)
 
     def get(self, *args, **kwargs):
         """
