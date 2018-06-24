@@ -41,3 +41,10 @@ def is_dev(ctx):
             return True
 
     return False
+
+def is_admin(ctx):
+    """ 
+        Checks if the author is an admin
+    """
+
+    return ctx.author.guild_permissions.administrator
