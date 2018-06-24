@@ -6,8 +6,7 @@
         "token"  : "",
         "prefix" : "!",
         "commands" : {
-            "command_name"  : false,
-            "command_name_2": true
+            "test" : true
         },
         "developers_id":
         [
