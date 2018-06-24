@@ -28,7 +28,7 @@ import sys
 sys.path.append("./Lib/discord.py")
 sys.path.append("../")
 
-from bot_decorators import is_dev
+from bot_decorators import is_dev, is_admin
 import logs
 import discord
 import asyncio
@@ -61,6 +61,18 @@ class Test_commands():
     async def _dev_error(self, ctx, error):
         await ctx.send("You are not a dev !")
         return
+
+    @test.command(name='admin')
+    @commands.check(is_admin)
+    async def _admin(self, ctx):
+        await ctx.send("You are an admin !")
+        return
+
+    @_admin.error
+    async def _admin_error(self, ctx):
+        await ctx.send("You are not an admin !")
+        return
+
 
 def setup(bot):
     bot.add_cog(Test_commands(bot))
