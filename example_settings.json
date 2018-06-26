@@ -22,9 +22,16 @@
  *    SOFTWARE.
  */
 
- {
+// /!\ Since comments are not supported in json, every comment in here should /!\
+// /!\ be removed to create a real working settings file                      /!\
+
+// Properties with a '_' as a prefix as protected and cannot be written from code
+
+{
 	//Should logs or debug be used 
     "logs"  : true,
+
+    //If debug is enabled, admin only commands will be enabled to devs as well
     "debug" : true,
 
 	// Main bot settings
@@ -37,9 +44,15 @@
         
 		//Commands settings
         "commands" : {
-            "test" :
+            "test" : // 'test' is the name of the file containing the test extension in the commands folder (commands/test.py)
             {
+                //This variable defines if the command should be enabled to the
+                //public, if set to false, only the bot developers can use it
                 "enabled" : false
+            },
+            "game" :
+            {
+                "enabled" : true
             }
         },
 
