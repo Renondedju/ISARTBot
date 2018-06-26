@@ -73,6 +73,8 @@ class Bot(discord.ext.commands.Bot):
 
         self.run(self.__settings.get("bot", "token"))
 
+        self.__settings.close()
+
     @property
     def settings(self):
         return self.__settings
