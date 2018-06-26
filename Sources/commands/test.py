@@ -41,7 +41,7 @@ class Test_commands():
         #Private
         self.__bot = bot
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, invoke_without_command=True)
     @commands.check(is_dev)
     async def test(self, ctx):
         """
@@ -71,7 +71,7 @@ class Test_commands():
         return
 
     ###             Settings group
-    @test.group(pass_context=True)
+    @test.group(pass_context=True, invoke_without_command=True)
     async def settings(self, ctx):
         """
             Creates a settings command group
