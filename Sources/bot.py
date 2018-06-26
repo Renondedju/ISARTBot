@@ -149,7 +149,6 @@ class Bot(discord.ext.commands.Bot):
 
         if (enabled is False):
             await ctx.send("Sorry, but this command is disabled for now !")
-            raise commands.CommandNotFound()
 
         return enabled
 
