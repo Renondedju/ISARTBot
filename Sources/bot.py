@@ -52,7 +52,7 @@ class Bot(discord.ext.commands.Bot):
         #Private
         self.__settings     = settings.Settings()
         self.__commands     = self.__settings.get("bot", "commands")
-        self.__logs         = logs.Logs(self.__settings.get("logs"))
+        self.__logs         = logs.Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
         #Setup
@@ -72,7 +72,9 @@ class Bot(discord.ext.commands.Bot):
         self.add_check(self.check_enable)
 
         self.run(self.__settings.get("bot", "token"))
-        
+
+        self.__logs.close()
+
     @property
     def settings(self):
         return self.__settings
