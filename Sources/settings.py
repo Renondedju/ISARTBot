@@ -23,7 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+import os.path
 import json
 import re
 
@@ -41,24 +41,80 @@ class Settings():
         self.__settings = {"settings": {}}
         self.__path     = path
 
-        with open(path) as f:
-            data = re.sub(r"//.*\n|\/\*[\s\S]*?(?:\*\/)", "", f.read())
-            self.__settings["settings"] = json.loads(data)
+        with open(path, 'r') as f:
+            self.__settings["settings"] = json.load(f)
+
+    def save(self):
+
+        if os.path.isfile(self.__path):
+            with open(self.__path, 'w') as f:
+                json.dump(self.__settings["settings"], f, indent=4, sort_keys=True)
+
+    def __getkey(self, dictionary: dict, key: str):
+        """
+        Gets a key
+        """
+        
+        real_key = key
+        
+        if '_' + key in dictionary:
+            real_key = '_' + key
+
+        elif not key in dictionary:
+            return None
+
+        return dictionary.get(real_key)
+
+    def __writekey(self, dictionary: dict, key: str, data):
+        """
+            Writes a key if this key isn't protected
+            returns true if the write is successful
+        """
+
+        #Updating a key
+        if key in dictionary:
+            dictionary[key] = data
+            self.save()
+            return True
+
+        #Adding a new key
+        elif key not in dictionary and '_' + key not in dictionary:
+            dictionary[key] = data
+            self.save()
+            return True
+
+        return False
 
     def get(self, *args, **kwargs):
         """
         Return the requested element
         """
-        data = self.__settings["settings"]
+        data = self.__settings.get("settings")
         
-        command = kwargs.get('command', None)
+        command = kwargs.get('command', '')
         if (command != None and command != ""):
-            data = data["bot"]["commands"][command]
+            data = self.__getkey(self.__getkey(self.__getkey(data, "bot"), "commands"), command)
 
         for i in range(len(args)):
-            data = data[args[i]]
+            data = self.__getkey(data, args[i])
 
         return data
+
+    def write(self, data, key, *args, **kwargs):
+        """
+        Writes an element into the settings
+        """
+
+        dictionary = self.__settings.get("settings")
+        
+        command = kwargs.get('command', '')
+        if (command != None and command != ""):
+            dictionary = self.__getkey(self.__getkey(self.__getkey(dictionary, "bot"), "commands"), command)
+
+        for i in range(len(args)):
+            dictionary = self.__getkey(dictionary, args[i])
+
+        return self.__writekey(dictionary, key, data)
 
     @property
     def path(self):

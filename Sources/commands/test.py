@@ -29,10 +29,9 @@ sys.path.append("./Lib/discord.py")
 sys.path.append("../")
 
 from bot_decorators import is_dev, is_admin
-import logs
+import json
 import discord
 import asyncio
-import settings
 from discord.ext import commands
 
 class Test_commands():
@@ -42,7 +41,8 @@ class Test_commands():
         #Private
         self.__bot = bot
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.check(is_dev)
     async def test(self, ctx):
         """
             Creates a command group
@@ -51,16 +51,13 @@ class Test_commands():
         if ctx.invoked_subcommand is None:
             await ctx.send("{0.subcommand_passed} doesn't exists".format(ctx))
 
-    @test.command(name='dev')
-    @commands.check(is_dev)
-    async def _dev(self, ctx):
-        await ctx.send("You are a dev !")
-        return
+    @test.error
+    async def test_error(self, ctx, error):
 
-    @_dev.error
-    async def _dev_error(self, ctx, error):
-        await ctx.send("You are not a dev !")
-        return
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send("You need to be a dev to use this command")
+        else:
+            raise error
 
     @test.command(name='admin')
     @commands.check(is_admin)
@@ -71,6 +68,35 @@ class Test_commands():
     @_admin.error
     async def _admin_error(self, ctx):
         await ctx.send("You are not an admin !")
+        return
+
+    ###             Settings group
+    @test.group(pass_context=True, invoke_without_command=True)
+    async def settings(self, ctx):
+        """
+            Creates a settings command group
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.send('nothing to do.')
+        return
+
+    @settings.command(name='read')
+    async def __settings_read(self, ctx):
+
+        string = json.dumps(self.__bot.settings.get(), indent=4)
+
+        await ctx.send("```json\n{}\n```".format(string))
+
+        return
+
+    @settings.command(name='write')
+    async def __settings_write(self, ctx, data, key, *args):
+
+        if self.__bot.settings.write(data, key, *args):
+            await ctx.send("Settings have been modified successfuly !")
+        else:
+            await ctx.send("Sorry but the setting you tried to write has been denied.")
+
         return
 
 def setup(bot):
