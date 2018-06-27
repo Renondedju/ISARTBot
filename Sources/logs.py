@@ -25,13 +25,14 @@ SOFTWARE.
 """
 
 from datetime import datetime
+import os.path
 
 class Logs():
     """
     Used to log any activity
     """
 
-    def __init__(self, dir: str = "./logs.log", enabled: bool = True):
+    def __init__(self, path: str = "./logs.log", enabled: bool = True):
 
         #Public
         self.enabled = enabled
@@ -39,18 +40,28 @@ class Logs():
         #Private
         self.__logs_file = None
 
+        if (not self.enabled):
+            print("/!\\ Be careful, the logs are currently disabled /!\\")
+
         #Setup
         try:
-            self.__logs_file = open(dir, "a")
+            if os.path.isfile(path):
+                self.__logs_file = open(path, "a")
+            else:
+                self.__logs_file = None
+                self.print("Warning : no logs file found !")
         except:
             self.__logs_file = None
-            print("Warning : no logs file found !")
+            self.print("Warning : no logs file found !")
 
     def print(self, *args):
         """
         Logs every args into the console and
         the file (if the opening is successful)
         """
+
+        if not self.enabled:
+            return
 
         #Generating the output
         str_args = []
@@ -68,7 +79,7 @@ class Logs():
 
         return
 
-    def __del__(self):
+    def close(self):
 
         if (self.__logs_file != None):
             self.__logs_file.close()
