@@ -52,24 +52,28 @@ class Bot(discord.ext.commands.Bot):
         #Private
         self.__settings     = settings.Settings()
         self.__commands     = self.__settings.get("bot", "commands")
-        self.__logs         = logs.Logs(self.__settings.get("logs"))
+        self.__logs         = logs.Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
         #Setup
         for name, enabled in self.__commands.items():
-            if (name != "" and enabled):
-                self.load_extension  ('commands.' + name)
-                self.__logs.print    ('Loaded the command ' + name)
-            else:
-                self.__logs.print    ('The command ' + name + ' is currently disabled')
-        
+            if (name != ""):
+                name = name.strip('_')
+                try:
+                    self.load_extension  ('commands.' + name)
+                    self.__logs.print    ('Loaded the command {0}, enabled = {1}'
+                        .format(name, str(enabled.get('enabled'))))
+                except:
+                    self.__logs.print('Failed to load extension named command.{0}'
+                    .format(name))
+
         self.add_check(self.globally_block_dms)
         self.add_check(self.log_command)
         self.add_check(self.check_enable)
 
         self.run(self.__settings.get("bot", "token"))
 
-        self.__settings.close()
+        self.__logs.close()
 
     @property
     def settings(self):
@@ -81,20 +85,13 @@ class Bot(discord.ext.commands.Bot):
             to discord and ready to operate
         """
 
+        self.__logs.print('------------')
         self.__logs.print('Logged in as')
         self.__logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
         self.__logs.print('User ID  : {0}'    .format(self.user.id))
         self.__logs.print('------------')
 
-    async def on_command_error(self, ctx, error):
-        """
-            Handles unhandeled errors
-        """
-
-        # This prevents any commands with local handlers being handled here in on_command_error.
-        if hasattr(ctx.command, 'on_error'):
-            return
-        
+    async def on_error(self, ctx, error):
         ignored = (commands.CommandNotFound, commands.UserInputError)
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
@@ -113,9 +110,31 @@ class Bot(discord.ext.commands.Bot):
         # All other Errors not returned come here... And we can just print the default TraceBack.
         self.__logs.print('Ignoring exception in command {}:'.format(ctx.command))
         for err in traceback.format_exception(type(error), error, error.__traceback__):
+            if (err[len(err) - 1] == '\n'):
+                err = err[:-1]
             self.__logs.print(err)
 
+        errors = traceback.format_tb(error.__traceback__)
+        embed  = discord.Embed(description =
+            "Oops an unexpected error occured !" +
+            " Please [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
+            " on github if this error is recurrent\n" +
+            "Make sure to include this report in it :\n```\n" +
+            errors[len(errors) - 1] + 
+            "\n```")
+
+        await ctx.send(embed = embed)
+
         return
+
+    async def on_command_error(self, ctx, error):
+        """ Handles unhandeled errors """
+
+        # This prevents any commands with local handlers being handled here in on_command_error.
+        if hasattr(ctx.command, 'on_error'):
+            return
+        
+        self.on_error(ctx, error)
 
     ###Checks
 
@@ -144,7 +163,6 @@ class Bot(discord.ext.commands.Bot):
 
         if (enabled is False):
             await ctx.send("Sorry, but this command is disabled for now !")
-            raise commands.CommandNotFound()
 
         return enabled
 

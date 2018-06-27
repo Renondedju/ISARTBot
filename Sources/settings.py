@@ -44,11 +44,11 @@ class Settings():
         with open(path, 'r') as f:
             self.__settings["settings"] = json.load(f)
 
-    def close(self):
+    def save(self):
 
         if os.path.isfile(self.__path):
             with open(self.__path, 'w') as f:
-                json.dump(self.__settings["settings"], f)
+                json.dump(self.__settings["settings"], f, indent=4, sort_keys=True)
 
     def __getkey(self, dictionary: dict, key: str):
         """
@@ -74,11 +74,13 @@ class Settings():
         #Updating a key
         if key in dictionary:
             dictionary[key] = data
+            self.save()
             return True
 
         #Adding a new key
         elif key not in dictionary and '_' + key not in dictionary:
             dictionary[key] = data
+            self.save()
             return True
 
         return False
