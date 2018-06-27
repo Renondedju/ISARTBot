@@ -51,13 +51,21 @@ class Test_commands():
         if ctx.invoked_subcommand is None:
             await ctx.send("{0.subcommand_passed} doesn't exists".format(ctx))
 
+    @test.command(name='error')
+    async def _error(self, ctx):
+        raise ValueError("Test of unhandled exception")
+
+    @_error.error
+    async def _error_error(self, ctx, error):
+        await ctx.bot.on_error(ctx, error)
+
     @test.error
     async def test_error(self, ctx, error):
 
         if isinstance(error, commands.CheckFailure):
             await ctx.send("You need to be a dev to use this command")
         else:
-            raise error
+            await ctx.bot.on_error(ctx, error)
 
     @test.command(name='admin')
     @commands.check(is_admin)

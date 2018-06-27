@@ -53,7 +53,7 @@ class Module_commands():
         if isinstance(error, commands.CheckFailure):
             await ctx.send("You need to be a dev to use this command")
         else:
-            raise error
+            await ctx.bot.on_error(ctx, error)            
 
     @module.command(name="load")
     async def _load(self, ctx, *, module : str):

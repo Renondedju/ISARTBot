@@ -91,15 +91,7 @@ class Bot(discord.ext.commands.Bot):
         self.__logs.print('User ID  : {0}'    .format(self.user.id))
         self.__logs.print('------------')
 
-    async def on_command_error(self, ctx, error):
-        """
-            Handles unhandeled errors
-        """
-
-        # This prevents any commands with local handlers being handled here in on_command_error.
-        if hasattr(ctx.command, 'on_error'):
-            return
-        
+    async def on_error(self, ctx, error):
         ignored = (commands.CommandNotFound, commands.UserInputError)
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
@@ -122,7 +114,27 @@ class Bot(discord.ext.commands.Bot):
                 err = err[:-1]
             self.__logs.print(err)
 
+        errors = traceback.format_tb(error.__traceback__)
+        embed  = discord.Embed(description =
+            "Oops an unexpected error occured !" +
+            " Please [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
+            " on github if this error is recurrent\n" +
+            "Make sure to include this report in it :\n```\n" +
+            errors[len(errors) - 1] + 
+            "\n```")
+
+        await ctx.send(embed = embed)
+
         return
+
+    async def on_command_error(self, ctx, error):
+        """ Handles unhandeled errors """
+
+        # This prevents any commands with local handlers being handled here in on_command_error.
+        if hasattr(ctx.command, 'on_error'):
+            return
+        
+        self.on_error(ctx, error)
 
     ###Checks
 
