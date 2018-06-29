@@ -85,6 +85,16 @@ class Settings():
 
         return False
 
+    def __delkey(self, dictionary: dict, key: str):
+        """
+            Deletes a key from a dict
+        """
+
+        dictionary.pop(      key, None)
+        dictionary.pop('_' + key, None)
+
+        self.save()
+
     def get(self, *args, **kwargs):
         """
         Return the requested element
@@ -115,6 +125,20 @@ class Settings():
             dictionary = self.__getkey(dictionary, args[i])
 
         return self.__writekey(dictionary, key, data)
+
+    def delete(self, key, *args, **kwargs):
+        """ Deletes a key from the settings """
+
+        dictionary = self.__settings.get("settings")
+        
+        command = kwargs.get('command', '')
+        if (command != None and command != ""):
+            dictionary = self.__getkey(self.__getkey(self.__getkey(dictionary, "bot"), "commands"), command)
+
+        for i in range(len(args)):
+            dictionary = self.__getkey(dictionary, args[i])
+
+        return self.__delkey(dictionary, key)
 
     @property
     def path(self):
