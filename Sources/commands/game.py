@@ -51,6 +51,15 @@ class Game_commands():
                            " type ``{}help game``"
                            .format(self.__bot.settings.get("bot", "prefix")))
 
+    def get_game_category(self, ctx):
+        """ Retriving the game category """
+
+        for cat in ctx.guild.categories:
+            if str(cat.id) == str(ctx.bot.settings.get("category_id", command="game")):
+                return cat
+
+        return None 
+
     @game.command(name='create', hidden=True)
     @commands.check(is_admin)
     async def _create(self, ctx, *, game_name: str):
@@ -63,12 +72,7 @@ class Game_commands():
             await ctx.send("The game named {} already exists !".format(game_name))
             return
 
-        #Retriving the game category
-        game_category = None
-        for cat in ctx.guild.categories:
-            if str(cat.id) == str(ctx.bot.settings.get("category_id", command="game")):
-                game_category = cat
-                break
+        game_category = self.get_game_category(ctx)
 
         #If the game category isn't found, raising an error
         if (game_category is None):
@@ -80,8 +84,6 @@ class Game_commands():
             name        = game_name,
             colour      = discord.Colour(int(color, 16)),
             mentionable = True)
-
-        ctx.bot.settings.write({"id" : role.id}, role.name, "games_roles", command="game")
 
         override = {role                   : discord.PermissionOverwrite(read_messages=True),
                     ctx.guild.default_role : discord.PermissionOverwrite(read_messages=False)}
@@ -100,6 +102,11 @@ class Game_commands():
         if (text is None or vocal is None):
             raise commands.CommandError(message="Failed to create the game channels")
 
+        ctx.bot.settings.write({"id"    : role.id,
+                                "vocal" : [vocal.id],
+                                "text"  : [text.id]},
+            role.name, "games_roles", command="game")
+
         await ctx.send("Added the game {} to the list of avaliable games".format(role.mention))
 
         return
@@ -110,7 +117,59 @@ class Game_commands():
 
         game_name = game_name.lower().strip()
 
-        await ctx.send("TODO :)")
+        #Checking if the game exists
+        if game_name not in self.__bot.settings.get("games_roles", command="game"):
+            await ctx.send("The game named {} does not exists !".format(game_name))
+            return
+
+        game_category = self.get_game_category(ctx)
+
+        role = discord.utils.get(ctx.guild.roles,
+            id=ctx.bot.settings.get("games_roles", game_name, "id", command="game"))
+
+        if (role is None):
+            raise commands.CommandError(message="No valid role found. Aborting")
+
+        #If the game category isn't found, raising an error
+        if (game_category is None):
+            raise commands.CommandError(message="No valid category id found. Aborting")
+
+        def check(reaction, user):
+            return user == ctx.message.author and str(reaction.emoji) == '👍'
+
+        message = await ctx.send("Are you sure you want to delete the game {} ?".format(role.mention)
+                               + "\nReact with 👍 if you want to continue")
+        await message.add_reaction('👍')
+
+        try:
+            await ctx.bot.wait_for('reaction_add', timeout=5.0, check=check)
+
+        except asyncio.TimeoutError:
+            await ctx.send('Aborted deletion.')
+            return
+
+        reason = "This channel is deleted due to the game role @{} being deleted".format(game_name)
+
+        try:
+            for id in ctx.bot.settings.get("games_roles", game_name, "text", command="game"):
+                text = ctx.bot.get_channel(id)
+                if (text != None):
+                    await text.delete(reason=reason)
+
+            for id in ctx.bot.settings.get("games_roles", game_name, "vocal", command="game"):
+                vocal = ctx.bot.get_channel(id)
+                if (vocal != None):
+                    await vocal.delete(reason=reason)
+
+            await role.delete()
+
+        except:
+
+            raise commands.CommandError(message="Failed to delete a role or channel !")
+        
+        ctx.bot.settings.delete(role.name, "games_roles", command="game")
+
+        await ctx.send("Successfully deleted the game {} !".format(game_name))
 
     @_delete.error
     @_create.error
