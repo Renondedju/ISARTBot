@@ -37,10 +37,7 @@ import bot_decorators
 from discord.ext import commands
 
 class Bot(discord.ext.commands.Bot):
-    """
-    Main bot class.
-
-    """
+    """ Main bot class """
 
     def __init__(self, *args, **kwargs):
         """
@@ -123,6 +120,8 @@ class Bot(discord.ext.commands.Bot):
             errors[len(errors) - 1] + 
             "\n```")
 
+        embed.colour = discord.Colour.red()
+
         await ctx.send(embed = embed)
 
         return
@@ -137,7 +136,6 @@ class Bot(discord.ext.commands.Bot):
         self.on_error(ctx, error)
 
     ###Checks
-
     async def globally_block_dms(self, ctx):
         """
             Checks if the messages provides from
