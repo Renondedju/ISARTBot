@@ -320,5 +320,11 @@ class Game_commands():
         else:
             await ctx.bot.on_error(ctx, error)
 
+        #List command
+
+    @game.command(name='list')
+    async def _list(self, ctx):
+        await ctx.send("TODO")
+
 def setup(bot):
     bot.add_cog(Game_commands(bot))
