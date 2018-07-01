@@ -57,6 +57,9 @@ class Settings():
         
         real_key = key
         
+        if dictionary is None:
+            return None
+
         if '_' + key in dictionary:
             real_key = '_' + key
 
@@ -70,6 +73,9 @@ class Settings():
             Writes a key if this key isn't protected
             returns true if the write is successful
         """
+
+        if dictionary is None:
+            return False
 
         #Updating a key
         if key in dictionary:
@@ -89,6 +95,9 @@ class Settings():
         """
             Deletes a key from a dict
         """
+
+        if dictionary is None:
+            return False
 
         dictionary.pop(      key, None)
         dictionary.pop('_' + key, None)
