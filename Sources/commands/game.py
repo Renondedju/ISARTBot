@@ -44,12 +44,12 @@ class Game_commands():
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def game(self, ctx):
-        """ Creates a command group """
-
         if ctx.invoked_subcommand is None:
-            await ctx.send("Game requiers a subcommand, if you need some help please"
-                           " type ``{}help game``"
-                           .format(self.__bot.settings.get("bot", "prefix")))
+            await ctx.bot.send_fail(ctx,
+                "Game subcommand not recognized.\nIf you need some help please"
+                " type ``{}help game``"
+                .format(self.__bot.settings.get("bot", "prefix")),
+                "Game")
 
     def get_game_category(self, ctx):
         """ Retriving the game category """
@@ -60,10 +60,11 @@ class Game_commands():
 
         return None 
 
+        #Create command
     @game.command(name='create', hidden=True)
     @commands.check(is_admin)
     async def _create(self, ctx, *, game_name: str):
-        """ Creates a game if this game does not exists yet """
+        """ Creates a game role if this game does not exists yet (admin only) """
 
         game_name = game_name.lower().strip()
 
@@ -115,10 +116,11 @@ class Game_commands():
 
         return
 
+        #Delete command
     @game.command(name='delete', hidden=True)
     @commands.check(is_admin)
     async def _delete(self, ctx, *, game_name: str):
-
+        """ Deletes a game role (Admin only) """
         game_name = game_name.lower().strip()
 
         #Checking if the game exists
@@ -217,6 +219,7 @@ class Game_commands():
 
         return
 
+        #Add command
     @game.command(name='add')
     async def _add(self, ctx, *, game_name: str):
         """ Adds a game role to the user """
@@ -225,11 +228,16 @@ class Game_commands():
 
         role = discord.utils.get(ctx.guild.roles,
             id=ctx.bot.settings.get("games_roles", game_name, "id", command="game"))
-        text = ctx.bot.get_channel(ctx.bot.settings.get(
-            "games_roles", game_name, "text", command="game")[0])
 
         if role is None:
-            await ctx.bot.send_fail(ctx, "No corresponding game role found", "Game")
+            return await ctx.bot.send_fail(ctx,
+                "No corresponding game role found"
+                "\nUse ``{}game list`` to have the list of all the games avaliable for now"
+                .format(self.__bot.settings.get("bot", "prefix"))
+                ,"Game")
+
+        text = ctx.bot.get_channel(ctx.bot.settings.get(
+            "games_roles", game_name, "text", command="game")[0])
 
         if role in ctx.message.author.roles:
             return await ctx.bot.send_fail(ctx,
@@ -249,6 +257,53 @@ class Game_commands():
     @_add.error
     async def _add_error(self, ctx, error):
         """ Catches the game add command errors """
+
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.bot.send_fail(ctx,
+                "You missed an argument. Type __``{}help"
+                " game add``__ for some help"
+                .format(self.__bot.settings.get("bot", "prefix")),
+                "Command failed")
+
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.bot.send_fail(ctx,
+                "I need some more permissions to do that sorry !"
+                ,"Command failed")
+
+        else:
+            await ctx.bot.on_error(ctx, error)
+
+        #Remove command
+    @game.command(name='remove')
+    async def _remove(self, ctx, *, game_name: str):
+        """ Removes a game role to the user """
+        
+        game_name = game_name.lower().strip()
+
+        role = discord.utils.get(ctx.guild.roles,
+            id=ctx.bot.settings.get("games_roles", game_name, "id", command="game"))
+
+        if role is None:
+            return await ctx.bot.send_fail(ctx,
+                "No corresponding game role found"
+                "\nUse ``{}game list`` to have the list of all the games avaliable for now"
+                .format(self.__bot.settings.get("bot", "prefix"))
+                ,"Game")
+
+        if role in ctx.message.author.roles:
+            await ctx.message.author.remove_roles(role)
+
+            return await ctx.bot.send_success(ctx, 
+                "Game role removed !",
+                "Game")
+        
+        return await ctx.bot.send_fail(ctx, 
+            "Sorry but I can't remove you a role that you don't have",
+            "Game")
+
+    @_remove.error
+    async def _remove_error(self, ctx, error):
+        """ Catches the game reomve command errors """
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.bot.send_fail(ctx,
