@@ -196,23 +196,74 @@ class Game_commands():
         """
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.bot.send_fail("You need to be an admin to do that !"
-                , "Command failed")
+            await ctx.bot.send_fail(ctx,
+                "You need to be an admin to do that !"
+                ,"Command failed")
 
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.bot.send_fail("You missed an argument. Type __``{}help"
-                            "game create``__ for some help"
-                            .format(self.__bot.settings.get("bot", "prefix")),
-                            "Command failed")
+            await ctx.bot.send_fail(ctx,
+                "You missed an argument. Type __``{}help"
+                " game``__ for some help"
+                .format(self.__bot.settings.get("bot", "prefix")),
+                "Command failed")
 
         elif isinstance(error, commands.MissingPermissions):
-            await ctx.bot.send_fail("I need some more permissions to do that sorry !"
-                , "Command failed")
+            await ctx.bot.send_fail(ctx,
+                "I need some more permissions to do that sorry !"
+                ,"Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
 
         return
+
+    @game.command(name='add')
+    async def _add(self, ctx, *, game_name: str):
+        """ Adds a game role to the user """
+        
+        game_name = game_name.lower().strip()
+
+        role = discord.utils.get(ctx.guild.roles,
+            id=ctx.bot.settings.get("games_roles", game_name, "id", command="game"))
+        text = ctx.bot.get_channel(ctx.bot.settings.get(
+            "games_roles", game_name, "text", command="game")[0])
+
+        if role is None:
+            await ctx.bot.send_fail(ctx, "No corresponding game role found", "Game")
+
+        if role in ctx.message.author.roles:
+            return await ctx.bot.send_fail(ctx,
+                "You already have this game role !"
+                "\nIf you are lost here is your channel {}".format(text.mention),
+                "Game")
+
+        await ctx.message.author.add_roles(role)
+
+        await text.send("{0.mention} just joined the {1}'s world ! Gl & Hf !"
+            .format(ctx.author, game_name))
+
+        return await ctx.bot.send_success(ctx, 
+            "Role added ! Have fun in {} !".format(text.mention),
+            "Game")
+
+    @_add.error
+    async def _add_error(self, ctx, error):
+        """ Catches the game add command errors """
+
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.bot.send_fail(ctx,
+                "You missed an argument. Type __``{}help"
+                " game add``__ for some help"
+                .format(self.__bot.settings.get("bot", "prefix")),
+                "Command failed")
+
+        elif isinstance(error, commands.MissingPermissions):
+            await ctx.bot.send_fail(ctx,
+                "I need some more permissions to do that sorry !"
+                ,"Command failed")
+
+        else:
+            await ctx.bot.on_error(ctx, error)
 
 def setup(bot):
     bot.add_cog(Game_commands(bot))
