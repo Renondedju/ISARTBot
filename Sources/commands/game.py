@@ -69,7 +69,9 @@ class Game_commands():
 
         #Checking if the game already exists
         if game_name in self.__bot.settings.get("games_roles", command="game"):
-            await ctx.send("The game named {} already exists !".format(game_name))
+            await ctx.bot.send_fail(ctx, 
+                "The game named {} already exists !".format(game_name),
+                "Create game")
             return
 
         game_category = self.get_game_category(ctx)
@@ -107,7 +109,9 @@ class Game_commands():
                                 "text"  : [text.id]},
             role.name, "games_roles", command="game")
 
-        await ctx.send("Added the game {} to the list of avaliable games".format(role.mention))
+        await ctx.bot.send_success(ctx,
+            "Added the game {} to the list of avaliable games".format(role.mention),
+            "Create game")
 
         return
 
@@ -119,7 +123,7 @@ class Game_commands():
 
         #Checking if the game exists
         if game_name not in self.__bot.settings.get("games_roles", command="game"):
-            await ctx.send("The game named {} does not exists !".format(game_name))
+            await ctx.bot.send_fail(ctx, "The game named {} does not exists !".format(game_name))
             return
 
         game_category = self.get_game_category(ctx)
@@ -137,15 +141,25 @@ class Game_commands():
         def check(reaction, user):
             return user == ctx.message.author and str(reaction.emoji) == '👍'
 
-        message = await ctx.send("Are you sure you want to delete the game {} ?".format(role.mention)
-                               + "\nReact with 👍 if you want to continue")
+        embed = discord.Embed()
+
+        embed.description = "Are you sure you want to delete the game {} ?".format(role.mention)
+        embed.title       = "Delete game ?"
+        embed.set_footer(text="React with 👍 if you want to continue")
+
+        message = await ctx.send(embed=embed)
+
         await message.add_reaction('👍')
 
         try:
             await ctx.bot.wait_for('reaction_add', timeout=5.0, check=check)
 
         except asyncio.TimeoutError:
-            await ctx.send('Aborted deletion.')
+
+            embed.description += "\n\nAborted deletion."
+            embed.color = discord.Color.red()
+            
+            await message.edit(embed=embed)
             return
 
         reason = "This channel is deleted due to the game role @{} being deleted".format(game_name)
@@ -164,30 +178,36 @@ class Game_commands():
             await role.delete()
 
         except:
-
             raise commands.CommandError(message="Failed to delete a role or channel !")
         
         ctx.bot.settings.delete(role.name, "games_roles", command="game")
 
-        await ctx.send("Successfully deleted the game {} !".format(game_name))
+
+        embed.description += "\n\nSuccessfully deleted the game {} !".format(game_name)
+        embed.color = discord.Color.green()
+        
+        await message.edit(embed=embed)
 
     @_delete.error
     @_create.error
     async def _error(self, ctx, error):
         """
-            Catches errors of the create subcommand
+            Catches errors of the create and delete subcommands
         """
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.send("You need to be an admin to do that !")
+            await ctx.bot.send_fail("You need to be an admin to do that !"
+                , "Command failed")
 
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("You missed an argument. Type __``{}help"
+            await ctx.bot.send_fail("You missed an argument. Type __``{}help"
                             "game create``__ for some help"
-                            .format(self.__bot.settings.get("bot", "prefix")))
+                            .format(self.__bot.settings.get("bot", "prefix")),
+                            "Command failed")
 
         elif isinstance(error, commands.MissingPermissions):
-            await ctx.send("I need some more permissions to do that sorry !")
+            await ctx.bot.send_fail("I need some more permissions to do that sorry !"
+                , "Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
