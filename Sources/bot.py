@@ -40,9 +40,7 @@ class Bot(discord.ext.commands.Bot):
     """ Main bot class """
 
     def __init__(self, *args, **kwargs):
-        """
-            Inits the bot
-        """
+        """ Inits and runs the bot """
 
         super().__init__(command_prefix = "!", *args, **kwargs)
 
@@ -52,30 +50,59 @@ class Bot(discord.ext.commands.Bot):
         self.__logs         = logs.Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
-        #Setup
-        for name, enabled in self.__commands.items():
-            if (name != ""):
-                name = name.strip('_')
-                try:
-                    self.load_extension  ('commands.' + name)
-                    self.__logs.print    ('Loaded the command {0}, enabled = {1}'
-                        .format(name, str(enabled.get('enabled'))))
-                except:
-                    self.__logs.print('Failed to load extension named command.{0}'
-                    .format(name))
+        self.loop.create_task(self.load_cog())
 
         self.add_check(self.globally_block_dms)
-        self.add_check(self.log_command)
         self.add_check(self.check_enable)
+        self.add_check(self.log_command)
 
         self.run(self.__settings.get("bot", "token"))
 
         self.__logs.close()
 
+    async def load_cog(self):
+        """ Loads all the cogs of the bot defined into the settings.json file """
+
+        for name, enabled in self.__commands.items():
+            if (name != ""):
+                name = name.strip('_')
+
+                try:
+                    self.load_extension  ('commands.' + name)
+                    self.__logs.print    ('Loaded the command {0}, enabled = {1}'
+                        .format(name, str(enabled.get('enabled'))))
+
+                except Exception as e:
+                    await self.on_error(None, e)
+                    self.__logs.print('Failed to load extension named command.{0}'.format(name))
+
+        return
+
     @property
     def settings(self):
         return self.__settings
 
+    async def send_success(self, ctx, message, title=""):
+        """ Send a successfull message """
+
+        embed = discord.Embed(
+            title       = title,
+            description = message,
+            colour      = discord.Color.green())
+
+        return await ctx.send(embed=embed)
+
+    async def send_fail(self, ctx, message, title=""):
+        """ Send a failed message """
+
+        embed = discord.Embed(
+            title       = title,
+            description = message,
+            colour      = discord.Color.red())
+
+        return await ctx.send(embed=embed)
+
+    #Events
     async def on_ready(self):
         """
             Executed when the bot is connected
@@ -89,6 +116,8 @@ class Bot(discord.ext.commands.Bot):
         self.__logs.print('------------')
 
     async def on_error(self, ctx, error):
+        """ Sends errors reports if needed """
+
         ignored = (commands.CommandNotFound, commands.UserInputError)
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
@@ -111,18 +140,23 @@ class Bot(discord.ext.commands.Bot):
                 err = err[:-1]
             self.__logs.print(err)
 
-        errors = traceback.format_tb(error.__traceback__)
-        embed  = discord.Embed(description =
-            "Oops an unexpected error occured !" +
-            " Please [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
-            " on github if this error is recurrent\n" +
-            "Make sure to include this report in it :\n```\n" +
-            errors[len(errors) - 1] + 
-            "\n```")
+        try:
+            errors = traceback.format_tb(error.__traceback__)
+            embed  = discord.Embed(description =
+                "Oops an unexpected error occured !" +
+                "\nPlease [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
+                " on github if this error is recurrent\n" +
+                "Make sure to include a screenshot of this message\n```\n" +
+                errors[len(errors) - 1] + 
+                "\n```",
+                title = "Error")
 
-        embed.colour = discord.Colour.red()
+            embed.set_footer(text=self.__logs.get_time)
+            embed.colour = discord.Colour.red()
 
-        await ctx.send(embed = embed)
+            await ctx.send(embed = embed)
+        except:
+            return
 
         return
 
@@ -133,7 +167,7 @@ class Bot(discord.ext.commands.Bot):
         if hasattr(ctx.command, 'on_error'):
             return
         
-        self.on_error(ctx, error)
+        await self.on_error(ctx, error)
 
     ###Checks
     async def globally_block_dms(self, ctx):
@@ -165,9 +199,7 @@ class Bot(discord.ext.commands.Bot):
         return enabled
 
     async def log_command(self, ctx):
-        """
-            Logs every command
-        """
+        """ Logs every command """
         author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
         channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
 
