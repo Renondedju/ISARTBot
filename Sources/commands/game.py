@@ -33,6 +33,8 @@ import logs
 import discord
 import asyncio
 import settings
+from math import ceil
+
 from discord.ext import commands
 
 class Game_commands():
@@ -303,7 +305,7 @@ class Game_commands():
 
     @_remove.error
     async def _remove_error(self, ctx, error):
-        """ Catches the game reomve command errors """
+        """ Catches the game remove command errors """
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.bot.send_fail(ctx,
@@ -320,11 +322,47 @@ class Game_commands():
         else:
             await ctx.bot.on_error(ctx, error)
 
-        #List command
-
+    #List command
     @game.command(name='list')
-    async def _list(self, ctx):
-        await ctx.send("TODO")
+    async def _list(self, ctx, page = 1):
+        """ lists the games avaliable """
+
+        games     = list(ctx.bot.settings.get("games_roles", command="game").keys())
+        max_lines = ctx.bot.settings.get(  "list_max_lines", command="game")
+        max_pages = ceil(len(games) / max_lines)
+
+        page = max(1, page)
+        page = min(page, max_pages)
+
+        lines = []
+        for index in range(max_lines * (page - 1), max_lines * page):
+            try:
+                lines.append(games[index])
+            except IndexError:
+                break
+
+        text  = "```\n{}```".format('\n'.join(lines))
+
+        embed = discord.Embed()
+
+        embed.description = text
+        embed.title       = "Game list"
+        embed.color       = discord.Color.green()
+        embed.set_footer(text = f"Page {page} out of {max_pages}")
+
+        await ctx.send(embed=embed)
+
+    @_list.error
+    async def _list_error(self, ctx, error):
+        """ Catches the game list command errors """
+
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.bot.send_fail(ctx,
+                "I need some more permissions to do that sorry !"
+                ,"Command failed")
+
+        else:
+            await ctx.bot.on_error(ctx, error)
 
 def setup(bot):
     bot.add_cog(Game_commands(bot))
