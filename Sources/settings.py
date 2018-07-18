@@ -57,6 +57,9 @@ class Settings():
         
         real_key = key
         
+        if dictionary is None:
+            return None
+
         if '_' + key in dictionary:
             real_key = '_' + key
 
@@ -71,6 +74,9 @@ class Settings():
             returns true if the write is successful
         """
 
+        if dictionary is None:
+            return False
+
         #Updating a key
         if key in dictionary:
             dictionary[key] = data
@@ -84,6 +90,19 @@ class Settings():
             return True
 
         return False
+
+    def __delkey(self, dictionary: dict, key: str):
+        """
+            Deletes a key from a dict
+        """
+
+        if dictionary is None:
+            return False
+
+        dictionary.pop(      key, None)
+        dictionary.pop('_' + key, None)
+
+        self.save()
 
     def get(self, *args, **kwargs):
         """
@@ -115,6 +134,20 @@ class Settings():
             dictionary = self.__getkey(dictionary, args[i])
 
         return self.__writekey(dictionary, key, data)
+
+    def delete(self, key, *args, **kwargs):
+        """ Deletes a key from the settings """
+
+        dictionary = self.__settings.get("settings")
+        
+        command = kwargs.get('command', '')
+        if (command != None and command != ""):
+            dictionary = self.__getkey(self.__getkey(self.__getkey(dictionary, "bot"), "commands"), command)
+
+        for i in range(len(args)):
+            dictionary = self.__getkey(dictionary, args[i])
+
+        return self.__delkey(dictionary, key)
 
     @property
     def path(self):

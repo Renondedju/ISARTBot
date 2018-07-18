@@ -54,6 +54,10 @@ class Logs():
             self.__logs_file = None
             self.print("Warning : no logs file found !")
 
+    @property
+    def get_time(self):
+        return datetime.now().strftime('%Y/%m/%d at %H:%M:%S')
+
     def print(self, *args):
         """
         Logs every args into the console and
@@ -70,7 +74,7 @@ class Logs():
 
         output = " "
         output = output.join(args)
-        date   = datetime.now().strftime('%Y/%m/%d at %H:%M:%S')
+        date   = self.get_time
         output = date + " - " + output
 
         print(output)
