@@ -47,11 +47,18 @@ class Class_commands():
     def get_class(self, ctx, class_name : str):
         """ Checks if a class exists or not """
 
-        for category in ctx.guild.categories:
-            if category.name == class_name:
-                return category
+        category = None
+        role     = None
 
-        return None
+        for cat in ctx.guild.categories:
+            if cat.name == class_name:
+                category = cat
+
+        for r in ctx.guild.roles:
+            if r.name == class_name:
+                role = r
+
+        return category, role
 
     @commands.group(pass_context=True, invoke_without_command=True, name='class')
     async def _class(self, ctx):
@@ -67,7 +74,9 @@ class Class_commands():
 
         name = name.upper().strip()
 
-        if self.get_class(ctx, name):
+        cat, role = self.get_class(ctx, name)
+
+        if cat is not None or role is not None:
             await ctx.bot.send_fail(ctx, "This class already exists !", "Error")
             return
 
@@ -105,16 +114,11 @@ class Class_commands():
 
         name = name.upper().strip()
 
-        category = self.get_class(ctx, name)
+        category, role = self.get_class(ctx, name)
 
         if category is None:
             await ctx.bot.send_fail(ctx, "This class does not exists !", "Delete class ?")
             return
-
-        role = None
-        for r in ctx.guild.roles:
-            if r.name == name:
-                role = r
 
         if role is None:
             await ctx.bot.send_fail(ctx, f"There is no role named {name}.", "Delete class ?")
@@ -187,6 +191,27 @@ class Class_commands():
             await ctx.bot.on_error(ctx, error)
 
         return
+
+    @_class.command(name='rename', hidden=True)
+    @commands.check(is_admin)
+    async def _rename(self, ctx, original_name, new_name):
+        """ Renames a class """
+
+        original_name = original_name.upper().strip()
+        new_name      = new_name     .upper().strip()
+
+        old_category, old_role = self.get_class(ctx, original_name)
+        new_category, new_role = self.get_class(ctx, new_name)
+
+        if (new_category is not None) or (new_role is not None) or (old_category is None) or (old_role is None):
+            raise commands.CommandError(message="One of the roles is missing or already exists")
     
+        await old_role    .edit(name=new_name)
+        await old_category.edit(name=new_name)
+
+        await ctx.bot.send_success(ctx,
+            f"The class @{original_name} has successfully renamed to {old_role.mention}",
+            "Rename class")
+
 def setup(bot):
     bot.add_cog(Class_commands(bot))
