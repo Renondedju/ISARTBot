@@ -1,40 +1,35 @@
 # -*- coding: utf-8 -*-
 
-"""
-MIT License
+# MIT License
 
-Copyright (c) 2018 Renondedju
+# Copyright (c) 2018 Renondedju
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-#Importing discord libraries (local)
-import sys
-sys.path.insert(0, "./Lib/discord.py")
-
-import logs
 import discord
 import asyncio
-import settings
 import traceback
-import bot_decorators
-from discord.ext import commands
+
+from .logs           import Logs
+from .settings       import Settings
+from .bot_decorators import is_dev
+from  discord.ext    import commands
 
 class Bot(discord.ext.commands.Bot):
     """ Main bot class """
@@ -45,9 +40,9 @@ class Bot(discord.ext.commands.Bot):
         super().__init__(command_prefix = "!", *args, **kwargs)
 
         #Private
-        self.__settings     = settings.Settings()
+        self.__settings     = Settings()
         self.__commands     = self.__settings.get("bot", "commands")
-        self.__logs         = logs.Logs(enabled = self.__settings.get("logs"))
+        self.__logs         = Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
         self.loop.create_task(self.load_cog())
@@ -68,13 +63,13 @@ class Bot(discord.ext.commands.Bot):
                 name = name.strip('_')
 
                 try:
-                    self.load_extension  ('commands.' + name)
+                    self.load_extension  ('isartbot.commands.' + name)
                     self.__logs.print    ('Loaded the command {0}, enabled = {1}'
                         .format(name, str(enabled.get('enabled'))))
 
                 except Exception as e:
                     await self.on_error(None, e)
-                    self.__logs.print('Failed to load extension named command.{0}'.format(name))
+                    self.__logs.print('Failed to load extension named commands.{0}'.format(name))
 
         return
 
@@ -134,7 +129,11 @@ class Bot(discord.ext.commands.Bot):
                 return
         
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.__logs.print('Ignoring exception in command {}:'.format(ctx.command))
+        if ctx is not None:
+            self.__logs.print('Ignoring exception in command {}:'.format(ctx.command))
+        else:
+            self.__logs.print('Ctx is empty, this might be comming from the module loading function:')
+
         for err in traceback.format_exception(type(error), error, error.__traceback__):
             if (err[len(err) - 1] == '\n'):
                 err = err[:-1]
@@ -143,7 +142,7 @@ class Bot(discord.ext.commands.Bot):
         try:
             errors = traceback.format_tb(error.__traceback__)
             embed  = discord.Embed(description =
-                "Oops an unexpected error occured !" +
+                "Oops an unexpected error occurred !" +
                 "\nPlease [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
                 " on github if this error is recurrent\n" +
                 "Make sure to include a screenshot of this message\n```\n" +
@@ -161,7 +160,7 @@ class Bot(discord.ext.commands.Bot):
         return
 
     async def on_command_error(self, ctx, error):
-        """ Handles unhandeled errors """
+        """ Handles unhandled errors """
 
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, 'on_error'):
@@ -188,7 +187,7 @@ class Bot(discord.ext.commands.Bot):
             Checks if the command is enabled or not
         """
 
-        if bot_decorators.is_dev(ctx):
+        if is_dev(ctx):
             return True
         
         enabled = ctx.bot.settings.get("enabled", command=ctx.command.name)
