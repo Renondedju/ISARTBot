@@ -1,38 +1,33 @@
 # -*- coding: utf-8 -*-
 
-"""
-MIT License
+# MIT License
 
-Copyright (c) 2018 Renondedju
+# Copyright (c) 2018 Renondedju
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-import sys
-sys.path.append("./Lib/discord.py")
-sys.path.append("../")
-
-from bot_decorators import is_dev, is_admin
-import json
-import discord
 import asyncio
-from discord.ext import commands
+import discord
+
+from isartbot.bot_decorators import is_dev, is_admin
+from discord.ext             import commands
+from json                    import dumps
 
 class Test_commands():
 
@@ -44,9 +39,7 @@ class Test_commands():
     @commands.group(pass_context=True, invoke_without_command=True)
     @commands.check(is_dev)
     async def test(self, ctx):
-        """
-            Creates a command group
-        """
+        """ Creates a command group """
 
         if ctx.invoked_subcommand is None:
             await ctx.send("{0.subcommand_passed} doesn't exists".format(ctx))
@@ -91,7 +84,7 @@ class Test_commands():
     @settings.command(name='read')
     async def __settings_read(self, ctx):
 
-        string = json.dumps(self.__bot.settings.get(), indent=4)
+        string = dumps(self.__bot.settings.get(), indent=4)
 
         await ctx.send("```json\n{}\n```".format(string))
 
@@ -101,7 +94,7 @@ class Test_commands():
     async def __settings_write(self, ctx, data, key, *args):
 
         if self.__bot.settings.write(data, key, *args):
-            await ctx.send("Settings have been modified successfuly !")
+            await ctx.send("Settings have been modified successfully !")
         else:
             await ctx.send("Sorry but the setting you tried to write has been denied.")
 
