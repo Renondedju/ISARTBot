@@ -36,7 +36,41 @@ class Game_commands():
     def __init__(self, bot):
 
         #Private
-        self.__bot = bot
+        self.bot = bot
+        self.some_task = self.bot.loop.create_task(self.check_for_games())
+
+    def __unload(self):
+        self.some_task.cancel()
+
+    async def check_for_games(self):
+        """ Scan games and auto assign """
+
+        guild_id = self.bot.settings.get('bot', 'server_id')
+        delay    = self.bot.settings.get('auto_assign_refresh_delay', command = "game")
+
+        while (delay != -1):
+            await asyncio.sleep(delay)
+
+            enabled = self.bot.settings.get('enabled', command = "game")
+            guild   = self.bot.get_guild(guild_id)
+
+            if not enabled:
+                pass
+            
+            for member in guild.members:
+
+                if isinstance(member.activity, (discord.Game, discord.Activity)):
+                    game = member.activity.name.lower()
+                    role = discord.utils.get(guild.roles,
+                        id = self.bot.settings.get("games_roles", game, "id", command="game"))
+
+                    try:
+                        if role not in member.roles:
+                            await member.add_roles(role)
+                            self.bot.logs.print(
+                                f'Added the game {role.name} to {member.name}#{member.discriminator}')
+                    except:
+                        pass
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def game(self, ctx):
@@ -44,7 +78,7 @@ class Game_commands():
             await ctx.bot.send_fail(ctx,
                 "Game subcommand not recognized.\nIf you need some help please"
                 " type ``{}help game``"
-                .format(self.__bot.settings.get("bot", "prefix")),
+                .format(self.bot.settings.get("bot", "prefix")),
                 "Game")
 
     def get_game_category(self, ctx):
@@ -65,7 +99,7 @@ class Game_commands():
         game_name = game_name.lower().strip()
 
         #Checking if the game already exists
-        if game_name in self.__bot.settings.get("games_roles", command="game"):
+        if game_name in self.bot.settings.get("games_roles", command="game"):
             await ctx.bot.send_fail(ctx, 
                 "The game named {} already exists !".format(game_name),
                 "Create game")
@@ -120,7 +154,7 @@ class Game_commands():
         game_name = game_name.lower().strip()
 
         #Checking if the game exists
-        if game_name not in self.__bot.settings.get("games_roles", command="game"):
+        if game_name not in self.bot.settings.get("games_roles", command="game"):
             await ctx.bot.send_fail(ctx, "The game named {} does not exists !".format(game_name))
             return
 
@@ -202,7 +236,7 @@ class Game_commands():
             await ctx.bot.send_fail(ctx,
                 "You missed an argument. Type __``{}help"
                 " game``__ for some help"
-                .format(self.__bot.settings.get("bot", "prefix")),
+                .format(self.bot.settings.get("bot", "prefix")),
                 "Command failed")
 
         elif isinstance(error, commands.MissingPermissions):
@@ -229,7 +263,7 @@ class Game_commands():
             return await ctx.bot.send_fail(ctx,
                 "No corresponding game role found"
                 "\nUse ``{}game list`` to have the list of all the games avaliable for now"
-                .format(self.__bot.settings.get("bot", "prefix"))
+                .format(self.bot.settings.get("bot", "prefix"))
                 ,"Game")
 
         text = ctx.bot.get_channel(ctx.bot.settings.get(
@@ -258,7 +292,7 @@ class Game_commands():
             await ctx.bot.send_fail(ctx,
                 "You missed an argument. Type __``{}help"
                 " game add``__ for some help"
-                .format(self.__bot.settings.get("bot", "prefix")),
+                .format(self.bot.settings.get("bot", "prefix")),
                 "Command failed")
 
         elif isinstance(error, commands.MissingPermissions):
@@ -283,7 +317,7 @@ class Game_commands():
             return await ctx.bot.send_fail(ctx,
                 "No corresponding game role found"
                 "\nUse ``{}game list`` to have the list of all the games avaliable for now"
-                .format(self.__bot.settings.get("bot", "prefix"))
+                .format(self.bot.settings.get("bot", "prefix"))
                 ,"Game")
 
         if role in ctx.message.author.roles:
@@ -305,7 +339,7 @@ class Game_commands():
             await ctx.bot.send_fail(ctx,
                 "You missed an argument. Type __``{}help"
                 " game add``__ for some help"
-                .format(self.__bot.settings.get("bot", "prefix")),
+                .format(self.bot.settings.get("bot", "prefix")),
                 "Command failed")
 
         elif isinstance(error, commands.MissingPermissions):
