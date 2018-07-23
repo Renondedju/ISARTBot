@@ -39,13 +39,13 @@ class Settings():
         self.__settings = {"settings": {}}
         self.__path     = path
 
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
             self.__settings["settings"] = load(f)
 
     def save(self):
 
         if isfile(self.__path):
-            with open(self.__path, 'w') as f:
+            with open(self.__path, 'w', encoding='utf-8') as f:
                 dump(self.__settings["settings"], f, indent=4, sort_keys=True)
 
     def __getkey(self, dictionary: dict, key: str):
