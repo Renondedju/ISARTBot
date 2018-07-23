@@ -42,7 +42,7 @@ class Bot(discord.ext.commands.Bot):
         #Private
         self.__settings     = Settings()
         self.__commands     = self.__settings.get("bot", "commands")
-        self.__logs         = Logs(enabled = self.__settings.get("logs"))
+        self.logs           = Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
         self.loop.create_task(self.load_cog())
@@ -53,7 +53,7 @@ class Bot(discord.ext.commands.Bot):
 
         self.run(self.__settings.get("bot", "token"))
 
-        self.__logs.close()
+        self.logs.close()
 
     async def load_cog(self):
         """ Loads all the cogs of the bot defined into the settings.json file """
@@ -63,13 +63,13 @@ class Bot(discord.ext.commands.Bot):
                 name = name.strip('_')
 
                 try:
-                    self.load_extension  ('isartbot.commands.' + name)
-                    self.__logs.print    ('Loaded the command {0}, enabled = {1}'
+                    self.load_extension('isartbot.commands.' + name)
+                    self.logs.print    ('Loaded the command {0}, enabled = {1}'
                         .format(name, str(enabled.get('enabled'))))
 
                 except Exception as e:
                     await self.on_error(None, e)
-                    self.__logs.print('Failed to load extension named commands.{0}'.format(name))
+                    self.logs.print('Failed to load extension named commands.{0}'.format(name))
 
         return
 
@@ -104,11 +104,11 @@ class Bot(discord.ext.commands.Bot):
             to discord and ready to operate
         """
 
-        self.__logs.print('------------')
-        self.__logs.print('Logged in as')
-        self.__logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
-        self.__logs.print('User ID  : {0}'    .format(self.user.id))
-        self.__logs.print('------------')
+        self.logs.print('------------')
+        self.logs.print('Logged in as')
+        self.logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
+        self.logs.print('User ID  : {0}'    .format(self.user.id))
+        self.logs.print('------------')
 
     async def on_error(self, ctx, error):
         """ Sends errors reports if needed """
@@ -130,14 +130,14 @@ class Bot(discord.ext.commands.Bot):
         
         # All other Errors not returned come here... And we can just print the default TraceBack.
         if ctx is not None:
-            self.__logs.print('Ignoring exception in command {}:'.format(ctx.command))
+            self.logs.print('Ignoring exception in command {}:'.format(ctx.command))
         else:
-            self.__logs.print('Ctx is empty, this might be comming from the module loading function:')
+            self.logs.print('Ctx is empty, this might be comming from the module loading function:')
 
         for err in traceback.format_exception(type(error), error, error.__traceback__):
             if (err[len(err) - 1] == '\n'):
                 err = err[:-1]
-            self.__logs.print(err)
+            self.logs.print(err)
 
         try:
             errors = traceback.format_tb(error.__traceback__)
@@ -150,7 +150,7 @@ class Bot(discord.ext.commands.Bot):
                 "\n```",
                 title = "Error")
 
-            embed.set_footer(text=self.__logs.get_time)
+            embed.set_footer(text=self.logs.get_time)
             embed.colour = discord.Colour.red()
 
             await ctx.send(embed = embed)
@@ -202,6 +202,6 @@ class Bot(discord.ext.commands.Bot):
         author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
         channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
 
-        self.__logs.print('{0}\t{1} : {2}'.format(author, channel, ctx.message.content))
+        self.logs.print('{0}\t{1} : {2}'.format(author, channel, ctx.message.content))
 
         return True

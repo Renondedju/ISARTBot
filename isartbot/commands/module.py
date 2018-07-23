@@ -64,10 +64,14 @@ class Module_commands():
         try:
             self.__bot.load_extension(module)
         except Exception as e:
-            await ctx.send("Failed to load extension"
-                "\n{}: {}".format(type(e).__name__, e))
+            await ctx.bot.send_fail(ctx,
+                "Failed to load extension"
+                "\n{}: {}".format(type(e).__name__, e),
+                "Extension")
         else:
-            await ctx.send("Successfully loaded extension named {}".format(module))
+            await ctx.bot.send_success(ctx,
+                "Successfully loaded extension named {}".format(module),
+                "Extension")
 
     @module.command(name="unload")
     async def _unload(self, ctx, *, module : str):
@@ -78,10 +82,12 @@ class Module_commands():
         try:
             self.__bot.unload_extension(module)
         except Exception as e:
-            await ctx.send("Failed to unload extension"
-                "\n{}: {}".format(type(e).__name__, e))
+            await ctx.bot.send_fail(ctx, "Failed to unload extension"
+                "\n{}: {}".format(type(e).__name__, e), "Extension")
         else:
-            await ctx.send("Successfully unloaded extension named {}".format(module))
+            await ctx.bot.send_success(ctx,
+            "Successfully unloaded extension named {}".format(module),
+            "Extension")
 
     @module.command(name='reload')
     async def _reload(self, ctx, *, module : str):
@@ -93,10 +99,52 @@ class Module_commands():
             self.__bot.unload_extension(module)
             self.__bot.load_extension(module)
         except Exception as e:
-            await ctx.send("Failed to reload extension"
-                "\n{}: {}".format(type(e).__name__, e))
+            await ctx.bot.send_fail(ctx,
+                "Failed to reload extension"
+                "\n{}: {}".format(type(e).__name__, e),
+                "Extension")
         else:
-            await ctx.send("Successfully reloaded extension named {}".format(module))
+            await ctx.bot.send_success(ctx,
+            "Successfully reloaded extension named {}".format(module),
+            "Extension")
+
+    @module.command(name='enable')
+    async def _enable(self, ctx, module : str):
+
+        if ctx.bot.settings.get(command = module) is None:
+            await ctx.bot.send_fail(ctx,
+                f"Module named isartbot.commands.{module} does not exists",
+                "Module")
+            return
+
+        ctx.bot.settings.write(True, 'enabled', command = module)
+        await ctx.bot.send_success(ctx,
+            f"Module named isartbot.commands.{module} has successfully been enabled",
+            "Module")
+
+    @module.command(name='disable')
+    async def _disable(self, ctx, module : str):
+        
+        if ctx.bot.settings.get(command = module) is None:
+            await ctx.bot.send_fail(ctx,
+                f"Module named isartbot.commands.{module} does not exists",
+                "Module")
+            return
+
+        ctx.bot.settings.write(False, 'enabled', command = module)
+        await ctx.bot.send_success(ctx,
+            f"Module named isartbot.commands.{module} has successfully been disabled",
+            "Module")
+
+    @_enable.error
+    @_disable.error
+    async def _error(self, ctx, error):
+
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.bot.send_fail(ctx, str(error), "Module")
+            return
+
+        await ctx.bot.on_error(ctx, error)  
 
 def setup(bot):
     bot.add_cog(Module_commands(bot))
