@@ -43,22 +43,11 @@ class Class_commands():
     def get_class(self, ctx, class_name : str):
         """ Checks if a class exists or not """
 
-        role          = None
-        category      = None
-        delegate_role = None
-
-        for cat in ctx.guild.categories:
-            if cat.name == class_name:
-                category = cat
-
-        for r in ctx.guild.roles:
-            if r.name == class_name:
-                role = r
-
         prefix = self.__bot.settings.get("delegate_role_prefix", command="class_role")
-        for r in ctx.guild.roles:
-            if r.name == f'{prefix} {class_name}':
-                delegate_role = r
+
+        role          = discord.utils.get(ctx.guild.roles     , name=class_name)
+        delegate_role = discord.utils.get(ctx.guild.roles     , name=f'{prefix} {class_name}')
+        category      = discord.utils.get(ctx.guild.categories, name=class_name)
 
         return category, role, delegate_role
 
@@ -143,12 +132,16 @@ class Class_commands():
             return
 
         if role is None:
-            await ctx.bot.send_fail(ctx, f"There is no role named {name}.", "Delete class ?")
+            await ctx.bot.send_fail(ctx,
+                f"There is no role named @{name}.",
+                "Delete class ?")
             return
 
         prefix = ctx.bot.settings.get("delegate_role_prefix", command = "class_role")
         if delegate_role is None:
-            await ctx.bot.send_fail(ctx, f"There is no role named '{prefix} {name}'.", "Delete class ?")
+            await ctx.bot.send_fail(ctx,
+                f"There is no role named @{prefix} {name}",
+                "Delete class ?")
             return
 
         def check(reaction, user):
