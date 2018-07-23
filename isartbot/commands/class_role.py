@@ -43,18 +43,13 @@ class Class_commands():
     def get_class(self, ctx, class_name : str):
         """ Checks if a class exists or not """
 
-        category = None
-        role     = None
+        prefix = self.__bot.settings.get("delegate_role_prefix", command="class_role")
 
-        for cat in ctx.guild.categories:
-            if cat.name == class_name:
-                category = cat
+        role          = discord.utils.get(ctx.guild.roles     , name=class_name)
+        delegate_role = discord.utils.get(ctx.guild.roles     , name=f'{prefix} {class_name}')
+        category      = discord.utils.get(ctx.guild.categories, name=class_name)
 
-        for r in ctx.guild.roles:
-            if r.name == class_name:
-                role = r
-
-        return category, role
+        return category, role, delegate_role
 
     @commands.group(pass_context=True, invoke_without_command=True, name='class')
     async def _class(self, ctx):
@@ -70,34 +65,54 @@ class Class_commands():
 
         name = name.upper().strip()
 
-        cat, role = self.get_class(ctx, name)
+        cat, role, delegate = self.get_class(ctx, name)
 
-        if cat is not None or role is not None:
+        if cat is not None or role is not None or delegate is not None:
             await ctx.bot.send_fail(ctx, "This class already exists !", "Error")
             return
 
-        color = ctx.bot.settings.get("role_color", command="class")
+        color  = ctx.bot.settings.get("role_color"          , command="class_role")
+        color2 = ctx.bot.settings.get("delegate_role_color" , command="class_role")
+        prefix = ctx.bot.settings.get("delegate_role_prefix", command="class_role")
+
         role = await ctx.guild.create_role(
             name        = name,
             colour      = discord.Colour(int(color, 16)),
             mentionable = True)
 
+        delegate = await ctx.guild.create_role(
+            name        = f'{prefix} {name}',
+            colour      = discord.Colour(int(color2, 16)),
+            mentionable = True)
+
         overwrites = {role                   : discord.PermissionOverwrite(read_messages=True),
                       ctx.guild.default_role : discord.PermissionOverwrite(read_messages=False)}
 
+        announce = {role                   : discord.PermissionOverwrite(read_messages=True),
+                    role                   : discord.PermissionOverwrite(send_messages=False),
+                    delegate               : discord.PermissionOverwrite(send_messages=True),
+                    ctx.guild.default_role : discord.PermissionOverwrite(read_messages=False)}
+
         category = await ctx.guild.create_category_channel(name, overwrites=overwrites)
 
-        for vocal_name in ctx.bot.settings.get("default_vocals", command="class"):
+        for vocal_name in ctx.bot.settings.get("default_vocals", command="class_role"):
             await ctx.guild.create_voice_channel(
                 name       = vocal_name,
                 category   = category,
                 overwrites = overwrites)
 
-        for text_name in ctx.bot.settings.get("default_texts", command="class"):
-            await ctx.guild.create_text_channel(
-                name       = text_name,
-                category   = category,
-                overwrites = overwrites)
+        announce_text = ctx.bot.settings.get("announce_channel_name", command="class_role")
+        for text_name in ctx.bot.settings.get("default_texts", command="class_role"):
+            if text_name == announce_text:
+                await ctx.guild.create_text_channel(
+                    name       = text_name,
+                    category   = category,
+                    overwrites = announce)
+            else:
+                await ctx.guild.create_text_channel(
+                    name       = text_name,
+                    category   = category,
+                    overwrites = overwrites)
 
         await ctx.bot.send_success(ctx,
             f"Successfully added {role.mention} the the available classes",
@@ -110,14 +125,23 @@ class Class_commands():
 
         name = name.upper().strip()
 
-        category, role = self.get_class(ctx, name)
+        category, role, delegate_role = self.get_class(ctx, name)
 
         if category is None:
             await ctx.bot.send_fail(ctx, "This class does not exists !", "Delete class ?")
             return
 
         if role is None:
-            await ctx.bot.send_fail(ctx, f"There is no role named {name}.", "Delete class ?")
+            await ctx.bot.send_fail(ctx,
+                f"There is no role named @{name}.",
+                "Delete class ?")
+            return
+
+        prefix = ctx.bot.settings.get("delegate_role_prefix", command = "class_role")
+        if delegate_role is None:
+            await ctx.bot.send_fail(ctx,
+                f"There is no role named @{prefix} {name}",
+                "Delete class ?")
             return
 
         def check(reaction, user):
@@ -148,6 +172,7 @@ class Class_commands():
 
             await role.delete()
             await category.delete()
+            await delegate_role.delete()
 
         except:
             embed.description += f"\n\nFailed to delete a role or channel !"
@@ -196,14 +221,23 @@ class Class_commands():
         original_name = original_name.upper().strip()
         new_name      = new_name     .upper().strip()
 
-        old_category, old_role = self.get_class(ctx, original_name)
-        new_category, new_role = self.get_class(ctx, new_name)
+        old_category, old_role, old_delegate = self.get_class(ctx, original_name)
+        new_category, new_role, new_delegate = self.get_class(ctx, new_name)
 
-        if (new_category is not None) or (new_role is not None) or (old_category is None) or (old_role is None):
-            raise commands.CommandError(message="One of the roles is missing or already exists")
+        if (new_category is not None) or \
+           (new_role     is not None) or \
+           (new_delegate is not None) or \
+           (old_category is     None) or \
+           (old_role     is     None) or \
+           (old_delegate is     None):
+            await ctx.bot.send_fail(ctx, "One of the roles is missing or already exists",
+                "Command failed")
     
+        prefix = ctx.bot.settings.get("delegate_role_prefix", command = "class_role")
+
         await old_role    .edit(name=new_name)
         await old_category.edit(name=new_name)
+        await old_delegate.edit(name=f'{prefix} {new_name}')
 
         await ctx.bot.send_success(ctx,
             f"The class @{original_name} has successfully renamed to {old_role.mention}",
