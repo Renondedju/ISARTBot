@@ -22,7 +22,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from  .class_role import *
-from  .module     import *
-from  .game       import *
-from  .test       import *
+# Init file nothing in here for now, just used to create a python submodule
