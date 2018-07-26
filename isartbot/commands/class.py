@@ -25,17 +25,10 @@
 import discord
 import asyncio
 
-from isartbot.logs           import Logs
-from isartbot.settings       import Settings
-from isartbot.bot_decorators import is_admin, is_dev
-
-from math import ceil
-
-from discord.ext import commands
-
-#Converters
-def role_name(name : str) -> str:
-    return name.upper().strip()
+from math                    import ceil
+from discord.ext             import commands
+from isartbot.converters     import upper_clean
+from isartbot.bot_decorators import is_admin
 
 class Class_commands():
 
@@ -66,7 +59,7 @@ class Class_commands():
 
     @_class.command(name='create', hidden=True)
     @commands.check(is_admin)
-    async def _create(self, ctx, name : role_name):
+    async def _create(self, ctx, name : upper_clean):
         """ Creates a class """
 
         cat, role, delegate = self.get_class(ctx, name)
@@ -127,7 +120,7 @@ class Class_commands():
 
     @_class.command(name='delete', hidden=True)
     @commands.check(is_admin)
-    async def _delete(self, ctx, name : role_name):
+    async def _delete(self, ctx, name : upper_clean):
         """ Deletes a class """
 
         category, role, delegate_role = self.get_class(ctx, name)
@@ -233,7 +226,7 @@ class Class_commands():
 
     @_class.command(name='rename', hidden=True)
     @commands.check(is_admin)
-    async def _rename(self, ctx, original_name : role_name, new_name : role_name):
+    async def _rename(self, ctx, original_name : upper_clean, new_name : upper_clean):
         """ Renames a class """
 
         old_category, old_role, old_delegate = self.get_class(ctx, original_name)
@@ -262,29 +255,6 @@ class Class_commands():
         await ctx.bot.send_success(ctx,
             f"The class @{original_name} has successfully renamed to {old_role.mention}",
             "Rename class")
-
-    @commands.command(pass_context=True)
-    async def iam(self, ctx, class_name : role_name):
-        """ Assign a class role to a user"""
-
-        role_names = self.bot.settings.get('roles', command = 'class')
-
-        #Checking if the requested role exists 
-        if class_name not in role_names:
-            await self.bot.send_fail(ctx,
-                "This class doesn't exists !", "I am")
-            return
-
-        #Checking if the user has already a class role
-        author_role_names = (role.name for role in ctx.author.roles)
-        if class_name in author_role_names:
-            await self.bot.send_fail(ctx,
-                "You already have a class role", "I am")
-            return
-
-        await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=class_name))
-
-        await self.bot.send_success(ctx, "Role added !", "I am")
 
 def setup(bot):
     bot.add_cog(Class_commands(bot))
