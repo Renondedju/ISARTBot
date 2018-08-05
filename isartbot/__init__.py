@@ -25,4 +25,5 @@
 from .bot            import *
 from .logs           import *
 from .settings       import *
+from .converters     import *
 from .bot_decorators import *
