@@ -22,4 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Init file nothing in here for now, just used to create a python submodule
+def upper_clean(name : str) -> str:
+    """ Example : ' pGp ' -> 'PGP' """
+    return name.upper().strip()
