@@ -50,8 +50,10 @@ class Class_commands():
 
         return category, role, delegate_role
 
-    @commands.group(pass_context=True, invoke_without_command=True, name='class')
+    @commands.group(pass_context=True, invoke_without_command=True,
+                    name='class', hidden=True)
     async def _class(self, ctx):
+        """ Class modification command """
         if ctx.invoked_subcommand is None:
             await ctx.bot.send_fail(ctx,
                 "Class subcommand not recognized.\nIf you need some help please"
