@@ -25,7 +25,7 @@
 import asyncio
 import discord
 
-from isartbot.bot_decorators import is_dev, is_admin
+from isartbot.bot_decorators import is_dev, is_admin, dont_run
 from discord.ext             import commands
 from json                    import dumps
 
@@ -36,7 +36,7 @@ class Test_commands():
         #Private
         self.__bot = bot
 
-    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
     @commands.check(is_dev)
     async def test(self, ctx):
         """ Creates a command group """
@@ -57,8 +57,9 @@ class Test_commands():
 
         if isinstance(error, commands.CheckFailure):
             await ctx.send("You need to be a dev to use this command")
-        else:
-            await ctx.bot.on_error(ctx, error)
+            return
+        
+        await ctx.bot.on_error(ctx, error)
 
     @test.command(name='admin')
     @commands.check(is_admin)
@@ -70,6 +71,22 @@ class Test_commands():
     async def _admin_error(self, ctx):
         await ctx.send("You are not an admin !")
         return
+
+    @test.command(name='dontrun', pass_context=True)
+    @commands.check(dont_run)
+    async def dontrun(self, ctx):
+
+        await ctx.send('Mhhh, i guess there is a problem')
+        return
+
+    @dontrun.error
+    async def dontrun_error(self, ctx, error):
+
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send("You cannot run this command :)")
+            return
+
+        await ctx.bot.on_error(ctx, error)
 
     ###             Settings group
     @test.group(pass_context=True, invoke_without_command=True)

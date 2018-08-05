@@ -25,6 +25,13 @@
 import asyncio
 import discord
 
+def dont_run(ctx):
+    """
+        Just prevents the command from being runned
+    """
+
+    return False
+
 def is_dev(ctx):
     """ 
         Checks if the author is one of the
