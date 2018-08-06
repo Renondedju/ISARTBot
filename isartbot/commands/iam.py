@@ -25,7 +25,9 @@
 import re
 import discord
 import asyncio
+import itertools
 
+from typing                  import Union
 from discord.ext             import commands
 from isartbot.converters     import upper_clean
 from isartbot.bot_decorators import is_admin
@@ -102,6 +104,65 @@ class Iam_commands():
 
     @_as.error
     async def _as_error(self, ctx, error):
+
+        if isinstance(error, commands.CheckFailure):
+            try:
+                await ctx.bot.send_fail(ctx, "You need to be an admin to use this command")
+            except:
+                pass
+
+        await ctx.bot.on_error(ctx, error)
+
+    @commands.command(pass_context=True, hidden=True, name='for',
+        usage="!for <Users and/or Roles> <'add' or 'remove'> <Roles>")
+    @commands.check(is_admin)
+    async def _for(self, ctx, *args : Union[discord.Member, discord.Role, str]):
+        """ Removes or adds roles to members of the guild """
+        selectors, action, roles = [list(items) for _, items in itertools.groupby(args, key=lambda x: isinstance(x, str))]
+
+        if len(action) != 1:
+            await self.bot.send_fail(ctx, "Action should be 'add' or 'remove' !", 'Error')
+            return
+
+        action = action[0].lower()
+
+        if action not in ['add', 'remove']:
+            await self.bot.send_fail(ctx, "Action should be 'add' or 'remove' !", 'Error')
+            return
+
+        selected_members = set()
+
+        for selection in selectors:
+            if isinstance(selection, discord.Member):
+                selected_members.add(selection)
+                continue
+            
+            for member in selection.members:
+                selected_members.add(member)
+
+        async def add():
+            for member in selected_members:
+                for role in roles:
+                    await member.add_roles(role)
+        
+        async def remove():
+            for member in selected_members:
+                for role in roles:
+                    await member.remove_roles(role)
+
+        strategies = {'add' : add, 'remove' : remove}
+
+        await strategies[action]()
+
+        await self.bot.send_success(ctx,
+            'Used the \'{}\' strategy with the roles {} on {}'.format(
+                action,
+                ' '.join([role.mention for role in roles]),
+                ' '.join([selector.mention for selector in selectors])),
+            'For command')
+
+    @_for.error
+    async def _for_error(self, ctx, error):
 
         if isinstance(error, commands.CheckFailure):
             try:
