@@ -45,11 +45,14 @@ class Bot(discord.ext.commands.Bot):
         self.logs           = Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
-        self.loop.create_task(self.load_cog())
+        self.logs.print('Initializing bot ...')
 
+        self.add_check(self.trigger_typing)
         self.add_check(self.globally_block_dms)
         self.add_check(self.check_enable)
         self.add_check(self.log_command)
+
+        self.loop.create_task(self.load_cog())
 
         self.run(self.__settings.get("bot", "token"))
 
@@ -57,6 +60,11 @@ class Bot(discord.ext.commands.Bot):
 
     async def load_cog(self):
         """ Loads all the cogs of the bot defined into the settings.json file """
+
+        try:
+            await self.wait_for('ready', timeout=30)
+        except asyncio.futures.TimeoutError:
+            self.logs.print("Wait for on_ready event timed out, loading the cogs anyway.")
 
         for name, enabled in self.__commands.items():
             if (name != ""):
@@ -169,6 +177,13 @@ class Bot(discord.ext.commands.Bot):
         await self.on_error(ctx, error)
 
     ###Checks
+    async def trigger_typing(self, ctx):
+        """ Triggers typing """
+
+        await ctx.trigger_typing()
+
+        return True
+
     async def globally_block_dms(self, ctx):
         """
             Checks if the messages provides from
