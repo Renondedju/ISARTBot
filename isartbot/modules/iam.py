@@ -52,7 +52,6 @@ class Iam_commands():
                 "This class doesn't exists !", "I am")
             return
 
-
         #Checking if the user has already a class role
         author_role_names = [role.name for role in ctx.author.roles]
 
