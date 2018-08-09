@@ -71,13 +71,13 @@ class Bot(discord.ext.commands.Bot):
                 name = name.strip('_')
 
                 try:
-                    self.load_extension('isartbot.commands.' + name)
-                    self.logs.print    ('Loaded the command {0}, enabled = {1}'
-                        .format(name, str(enabled.get('enabled'))))
+                    text = str(enabled.get('enabled'))
+                    self.load_extension('isartbot.modules.' + name)
+                    self.logs.print    ('Loaded the module {} : enabled = {}'.format(name, text))
 
                 except Exception as e:
                     await self.on_error(None, e)
-                    self.logs.print('Failed to load extension named commands.{0}'.format(name))
+                    self.logs.print('Failed to load extension named modules.{0}'.format(name))
 
         return
 
@@ -121,7 +121,9 @@ class Bot(discord.ext.commands.Bot):
     async def on_error(self, ctx, error):
         """ Sends errors reports if needed """
 
-        ignored = (commands.CommandNotFound, commands.UserInputError)
+        ignored = (commands.CommandNotFound,
+                   commands.UserInputError,
+                   commands.CheckFailure)
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
@@ -207,8 +209,10 @@ class Bot(discord.ext.commands.Bot):
         
         enabled = ctx.bot.settings.get("enabled", command=ctx.command.name)
 
-        if (enabled is False):
-            await ctx.send("Sorry, but this command is disabled for now !")
+        if (enabled == False):
+            await self.send_fail(ctx,
+                "Sorry, but this command is disabled for now !",
+                'Error')
 
         return enabled
 
@@ -217,6 +221,6 @@ class Bot(discord.ext.commands.Bot):
         author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
         channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
 
-        self.logs.print('{0}\t{1} : {2}'.format(author, channel, ctx.message.content))
+        self.logs.print('{0} {1} : {2}'.format(author, channel, ctx.message.content))
 
         return True
