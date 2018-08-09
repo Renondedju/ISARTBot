@@ -24,6 +24,7 @@
 
 from datetime import datetime
 from os.path  import isfile
+from os       import fsync
 
 class Logs():
     """
@@ -79,7 +80,14 @@ class Logs():
         if (self.__logs_file != None and self.__logs_file.writable()):
             self.__logs_file.write(output + '\n')
 
+        self.save()
+
         return
+
+    def save(self):
+        if (self.__logs_file != None):
+            self.__logs_file.flush()
+            fsync(self.__logs_file.fileno())
 
     def close(self):
 
