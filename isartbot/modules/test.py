@@ -42,7 +42,7 @@ class Test_commands():
         """ Creates a command group """
 
         if ctx.invoked_subcommand is None:
-            await ctx.send("{0.subcommand_passed} doesn't exists".format(ctx))
+            await ctx.send("Test !")
 
     @test.command(name='error')
     async def _error(self, ctx):
