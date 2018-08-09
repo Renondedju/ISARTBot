@@ -38,7 +38,7 @@ class Module_commands():
     def get_module_name(self, module : str) -> str:
 
         module = module.replace('.py', '').replace('commands.', '')
-        return "isartbot.commands." + module
+        return "isartbot.modules." + module
 
     @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
     @commands.check(is_dev)

@@ -1,68 +1,60 @@
-/*
- *    MIT License
- *
- *    Copyright (c) 2018 Renondedju
- *
- *    Permission is hereby granted, free of charge, to any person obtaining a copy
- *    of this software and associated documentation files (the "Software"), to deal
- *    in the Software without restriction, including without limitation the rights
- *    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *    copies of the Software, and to permit persons to whom the Software is
- *    furnished to do so, subject to the following conditions:
- *
- *    The above copyright notice and this permission notice shall be included in all
- *    copies or substantial portions of the Software.
- *    
- *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *    SOFTWARE.
- */
-
-// /!\ Since comments are not supported in json, every comment in here should /!\
-// /!\ be removed to create a real working settings file                      /!\
-
-// Properties with a '_' as a prefix as protected and cannot be written from code
-
 {
-	//Should logs or debug be used 
-    "logs"  : true,
-
-    //If debug is enabled, admin only commands will be enabled to devs as well
-    "debug" : true,
-
-	// Main bot settings
-    "bot"  : {
-		//Discord connexion token
-        "token"  : "",
-        
-        //Discord prefix
-        "prefix" : "!",
-        
-		//Commands settings
-        "commands" : {
-            "test" : // 'test' is the name of the file containing the test extension in the commands folder (commands/test.py)
-            {
-                //This variable defines if the command should be enabled to the
-                //public, if set to false, only the bot developers can use it
-                "enabled" : false
+    "_bot": {
+        "_commands": {
+            "class": {
+                "_announce_channel_name": "Annonces",
+                "_default_texts": [
+                    "Annonces",
+                    "G\u00e9n\u00e9ral",
+                    "Jeux",
+                    "Cours"
+                ],
+                "_default_vocals": [
+                    "Vocal 1",
+                    "Vocal 2"
+                ],
+                "_delegate_role_color": "0xe67e22",
+                "_delegate_role_prefix": "D\u00e9l\u00e9gu\u00e9s",
+                "_role_color": "0x2889da",
+                "enabled": false,
+                "roles": []
             },
-            "game" :
-            {
-                "enabled" : true
+            "game": {
+                "_auto_assign_refresh_delay": 20,
+                "_category_id": 0,
+                "_role_color": "0x1f8b4c",
+                "enabled": false,
+                "games_roles": {},
+                "list_max_lines": 10
+            },
+            "iam": {
+                "_isartian_role_id": 0,
+                "enabled": false
+            },
+            "module": {
+                "enabled": false
+            },
+            "test": {
+                "enabled": false
+            },
+            "starboard" : {
+                "enabled": false,
+                "channel_id" : 0,
+                "min_stars" : 3,
+                "stars" : {
+                    "0"  : ":star:",
+                    "5"  : ":star2:",
+                    "15" : ":dizzy:",
+                    "25" : ":sparkles:",
+                    "50" : ":comet:"
+                }
             }
         },
-
-		//Bot developers 
-        "developers_id":
-        [
-            213262036069515264,
-            121712966855950336,
-            179313613209600000,
-            134388384192790528
-        ]
-    }
+        "_developers_id": [0],
+        "_prefix": "!",
+        "_server_id": 0,
+        "_token": ""
+    },
+    "_debug": true,
+    "_logs": true
 }

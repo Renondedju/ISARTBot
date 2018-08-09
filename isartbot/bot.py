@@ -45,11 +45,14 @@ class Bot(discord.ext.commands.Bot):
         self.logs           = Logs(enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
-        self.loop.create_task(self.load_cog())
+        self.logs.print('Initializing bot ...')
 
+        self.add_check(self.trigger_typing)
         self.add_check(self.globally_block_dms)
         self.add_check(self.check_enable)
         self.add_check(self.log_command)
+
+        self.loop.create_task(self.load_cog())
 
         self.run(self.__settings.get("bot", "token"))
 
@@ -58,18 +61,23 @@ class Bot(discord.ext.commands.Bot):
     async def load_cog(self):
         """ Loads all the cogs of the bot defined into the settings.json file """
 
+        try:
+            await self.wait_for('ready', timeout=30)
+        except asyncio.futures.TimeoutError:
+            self.logs.print("Wait for on_ready event timed out, loading the cogs anyway.")
+
         for name, enabled in self.__commands.items():
             if (name != ""):
                 name = name.strip('_')
 
                 try:
-                    self.load_extension('isartbot.commands.' + name)
-                    self.logs.print    ('Loaded the command {0}, enabled = {1}'
-                        .format(name, str(enabled.get('enabled'))))
+                    text = str(enabled.get('enabled'))
+                    self.load_extension('isartbot.modules.' + name)
+                    self.logs.print    ('Loaded the module {} : enabled = {}'.format(name, text))
 
                 except Exception as e:
                     await self.on_error(None, e)
-                    self.logs.print('Failed to load extension named commands.{0}'.format(name))
+                    self.logs.print('Failed to load extension named modules.{0}'.format(name))
 
         return
 
@@ -113,7 +121,9 @@ class Bot(discord.ext.commands.Bot):
     async def on_error(self, ctx, error):
         """ Sends errors reports if needed """
 
-        ignored = (commands.CommandNotFound, commands.UserInputError)
+        ignored = (commands.CommandNotFound,
+                   commands.UserInputError,
+                   commands.CheckFailure)
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
@@ -169,6 +179,13 @@ class Bot(discord.ext.commands.Bot):
         await self.on_error(ctx, error)
 
     ###Checks
+    async def trigger_typing(self, ctx):
+        """ Triggers typing """
+
+        await ctx.trigger_typing()
+
+        return True
+
     async def globally_block_dms(self, ctx):
         """
             Checks if the messages provides from
@@ -192,8 +209,10 @@ class Bot(discord.ext.commands.Bot):
         
         enabled = ctx.bot.settings.get("enabled", command=ctx.command.name)
 
-        if (enabled is False):
-            await ctx.send("Sorry, but this command is disabled for now !")
+        if (enabled == False):
+            await self.send_fail(ctx,
+                "Sorry, but this command is disabled for now !",
+                'Error')
 
         return enabled
 
@@ -202,6 +221,6 @@ class Bot(discord.ext.commands.Bot):
         author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
         channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
 
-        self.logs.print('{0}\t{1} : {2}'.format(author, channel, ctx.message.content))
+        self.logs.print('{0} {1} : {2}'.format(author, channel, ctx.message.content))
 
         return True
