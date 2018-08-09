@@ -25,8 +25,8 @@
 import re
 import discord
 
-from isartbot.exceptions import CogLoadingFailed
-from discord.ext         import commands
+from isartbot.exceptions     import CogLoadingFailed
+from discord.ext             import commands
 
 class Starboard():
     """ Starboard class """
@@ -48,6 +48,11 @@ class Starboard():
 
         if self.star_channel is None:
             raise CogLoadingFailed('There is no starboard channel !')
+
+    def check_enabled(self):
+        """ Checks if the starboard is enabled or not """
+
+        return self.bot.settings.get("enabled", command='starboard')
 
     def check_star(self, reaction):
         """ Checks if there is a star in the reactions """
@@ -164,7 +169,7 @@ class Starboard():
     #Events 
     async def on_reaction_add(self, reaction, user):
 
-        if not self.check_star(reaction):
+        if not self.check_star(reaction) or not self.check_enabled():
             return
 
         starboard_message = await self.get_starboard_message(reaction.message)
@@ -177,7 +182,7 @@ class Starboard():
 
     async def on_reaction_remove(self, reaction, user):
         
-        if not self.check_star(reaction):
+        if not self.check_star(reaction) or not self.check_enabled():
             return
 
         count = self.count_stars(reaction.message)
@@ -190,7 +195,7 @@ class Starboard():
 
     async def on_reaction_clear(self, message, reactions):
         
-        if not self.check_star(reactions):
+        if not self.check_star(reactions) or not self.check_enabled():
             return
 
         await self.unstar_message(message)
