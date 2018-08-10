@@ -22,16 +22,169 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import re
 import asyncio
 import discord
+import feedparser
+
+from html2text               import html2text
+from discord.ext             import commands
+from isartbot.exceptions     import EmptyRssFeed, AlreadyExistingFeed, CogLoadingFailed
+from isartbot.bot_decorators import is_admin
 
 class Rss():
     """ Rss task and commands class """
 
     def __init__(self, bot):
-        self.bot = bot
 
-    
+        self.bot          = bot
+        self.feeds        = bot.settings.get('feeds',        command = 'rss')
+        self.channel_id   = bot.settings.get('channel_id'  , command = 'rss')
+        self.refresh_rate = bot.settings.get('refresh_rate', command = 'rss')
+        self.rss_channel  = bot.get_channel(self.channel_id)
+
+        if self.rss_channel is None:
+            raise CogLoadingFailed('Rss channel is None !')
+
+    @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
+    @commands.check(is_admin)
+    async def rss(self, ctx):
+        """ simple rss command group """
+        pass
+
+    def remove_feed(self, feed_url : str):
+        """ Removes a rss feed to the list of listened feeds
+        
+            returns True if the feed has successfully been removed,
+            False otherwise
+        """
+
+        self.feeds = self.bot.settings.get('feeds', command = 'rss')
+
+        feed_removed = False
+
+        for feed in self.feeds:
+            if feed['url'] == feed_url:
+                self.feeds.remove(feed)
+                feed_removed = True
+                break
+
+        self.bot.settings.write(self.feeds, 'feeds', command = 'rss')
+
+        return feed_removed
+
+    def add_feed(self, feed_url : str, logo : str):
+        """ Adds a rss feed to the list of listened feeds
+        
+            Raises:
+                EmptyRssFeed        - Feed is empty
+                AlreadyExistingFeed - Feed already exists in the list
+        """
+
+        self.feeds = self.bot.settings.get('feeds', command = 'rss')
+        urls = [feed['url'] for feed in self.feeds]
+
+        if feed_url in urls:
+            raise AlreadyExistingFeed
+
+        if len(feedparser.parse(feed_url).entries) == 0:
+            raise EmptyRssFeed
+
+        self.feeds.append({'url' : feed_url, 'logo' : logo})
+        self.bot.settings.write(self.feeds, 'feeds', command = 'rss')
+
+        return
+
+    def get_entry_embed(self, feed, entry, logo) -> discord.Embed:
+        """ Returns the discord embed for an rss entry """
+
+        embed = discord.Embed()
+        embed.set_author(
+            name=feed.feed.get('title', 'Unknown'), 
+            icon_url=logo,
+            url=feed.feed.get('link', ''))
+        embed.set_footer(text=entry.get('published', '')[:25])
+
+        embed.title       = html2text(entry.get('title'  , discord.Embed.Empty))[:255]
+        embed.description = html2text(entry.get('summary', discord.Embed.Empty))[:800]
+
+        embed.color = discord.Color.blue()
+
+        embed.title       = embed.title.replace('\n', ' ')
+        embed.description = embed.description.replace('\n', ' ')
+
+        if len(embed.description) > 1000:
+            embed.description += '...'
+
+        embed.description += '[Lire la suite]({})'.format(
+            entry.get('link',
+            feed.feed.get('link', 'https://www.google.com/')))
+
+        images = entry.get('media_thumbnail', [])
+        if len(images) > 0:
+            embed.set_image(url=images[0].get('url', ''))
+
+        return embed
+
+    #Commands
+    @rss.command()
+    async def add(self, ctx, feed_url, logo = ""):
+        """ Adds a rss feed to the list of listened feeds """
+
+        self.add_feed(feed_url, logo)
+
+        await self.bot.send_success(ctx,
+            "Successfully added the feed to the followed list",
+            "Rss feed")
+
+    @rss.command()
+    async def test(self, ctx):
+        """ Test the rss embed """
+
+
+        feed  = feedparser.parse(self.feeds[1]['url'])
+
+        for i in range(len(feed.entries)):
+            embed = self.get_entry_embed(feed, feed.entries[i],
+                self.feeds[0]['logo'])
+
+            await ctx.send(embed = embed)
+
+    @rss.command()
+    async def remove(self, ctx, *, feed_url):
+        """ Adds a rss feed to the list of listened feeds """
+
+        result = self.remove_feed(feed_url)
+
+        if not result:
+            await self.bot.send_fail(ctx,
+                "This feed does not exists, use ``{}rss list`` to get a  list "
+                "of all the feeds followed.".format(self.bot.command_prefix),
+                "Rss feed")
+            return
+
+        await self.bot.send_success(ctx,
+            "Successfully removed the feed of the followed list",
+            "Rss feed")
+
+    @add.error
+    async def add_error(self, ctx, error):
+
+        error = getattr(error, 'original', error)
+
+        if isinstance(error, EmptyRssFeed):
+            await self.bot.send_fail(ctx,
+                "The rss feed you tried to add seems to be empty",
+                "Rss feed")
+            return
+        
+        if isinstance(error, AlreadyExistingFeed):
+            await self.bot.send_fail(ctx,
+                "The rss feed you tried to add is already in the followed ones",
+                "Rss feed")
+            return
+
+        await self.bot.on_error(ctx, error)
 
 def setup(bot):
     bot.add_cog(Rss(bot))
