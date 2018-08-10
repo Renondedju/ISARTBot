@@ -22,8 +22,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 class CogLoadingFailed(Exception):
+    """ CogLoadingFailed exception """
 
     def __init__(self, message):
-        
+        self.message = message
+
+#Rss exceptions
+class EmptyRssFeed(Exception):
+    """ EmptyRssFeed exception """
+
+    def __init__(self, message = 'Feed is empty'):
+        self.message = message
+
+class AlreadyExistingFeed(Exception):
+    """ AlreadyExistingFeed exception """
+
+    def __init__(self, message = 'The feed is already in the list'):
         self.message = message
