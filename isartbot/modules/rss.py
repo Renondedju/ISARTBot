@@ -27,7 +27,7 @@ import asyncio
 import discord
 import feedparser
 
-from html2text               import html2text
+from bs4                     import BeautifulSoup
 from discord.ext             import commands
 from isartbot.exceptions     import EmptyRssFeed, AlreadyExistingFeed, CogLoadingFailed
 from isartbot.bot_decorators import is_admin
@@ -95,18 +95,33 @@ class Rss():
 
         return
 
+    def clean_html(self, raw_text : str) -> str:
+        """ Cleans the html content from the input """
+
+        soup = BeautifulSoup(raw_text,  'lxml')
+        soup = BeautifulSoup(soup.text, 'lxml')
+        
+        #We are doing the parsing 2 times since some feeds sends chars like '&lt;'
+        # wish gets converted to '<' or others special html chars.
+
+        return soup.text
+
     def get_entry_embed(self, feed, entry, logo) -> discord.Embed:
         """ Returns the discord embed for an rss entry """
+
+        feed_url = feed.feed.get('link', '')
+        if not feed_url.startswith('http'):
+            feed_url = ''
 
         embed = discord.Embed()
         embed.set_author(
             name=feed.feed.get('title', 'Unknown'), 
             icon_url=logo,
-            url=feed.feed.get('link', ''))
+            url=feed_url)
         embed.set_footer(text=entry.get('published', '')[:25])
 
-        embed.title       = html2text(entry.get('title'  , discord.Embed.Empty))[:255]
-        embed.description = html2text(entry.get('summary', discord.Embed.Empty))[:800]
+        embed.title       = self.clean_html(entry.get('title'  , discord.Embed.Empty))[:255]
+        embed.description = self.clean_html(entry.get('summary', discord.Embed.Empty))[:800]
 
         embed.color = discord.Color.blue()
 
@@ -116,14 +131,21 @@ class Rss():
         if len(embed.description) > 1000:
             embed.description += '...'
 
-        embed.description += '[Lire la suite]({})'.format(
+        embed.description += ' [Lire la suite]({})'.format(
             entry.get('link',
             feed.feed.get('link', 'https://www.google.com/')))
 
         images = entry.get('media_thumbnail', [])
         if len(images) > 0:
             embed.set_image(url=images[0].get('url', ''))
+        else:
+            links = entry.get('links', [])
 
+            for link in links:
+                if link.get('type', '').startswith('image/'):
+                    embed.set_image(url=link.get('href', ''))
+                    break
+                    
         return embed
 
     #Commands
@@ -141,12 +163,11 @@ class Rss():
     async def test(self, ctx):
         """ Test the rss embed """
 
+        feed = feedparser.parse(self.feeds[2]['url'])
 
-        feed  = feedparser.parse(self.feeds[1]['url'])
-
-        for i in range(len(feed.entries)):
+        for i in range(3):
             embed = self.get_entry_embed(feed, feed.entries[i],
-                self.feeds[0]['logo'])
+                self.feeds[2]['logo'])
 
             await ctx.send(embed = embed)
 
