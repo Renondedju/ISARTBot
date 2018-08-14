@@ -46,6 +46,11 @@ class Rss():
         if self.rss_channel is None:
             raise CogLoadingFailed('Rss channel is None !')
 
+        self.task = self.bot.loop.create_task(self.rss_task())
+
+    def __unload(self):
+        self.task.cancel()
+
     @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
     @commands.check(is_admin)
     async def rss(self, ctx):
@@ -104,7 +109,7 @@ class Rss():
         #We are doing the parsing 2 times since some feeds sends chars like '&lt;'
         # wish gets converted to '<' or others special html chars.
 
-        return soup.text
+        return soup.text.replace('\n', ' ')
 
     def get_entry_embed(self, feed, entry, logo) -> discord.Embed:
         """ Returns the discord embed for an rss entry """
@@ -125,9 +130,6 @@ class Rss():
 
         embed.color = discord.Color.blue()
 
-        embed.title       = embed.title.replace('\n', ' ')
-        embed.description = embed.description.replace('\n', ' ')
-
         if len(embed.description) > 1000:
             embed.description += '...'
 
@@ -147,6 +149,35 @@ class Rss():
                     break
                     
         return embed
+
+    async def has_been_posted(self, entry) -> bool:
+        """ Checks if an entry has already been posted or not """
+
+        async for message in self.rss_channel.history(limit=200):
+            for embed in message.embeds:
+                if embed.title == self.clean_html(entry.get('title', ''))[:255]:
+                    return True
+
+        return False
+
+    async def update_feeds(self):
+        """ Updates all the feeds and posts them if needed """
+
+        #Showing activity 
+        async with self.rss_channel.typing():
+            
+            #Updating rss feeds
+            for feed in self.feeds:
+                parsed_feed = feedparser.parse(feed['url'])
+                for entry in parsed_feed.entries:
+                    #For each entry not posted : post it !
+                    if (not await self.has_been_posted(entry)):
+
+                        embed = self.get_entry_embed(parsed_feed, entry, feed['logo'])
+                        await self.rss_channel.send(embed = embed)
+
+                        self.bot.logs.print('Sent a new rss entry : '
+                            + entry.get('title', 'unknown'))
 
     #Commands
     @rss.command()
@@ -170,6 +201,16 @@ class Rss():
                 self.feeds[2]['logo'])
 
             await ctx.send(embed = embed)
+
+    @rss.command()
+    async def update(self, ctx):
+        
+        async with ctx.message.channel.typing():
+            await self.update_feeds()
+
+        await self.bot.send_success(ctx,
+            'Feeds has successfully been updated',
+            'Rss feeds')
 
     @rss.command()
     async def remove(self, ctx, *, feed_url):
@@ -206,6 +247,15 @@ class Rss():
             return
 
         await self.bot.on_error(ctx, error)
+
+    async def rss_task(self):
+        """ main rss task. """
+
+        while (True):
+
+            #wait for a fixed amount of sec before doing a refresh
+            await asyncio.sleep(self.refresh_rate)
+            await self.update_feeds()
 
 def setup(bot):
     bot.add_cog(Rss(bot))
