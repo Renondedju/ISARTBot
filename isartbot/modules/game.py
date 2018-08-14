@@ -37,10 +37,10 @@ class Game_commands():
 
         #Private
         self.bot = bot
-        self.some_task = self.bot.loop.create_task(self.check_for_games())
+        self.task = self.bot.loop.create_task(self.check_for_games())
 
     def __unload(self):
-        self.some_task.cancel()
+        self.task.cancel()
 
     async def check_for_games(self):
         """ Scan games and auto assign """
