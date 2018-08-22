@@ -37,11 +37,12 @@ class Rss():
 
     def __init__(self, bot):
 
-        self.bot          = bot
-        self.feeds        = bot.settings.get('feeds',        command = 'rss')
-        self.channel_id   = bot.settings.get('channel_id'  , command = 'rss')
-        self.refresh_rate = bot.settings.get('refresh_rate', command = 'rss')
-        self.rss_channel  = bot.get_channel(self.channel_id)
+        self.bot               = bot
+        self.feeds             = bot.settings.get('feeds',             command = 'rss')
+        self.channel_id        = bot.settings.get('channel_id'  ,      command = 'rss')
+        self.refresh_rate      = bot.settings.get('refresh_rate',      command = 'rss')
+        self.max_entries_count = bot.settings.get('max_entries_count', command = 'rss')
+        self.rss_channel       = bot.get_channel(self.channel_id)
 
         if self.rss_channel is None:
             raise CogLoadingFailed('Rss channel is None !')
@@ -154,7 +155,7 @@ class Rss():
         """ Checks if an entry has already been posted or not """
 
         # The plus 5 is just to make sure 
-        count = len(self.feeds) * self.max_entries_count + 5
+        count = len(self.feeds) * self.max_entries_count
 
         async for message in self.rss_channel.history(limit = count):
             for embed in message.embeds:
@@ -172,7 +173,9 @@ class Rss():
             #Updating rss feeds
             for feed in self.feeds:
                 parsed_feed = feedparser.parse(feed['url'])
-                for entry in parsed_feed.entries:
+
+                for i in range(0, min(len(parsed_feed.entries), self.max_entries_count)):
+                    entry = parsed_feed.entries[i]
                     #For each entry not posted : post it !
                     if (not await self.has_been_posted(entry)):
 
