@@ -153,7 +153,10 @@ class Rss():
     async def has_been_posted(self, entry) -> bool:
         """ Checks if an entry has already been posted or not """
 
-        async for message in self.rss_channel.history(limit=200):
+        # The plus 5 is just to make sure 
+        count = len(self.feeds) * self.max_entries_count + 5
+
+        async for message in self.rss_channel.history(limit = count):
             for embed in message.embeds:
                 if embed.title == self.clean_html(entry.get('title', ''))[:255]:
                     return True
@@ -254,8 +257,8 @@ class Rss():
         while (True):
 
             #wait for a fixed amount of sec before doing a refresh
-            await asyncio.sleep(self.refresh_rate)
             await self.update_feeds()
+            await asyncio.sleep(self.refresh_rate)
 
 def setup(bot):
     bot.add_cog(Rss(bot))

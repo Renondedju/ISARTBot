@@ -72,6 +72,8 @@ class Game_commands():
                     except:
                         pass
 
+        self.bot.logs.print(f'Auto assign game loop finished !')
+
     @commands.group(pass_context=True, invoke_without_command=True)
     async def game(self, ctx):
         if ctx.invoked_subcommand is None:
@@ -147,6 +149,7 @@ class Game_commands():
         return
 
         #Delete command
+    
     @game.command(name='delete', hidden=True)
     @commands.check(is_admin)
     async def _delete(self, ctx, *, game_name: str):

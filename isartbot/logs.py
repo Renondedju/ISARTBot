@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 from datetime import datetime
-from os.path  import isfile
+from os.path  import isfile, abspath
 from os       import fsync
 
 class Logs():
@@ -42,16 +42,20 @@ class Logs():
         if (not self.enabled):
             print("/!\\ Be careful, the logs are currently disabled /!\\")
 
+        path = abspath(path)
+
         #Setup
         try:
             if isfile(path):
                 self.__logs_file = open(path, "a")
+                self.print("Logs file found at {}".format(path))
             else:
-                self.__logs_file = None
                 self.print("Warning : no logs file found !")
+                self.__logs_file = open("./logs.log", "w")
+                self.print("Warning : Created a log file at {}".format(path))
         except:
-            self.__logs_file = None
-            self.print("Warning : no logs file found !")
+                self.__logs_file = None
+                self.print("Warning : Failed to create a log file at {}".format(path))
 
     @property
     def get_time(self):
