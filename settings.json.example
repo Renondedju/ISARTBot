@@ -1,6 +1,10 @@
 {
     "_bot": {
         "_commands": {
+            # Every module here will be automatically loaded
+            # Every module has an 'enabled' attribute, if the attribute is set to false, 
+            # only developers can use the command.
+
             "class": {
                 "_announce_channel_name": "Annonces",
                 "_default_texts": [
@@ -19,6 +23,7 @@
                 "enabled": false,
                 "roles": []
             },
+
             "game": {
                 "_auto_assign_refresh_delay": 20,
                 "_category_id": 0,
@@ -27,16 +32,20 @@
                 "games_roles": {},
                 "list_max_lines": 10
             },
+
             "iam": {
                 "_isartian_role_id": 0,
                 "enabled": false
             },
+
             "module": {
                 "enabled": false
             },
+
             "test": {
                 "enabled": false
             },
+
             "starboard" : {
                 "enabled": false,
                 "channel_id" : 0,
@@ -50,12 +59,26 @@
                 }
             }
         },
+
+        # Developers discord id
         "_developers_id": [0],
+
+        # Bot prefix
         "_prefix": "!",
+
+        # Main server id, this way the bot will ignore every other servers
         "_server_id": 0,
+
+        # Discord connection token, can be found here : https://discordapp.com/developers/applications/
         "_token": ""
     },
+
+    # If debug is set to true, devs will be able to bypass every admin roles limitations
     "_debug": true,
+
+    # Enables logs
     "_logs": true,
+
+    # Enables console logging (enabling '_logs' is required for it to work)
     "_console_log" : true
 }
