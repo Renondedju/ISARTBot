@@ -22,11 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
 import isartbot
 
 def run():
 
     #Starting the bot
+    os.chdir(os.path.dirname(__file__))
+
     isartbot.Bot()
     return
 
