@@ -31,10 +31,12 @@ class Logs():
     Used to log any activity
     """
 
-    def __init__(self, path: str = "./logs.log", enabled: bool = True):
+    def __init__(self, bot, path: str = "./logs.log", enabled: bool = True):
 
         #Public
-        self.enabled = enabled
+        self.bot         = bot
+        self.enabled     = enabled
+        self.console_log = bot.settings.get("console_log")
 
         #Private
         self.__logs_file = None
@@ -80,11 +82,12 @@ class Logs():
         date   = self.get_time
         output = date + " - " + output
 
-        print(output)
+        if (self.console_log):
+            print(output)
+
         if (self.__logs_file != None and self.__logs_file.writable()):
             self.__logs_file.write(output + '\n')
-
-        self.save()
+            self.save()
 
         return
 

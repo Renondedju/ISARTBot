@@ -56,5 +56,6 @@
         "_token": ""
     },
     "_debug": true,
-    "_logs": true
+    "_logs": true,
+    "_console_log" : true
 }
