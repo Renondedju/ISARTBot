@@ -37,14 +37,14 @@ class Settings():
         """
 
         self.__settings = {"settings": {}}
-        self.__path     = path
+        self.__path     = abspath(path)
 
-        if not isfile(path):
+        if not isfile(self.__path):
             print("/!\\ ISART-Bot : Settings file not found at {}. Aborting /!\\".
-                format(abspath(path)))
+                format(self.__path))
             exit(1)
 
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(self.__path, 'r', encoding='utf-8') as f:
             self.__settings["settings"] = load(f)
 
     def save(self):
