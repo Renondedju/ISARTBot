@@ -151,13 +151,14 @@ class Rss():
                     
         return embed
 
-    async def has_been_posted(self, entry) -> bool:
+    async def has_been_posted(self, entry, history = []) -> bool:
         """ Checks if an entry has already been posted or not """
 
-        # The plus 5 is just to make sure 
-        count = len(self.feeds) * self.max_entries_count
+        #If there is no history to look for, fetching it.
+        if len(history) is 0:
+            history = await self.rss_channel.history(limit=200).flatten()
 
-        async for message in self.rss_channel.history(limit = count):
+        for message in history:
             for embed in message.embeds:
                 if embed.title == self.clean_html(entry.get('title', ''))[:255]:
                     return True
@@ -169,6 +170,9 @@ class Rss():
 
         #Showing activity 
         async with self.rss_channel.typing():
+
+            #Fetching history
+            messages = await self.rss_channel.history(limit=200).flatten()
             
             #Updating rss feeds
             for feed in self.feeds:
@@ -177,7 +181,7 @@ class Rss():
                 for i in range(0, min(len(parsed_feed.entries), self.max_entries_count)):
                     entry = parsed_feed.entries[i]
                     #For each entry not posted : post it !
-                    if (not await self.has_been_posted(entry)):
+                    if (not await self.has_been_posted(entry, messages)):
 
                         embed = self.get_entry_embed(parsed_feed, entry, feed['logo'])
                         await self.rss_channel.send(embed = embed)
@@ -257,11 +261,19 @@ class Rss():
     async def rss_task(self):
         """ main rss task. """
 
-        while (True):
+        try:
+            while (True):
 
-            #wait for a fixed amount of sec before doing a refresh
-            await self.update_feeds()
-            await asyncio.sleep(self.refresh_rate)
+                #wait for a fixed amount of sec before doing a refresh
+                await self.update_feeds()
+                await asyncio.sleep(self.refresh_rate)
+
+        except Exception as e:
+
+            self.bot.logs.print("Rss task failed ! The task will end after the following error message.")
+            self.bot.logs.print("To restart the task, please reload the rss module.")
+
+            await self.bot.on_error(None, e)
 
 def setup(bot):
     bot.add_cog(Rss(bot))
