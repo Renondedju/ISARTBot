@@ -255,6 +255,7 @@ class Game_commands():
         return
 
         #Add command
+    
     @game.command(name='add')
     async def _add(self, ctx, *, game_name: str):
         """ Adds a game role to the user """
