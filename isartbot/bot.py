@@ -42,7 +42,7 @@ class Bot(discord.ext.commands.Bot):
         #Private
         self.__settings     = Settings()
         self.__commands     = self.__settings.get("bot", "commands")
-        self.logs           = Logs(enabled = self.__settings.get("logs"))
+        self.logs           = Logs(self, enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
         self.logs.print('Initializing bot ...')
