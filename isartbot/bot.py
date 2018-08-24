@@ -29,6 +29,7 @@ import traceback
 from .logs           import Logs
 from .settings       import Settings
 from .bot_decorators import is_dev
+from  os.path        import abspath
 from  discord.ext    import commands
 
 class Bot(discord.ext.commands.Bot):
@@ -45,12 +46,13 @@ class Bot(discord.ext.commands.Bot):
         self.logs           = Logs(self, enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
+        self.logs.print('Using settings file at {}'.format(abspath(self.__settings.path)))
         self.logs.print('Initializing bot ...')
 
         self.add_check(self.trigger_typing)
         self.add_check(self.globally_block_dms)
-        self.add_check(self.check_enable)
         self.add_check(self.log_command)
+        self.add_check(self.check_enable)
 
         self.loop.create_task(self.load_cog())
 
@@ -207,7 +209,11 @@ class Bot(discord.ext.commands.Bot):
         if is_dev(ctx):
             return True
         
-        enabled = ctx.bot.settings.get("enabled", command=ctx.command.name)
+        command = ctx.command.root_parent
+        if (command is None):
+            command = ctx.command
+
+        enabled = ctx.bot.settings.get("enabled", command=command.name)
 
         if (enabled == False):
             await self.send_fail(ctx,
