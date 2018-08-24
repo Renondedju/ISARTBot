@@ -61,7 +61,7 @@ class Iam_commands():
                     "You already have a class role", "I am")
                 return
 
-        id = self.bot.settings.get('isartian_role_id', command='iam')
+        id = self.bot.settings.get('bot', 'isartian_role_id')
         
         await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=class_name))
         await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, id  = id))
