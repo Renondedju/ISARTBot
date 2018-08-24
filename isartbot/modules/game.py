@@ -37,10 +37,10 @@ class Game_commands():
 
         #Private
         self.bot = bot
-        self.some_task = self.bot.loop.create_task(self.check_for_games())
+        self.task = self.bot.loop.create_task(self.check_for_games())
 
     def __unload(self):
-        self.some_task.cancel()
+        self.task.cancel()
 
     async def check_for_games(self):
         """ Scan games and auto assign """
@@ -71,6 +71,8 @@ class Game_commands():
                                 f'Added the game {role.name} to {member.name}#{member.discriminator}')
                     except:
                         pass
+
+        self.bot.logs.print(f'Auto assign game loop finished !')
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def game(self, ctx):
@@ -147,6 +149,7 @@ class Game_commands():
         return
 
         #Delete command
+    
     @game.command(name='delete', hidden=True)
     @commands.check(is_admin)
     async def _delete(self, ctx, *, game_name: str):
