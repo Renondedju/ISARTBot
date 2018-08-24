@@ -47,17 +47,24 @@ class Game_commands():
 
         guild_id = self.bot.settings.get('bot', 'server_id')
         delay    = self.bot.settings.get('auto_assign_refresh_delay', command = "game")
+        guild    = self.bot.get_guild(guild_id)
+        isartian = discord.utils.get(guild.roles, id=self.bot.settings.get('bot', 'isartian_role_id'))
+
+        if (isartian is None):
+            self.bot.logs.print("Isartian role not found !")
+            self.bot.logs.print("Aborting game task, restart it by reloading the game module.")
+            return
 
         while (delay != -1):
             await asyncio.sleep(delay)
 
-            enabled = self.bot.settings.get('enabled', command = "game")
-            guild   = self.bot.get_guild(guild_id)
-
-            if not enabled:
+            if not self.bot.settings.get('enabled', command = "game"):
                 pass
             
             for member in guild.members:
+
+                if isartian not in member.roles:
+                    pass
 
                 if isinstance(member.activity, (discord.Game, discord.Activity)):
                     game = member.activity.name.lower()
