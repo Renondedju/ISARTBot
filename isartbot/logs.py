@@ -49,11 +49,11 @@ class Logs():
         #Setup
         try:
             if isfile(path):
-                self.__logs_file = open(path, "a")
+                self.__logs_file = open(path, "a", encoding='utf-8')
                 self.print("Logs file found at {}".format(path))
             else:
                 self.print("Warning : no logs file found !")
-                self.__logs_file = open("./logs.log", "w")
+                self.__logs_file = open("./logs.log", "w", encoding='utf-8')
                 self.print("Warning : Created a log file at {}".format(path))
         except:
                 self.__logs_file = None

@@ -29,6 +29,7 @@ import traceback
 from .logs           import Logs
 from .settings       import Settings
 from .bot_decorators import is_dev
+from  os.path        import abspath
 from  discord.ext    import commands
 
 class Bot(discord.ext.commands.Bot):
@@ -45,6 +46,7 @@ class Bot(discord.ext.commands.Bot):
         self.logs           = Logs(self, enabled = self.__settings.get("logs"))
         self.command_prefix = self.__settings.get("bot", "prefix")
 
+        self.logs.print('Using settings file at {}'.format(abspath(self.__settings.path)))
         self.logs.print('Initializing bot ...')
 
         self.add_check(self.trigger_typing)
