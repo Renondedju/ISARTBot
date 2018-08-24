@@ -1,0 +1,6 @@
+-U git+https://github.com/Rapptz/discord.py@rewrite
+websockets
+aiohttp
+feedparser
+beautifulsoup4
+lxml
