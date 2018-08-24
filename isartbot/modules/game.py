@@ -129,16 +129,11 @@ class Game_commands():
             category   = game_category,
             overwrites = override)
 
-        vocal = await ctx.guild.create_voice_channel(
-            name       = game_name,
-            category   = game_category,
-            overwrites = override)
-
-        if (text is None or vocal is None):
+        if (text is None):
             raise commands.CommandError(message="Failed to create the game channels")
 
         ctx.bot.settings.write({"id"    : role.id,
-                                "vocal" : [vocal.id],
+                                "vocal" : [],
                                 "text"  : [text.id]},
             role.name, "games_roles", command="game")
 
