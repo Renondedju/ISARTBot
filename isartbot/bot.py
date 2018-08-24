@@ -49,8 +49,8 @@ class Bot(discord.ext.commands.Bot):
 
         self.add_check(self.trigger_typing)
         self.add_check(self.globally_block_dms)
-        self.add_check(self.check_enable)
         self.add_check(self.log_command)
+        self.add_check(self.check_enable)
 
         self.loop.create_task(self.load_cog())
 
@@ -207,7 +207,11 @@ class Bot(discord.ext.commands.Bot):
         if is_dev(ctx):
             return True
         
-        enabled = ctx.bot.settings.get("enabled", command=ctx.command.name)
+        command = ctx.command.root_parent
+        if (command is None):
+            command = ctx.command
+
+        enabled = ctx.bot.settings.get("enabled", command=command.name)
 
         if (enabled == False):
             await self.send_fail(ctx,
