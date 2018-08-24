@@ -33,7 +33,7 @@ class Module_commands():
     def __init__(self, bot):
 
         #Private
-        self.__bot = bot
+        self.bot = bot
 
     def get_module_name(self, module : str) -> str:
 
@@ -62,7 +62,7 @@ class Module_commands():
         module = self.get_module_name(module)
 
         try:
-            self.__bot.load_extension(module)
+            self.bot.load_extension(module)
         except Exception as e:
             await ctx.bot.send_fail(ctx,
                 "Failed to load extension"
@@ -80,7 +80,7 @@ class Module_commands():
         module = self.get_module_name(module)
 
         try:
-            self.__bot.unload_extension(module)
+            self.bot.unload_extension(module)
         except Exception as e:
             await ctx.bot.send_fail(ctx, "Failed to unload extension"
                 "\n{}: {}".format(type(e).__name__, e), "Extension")
@@ -96,8 +96,8 @@ class Module_commands():
         module = self.get_module_name(module)
 
         try:
-            self.__bot.unload_extension(module)
-            self.__bot.load_extension(module)
+            self.bot.unload_extension(module)
+            self.bot.load_extension(module)
         except Exception as e:
             await ctx.bot.send_fail(ctx,
                 "Failed to reload extension"
@@ -118,6 +118,7 @@ class Module_commands():
             return
 
         ctx.bot.settings.write(True, 'enabled', command = module)
+        self.bot.logs.print("Enabled the module named '{}'".format(module))
         await ctx.bot.send_success(ctx,
             f"Module named isartbot.commands.{module} has successfully been enabled",
             "Module")
@@ -132,6 +133,7 @@ class Module_commands():
             return
 
         ctx.bot.settings.write(False, 'enabled', command = module)
+        self.bot.logs.print("Disabled the module named '{}'".format(module))
         await ctx.bot.send_success(ctx,
             f"Module named isartbot.commands.{module} has successfully been disabled",
             "Module")

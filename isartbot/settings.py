@@ -22,7 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from os.path import isfile
+from os.path import isfile, abspath
 from json    import load, dump
 
 class Settings():
@@ -37,9 +37,14 @@ class Settings():
         """
 
         self.__settings = {"settings": {}}
-        self.__path     = path
+        self.__path     = abspath(path)
 
-        with open(path, 'r', encoding='utf-8') as f:
+        if not isfile(self.__path):
+            print("/!\\ ISART-Bot : Settings file not found at {}. Aborting /!\\".
+                format(self.__path))
+            exit(1)
+
+        with open(self.__path, 'r', encoding='utf-8') as f:
             self.__settings["settings"] = load(f)
 
     def save(self):
