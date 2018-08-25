@@ -375,15 +375,13 @@ class Game_commands():
         lines = []
         for index in range(max_lines * (page - 1), max_lines * page):
             try:
-                lines.append(games[index])
+                lines.append('• ' + games[index])
             except IndexError:
                 break
 
-        text  = "```\n{}```".format('\n'.join(lines))
-
         embed = discord.Embed()
 
-        embed.description = text
+        embed.description = '\n'.join(lines)
         embed.title       = "Game list"
         embed.color       = discord.Color.green()
         embed.set_footer(text = f"Page {page} out of {max_pages}")
