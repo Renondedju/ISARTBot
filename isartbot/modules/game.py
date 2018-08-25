@@ -25,7 +25,7 @@
 import discord
 import asyncio
 
-from isartbot.bot_decorators import is_dev, is_admin
+from isartbot.bot_decorators import is_dev, is_admin, is_isartian
 from isartbot.settings       import Settings
 from isartbot.logs           import Logs
 from discord.ext             import commands
@@ -64,7 +64,7 @@ class Game_commands():
             for member in guild.members:
 
                 if isartian not in member.roles:
-                    pass
+                    continue
 
                 if isinstance(member.activity, (discord.Game, discord.Activity)):
                     game = member.activity.name.lower()
@@ -257,6 +257,7 @@ class Game_commands():
         #Add command
     
     @game.command(name='add')
+    @commands.check(is_isartian)
     async def _add(self, ctx, *, game_name: str):
         """ Adds a game role to the user """
         
@@ -310,7 +311,9 @@ class Game_commands():
             await ctx.bot.on_error(ctx, error)
 
         #Remove command
+ 
     @game.command(name='remove')
+    @commands.check(is_isartian)
     async def _remove(self, ctx, *, game_name: str):
         """ Removes a game role to the user """
         
@@ -358,6 +361,7 @@ class Game_commands():
 
     #List command
     @game.command(name='list')
+    @commands.check(is_isartian)
     async def _list(self, ctx, page = 1):
         """ lists the games avaliable """
 
