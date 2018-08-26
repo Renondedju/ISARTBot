@@ -35,6 +35,14 @@
 
             "iam": {
                 "_isartian_role_id": 0,
+                "assignable_roles": [
+                    {
+                        "id": 123,
+                        "dependencies": [123, 123, 132],
+                        "conflicting" : [123, 123, 132]
+                    },
+                    ...
+                ],
                 "enabled": false
             },
 
