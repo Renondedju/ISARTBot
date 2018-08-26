@@ -45,9 +45,8 @@ class Game_commands():
     async def check_for_games(self):
         """ Scan games and auto assign """
 
-        guild_id = self.bot.settings.get('bot', 'server_id')
+        guild    = self.bot.guild
         delay    = self.bot.settings.get('auto_assign_refresh_delay', command = "game")
-        guild    = self.bot.get_guild(guild_id)
         isartian = discord.utils.get(guild.roles, id=self.bot.settings.get('bot', 'isartian_role_id'))
 
         if (isartian is None):

@@ -60,6 +60,10 @@ class Bot(discord.ext.commands.Bot):
 
         self.logs.close()
 
+    @property
+    def guild(self):
+        return self.get_guild(self.settings.get('bot', 'server_id')) 
+
     async def load_cog(self):
         """ Loads all the cogs of the bot defined into the settings.json file """
 
