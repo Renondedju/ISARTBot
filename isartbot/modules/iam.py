@@ -31,7 +31,7 @@ from typing                        import Union
 from discord.ext                   import commands
 from isartbot.converters           import upper_clean
 from isartbot.bot_decorators       import is_admin
-from isartbot.data.assignable_role import Assignable_role
+from isartbot.data.assignable_role import *
 
 class Iam_commands():
     """ Role assignment class """
@@ -45,8 +45,7 @@ class Iam_commands():
     async def iam(self, ctx, role : discord.Role):
         """ Assign a class role to a user"""
 
-        raw_assignable_roles = self.bot.settings.get('assignable_roles', command = 'iam')
-        assignable_roles     = [Assignable_role(self.bot, data) for data in raw_assignable_roles]
+        assignable_roles = get_self_assignable_roles(self.bot)
 
         #For every assignable role
         for assignable_role in assignable_roles:
