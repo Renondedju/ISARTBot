@@ -27,7 +27,7 @@ import discord
 import asyncio
 import itertools
 
-from typing                        import Union
+from typing                        import Union, List
 from discord.ext                   import commands
 from isartbot.converters           import upper_clean
 from isartbot.bot_decorators       import is_admin
@@ -176,6 +176,34 @@ class Iam_commands():
                 pass
 
         await ctx.bot.on_error(ctx, error)
+
+    @commands.command(pass_context=True, hidden=True)
+    @commands.check(is_admin)
+    async def asar(self, ctx, role: discord.Role, *args : discord.Role):
+        """ asar stand for 'Add Self Assignable Role' 
+
+            Parameters : @Main_role @Conflict1 @conflict2, etc...
+        """
+
+        if role is None:
+            return await self.bot.send_fail(ctx, 
+                "The role you asked for does not exists",
+                "Add self assignable role")
+
+        conflicts = [role]
+        conflicts.extend((arg for arg in args if arg != None))
+        sar = create_self_assignable_role(self.bot, role, [], conflicts)
+
+        if not save_self_assignable_role(self.bot, sar):
+            return await self.bot.send_fail(ctx,
+                "Failed to add the role {} as a self "
+                "assignable role. This role might already be self assignable".format(role.mention),
+                "Add self assignable role")
+
+        return await self.bot.send_success(ctx,
+            "Role successfully added to the self assignable roles"
+            " with the following conflicting roles: {}".format(' '.join([c.mention for c in conflicts])),
+            "Add self assignable role")
 
 def setup(bot):
     bot.add_cog(Iam_commands(bot))
