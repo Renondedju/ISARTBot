@@ -25,7 +25,7 @@
 import discord
 import asyncio
 
-from isartbot.bot_decorators import is_dev, is_admin
+from isartbot.bot_decorators import is_dev, is_admin, is_isartian
 from isartbot.settings       import Settings
 from isartbot.logs           import Logs
 from discord.ext             import commands
@@ -45,9 +45,8 @@ class Game_commands():
     async def check_for_games(self):
         """ Scan games and auto assign """
 
-        guild_id = self.bot.settings.get('bot', 'server_id')
+        guild    = self.bot.guild
         delay    = self.bot.settings.get('auto_assign_refresh_delay', command = "game")
-        guild    = self.bot.get_guild(guild_id)
         isartian = discord.utils.get(guild.roles, id=self.bot.settings.get('bot', 'isartian_role_id'))
 
         if (isartian is None):
@@ -64,7 +63,7 @@ class Game_commands():
             for member in guild.members:
 
                 if isartian not in member.roles:
-                    pass
+                    continue
 
                 if isinstance(member.activity, (discord.Game, discord.Activity)):
                     game = member.activity.name.lower()
@@ -257,6 +256,7 @@ class Game_commands():
         #Add command
     
     @game.command(name='add')
+    @commands.check(is_isartian)
     async def _add(self, ctx, *, game_name: str):
         """ Adds a game role to the user """
         
@@ -310,7 +310,9 @@ class Game_commands():
             await ctx.bot.on_error(ctx, error)
 
         #Remove command
+ 
     @game.command(name='remove')
+    @commands.check(is_isartian)
     async def _remove(self, ctx, *, game_name: str):
         """ Removes a game role to the user """
         
@@ -358,6 +360,7 @@ class Game_commands():
 
     #List command
     @game.command(name='list')
+    @commands.check(is_isartian)
     async def _list(self, ctx, page = 1):
         """ lists the games avaliable """
 
@@ -371,15 +374,13 @@ class Game_commands():
         lines = []
         for index in range(max_lines * (page - 1), max_lines * page):
             try:
-                lines.append(games[index])
+                lines.append('• ' + games[index])
             except IndexError:
                 break
 
-        text  = "```\n{}```".format('\n'.join(lines))
-
         embed = discord.Embed()
 
-        embed.description = text
+        embed.description = '\n'.join(lines)
         embed.title       = "Game list"
         embed.color       = discord.Color.green()
         embed.set_footer(text = f"Page {page} out of {max_pages}")

@@ -25,6 +25,7 @@
 import discord
 import asyncio
 
+from isartbot.data           import assignable_role as ar
 from math                    import ceil
 from discord.ext             import commands
 from isartbot.converters     import upper_clean
@@ -36,6 +37,8 @@ class Class_commands():
 
         #Private
         self.bot = bot
+
+        self.iartian_role_id = self.bot.settings.get('bot', 'isartian_role_id')
 
     def get_class(self, ctx, class_name : str):
         """ Checks if a class exists or not """
@@ -66,14 +69,17 @@ class Class_commands():
 
         cat, role, delegate = self.get_class(ctx, name)
 
+        #Checking if the roles/channels already exists
         if cat is not None or role is not None or delegate is not None:
             await ctx.bot.send_fail(ctx, "This class already exists !", "Error")
             return
 
+        #If not: fetching data from the settings
         color  = ctx.bot.settings.get("role_color"          , command="class")
         color2 = ctx.bot.settings.get("delegate_role_color" , command="class")
         prefix = ctx.bot.settings.get("delegate_role_prefix", command="class")
 
+        #Creating class role and delegate role
         role = await ctx.guild.create_role(
             name        = name,
             colour      = discord.Colour(int(color, 16)),
@@ -84,6 +90,7 @@ class Class_commands():
             colour      = discord.Colour(int(color2, 16)),
             mentionable = True)
 
+        #Creating premissions
         overwrites = {role                   : discord.PermissionOverwrite(read_messages=True),
                       ctx.guild.default_role : discord.PermissionOverwrite(read_messages=False)}
 
@@ -91,14 +98,17 @@ class Class_commands():
                     delegate               : discord.PermissionOverwrite(read_messages=True, send_messages=True),
                     ctx.guild.default_role : discord.PermissionOverwrite(read_messages=False)}
 
+        #Creating category
         category = await ctx.guild.create_category_channel(name, overwrites=overwrites)
 
+        #Adding default vocals
         for vocal_name in ctx.bot.settings.get("default_vocals", command="class"):
             await ctx.guild.create_voice_channel(
                 name       = vocal_name,
                 category   = category,
                 overwrites = overwrites)
 
+        #Adding defaults text channels
         announce_text = ctx.bot.settings.get("announce_channel_name", command="class")
         for text_name in ctx.bot.settings.get("default_texts", command="class"):
             if text_name == announce_text:
@@ -112,9 +122,11 @@ class Class_commands():
                     category   = category,
                     overwrites = overwrites)
 
-        roles = self.bot.settings.get('roles', command = 'class')
-        roles.append(role.name)
-        self.bot.settings.write(roles, 'roles', command = 'class')
+        #Finally, adding the roles as self assignable
+        assignable_role = ar.create_self_assignable_role(self.bot, role, 
+                                            [self.iartian_role_id],
+                                            [self.iartian_role_id])
+        ar.save_self_assignable_role(self.bot, assignable_role)
 
         await ctx.bot.send_success(ctx,
             f"Successfully added {role.mention} the the available classes",
@@ -163,41 +175,30 @@ class Class_commands():
             embed.description += "\n\nAborted deletion."
             embed.color = discord.Color.red()
             
-            try:
-                await message.edit(embed=embed)
-            except:
-                pass
+            await message.edit(embed=embed)
             return
 
         try:
             for channel in category.channels:
                 await channel.delete()
 
+            ar.remove_self_assignable_role(self.bot, role)
+
             await role.delete()
             await category.delete()
             await delegate_role.delete()
-
-            roles = self.bot.settings.get('roles', command = 'class')
-            roles.remove(role.name)
-            self.bot.settings.write(roles, 'roles', command = 'class')
 
         except:
             embed.description += f"\n\nFailed to delete a role or channel !"
             embed.color = discord.Color.red()
 
-            try:
-                await message.edit(embed=embed)
-            except:
-                pass
+            await message.edit(embed=embed)
             return
 
         embed.description += f"\n\nSuccessfully deleted the class {name} !"
         embed.color = discord.Color.green()
         
-        try:
-            await message.edit(embed=embed)
-        except:
-            pass
+        await message.edit(embed=embed)
 
     @_create.error
     @_delete.error
