@@ -27,10 +27,11 @@ import discord
 import asyncio
 import itertools
 
-from typing                  import Union
-from discord.ext             import commands
-from isartbot.converters     import upper_clean
-from isartbot.bot_decorators import is_admin
+from typing                        import Union
+from discord.ext                   import commands
+from isartbot.converters           import upper_clean
+from isartbot.bot_decorators       import is_admin
+from isartbot.data.assignable_role import *
 
 class Iam_commands():
     """ Role assignment class """
@@ -41,32 +42,37 @@ class Iam_commands():
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def iam(self, ctx, class_name : upper_clean):
+    async def iam(self, ctx, role : discord.Role):
         """ Assign a class role to a user"""
 
-        role_names = self.bot.settings.get('roles', command = 'class')
+        assignable_roles = get_self_assignable_roles(self.bot)
 
-        #Checking if the requested role exists 
-        if class_name not in role_names:
-            await self.bot.send_fail(ctx,
-                "This class doesn't exists !", "I am")
-            return
+        #For every assignable role
+        for assignable_role in assignable_roles:
 
-        #Checking if the user has already a class role
-        author_role_names = [role.name for role in ctx.author.roles]
+            #If we found the desired role
+            if role.id == assignable_role.role.id:
 
-        for role in author_role_names:
-            if role in role_names:
-                await self.bot.send_fail(ctx,
-                    "You already have a class role", "I am")
-                return
+                #Checking for any conflicting role
+                for conflict in assignable_role.conflicting:
 
-        id = self.bot.settings.get('bot', 'isartian_role_id')
-        
-        await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, name=class_name))
-        await ctx.author.add_roles(discord.utils.get(ctx.guild.roles, id  = id))
+                    #If a conflicting role is found : error
+                    if conflict in ctx.author.roles:
+                        return await self.bot.send_fail(ctx, 
+                            "Cannot add you this role: the role named {} is conflicting.".format(conflict.mention), 
+                            "I am")
 
-        await self.bot.send_success(ctx, "Role added !", "I am")
+                #Otherwise adding the requested role
+                await ctx.author.add_roles(role, reason = 'Requested via an iam command')
+
+                #As well as the dependency roles
+                for dependency in assignable_role.dependencies:
+                    await ctx.author.add_roles(dependency, 
+                        reason = 'Requested via an iam command (dependency)')
+
+                return await self.bot.send_success(ctx, "Role added !", "I am")
+
+        return await self.bot.send_fail(ctx, "You cannot assing yourself this role !", "I am")
 
     @commands.command(pass_context=True, hidden=True, name='as')
     @commands.check(is_admin)
