@@ -44,6 +44,27 @@ def is_dev(ctx):
 
     return False
 
+async def is_isartian(ctx):
+    """
+        Checks if the author is an isartian
+    """
+
+    isartian = discord.utils.get(ctx.guild.roles, 
+        id = ctx.bot.settings.get('bot', 'isartian_role_id'))
+
+    if (isartian is None):
+        ctx.bot.logs.print("Isartian role is empty !")
+        return False
+
+    result = isartian in ctx.author.roles
+
+    if (result is False):
+        await ctx.bot.send_fail(ctx, 
+            "Sorry but you need to be have the isartian role to do that",
+            "Check")
+
+    return result
+
 def is_admin(ctx):
     """ 
         Checks if the author is an admin
