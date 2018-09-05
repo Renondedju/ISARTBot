@@ -85,16 +85,39 @@ class Starboard():
         
         return False
 
-    def count_stars(self, message : discord.Message) -> int:
-        """ Counts how many stars there is on the message """
+    def is_starboard_message(self, message: discord.Message):
+        """ Checks if the message is a starboard message """
 
-        # For each reaction in the message, if the reaction is a star
-        # returning the count of reactions
-        for reaction in message.reactions:
-            if self.check_star(reaction):
-                return reaction.count
+        if message is None:
+            return False
 
-        return 0
+        # If the message is in the starboard channel
+        if message.channel == self.star_channel:
+
+            # And if the message has embeds
+            if len(message.embeds) > 0:
+
+                # If the footer of the first embed of the message starts with 'id'
+                # Then it's a starboard message
+                return str(message.embeds[0].footer.text).lower().startswith('id')
+
+        return False
+
+    def get_star_emoji(self, count : int) -> str:
+        """ Returns the emoji to use of the count of stars """
+
+        # Default emoji is :star:
+        emoji = ":star:"
+
+        # Since the self.stars dict has been sorted, we can check
+        # for each star icon if the count variable is high enough to use it.
+        for number, text in self.stars.items():
+            if int(count) >= int(number):
+                emoji = text
+            else:
+                return emoji
+
+        return emoji
 
     def create_embed(self, message : discord.Message) -> discord.Embed:
         """ Creates an embed for a starboard message """
@@ -135,13 +158,68 @@ class Starboard():
 
         return embed
 
-    async def get_starboard_message(self, message : discord.Message) -> discord.Message:
-        """ Retruns a starboard message if there is one corresponding
+    async def count_stars(self, original_message : discord.Message, 
+                                starboard_message: discord.Message) -> int:
+        """ Counts how many stars there is on the message """
+
+        unique_users = set()
+
+        # Counts every star on the original message
+        for reaction in original_message.reactions:
+            if self.check_star(reaction):
+                unique_users = set(await reaction.users().flatten())
+                break
+
+        # If there is still no starboard message, stoping here
+        if starboard_message is None:
+            return len(unique_users)
+
+        # Otherwise, returning stars_count plus the number of star reactions under the
+        # starboard message
+        for reaction in starboard_message.reactions:
+            if self.check_star(reaction):
+                unique_users |= set(await reaction.users().flatten())
+                break
+                
+        return len(unique_users)
+
+    async def get_original_message(self, starboard_message: discord.Message) -> discord.Message:
+        """ Gets the original message from a starboard message """
+
+        if starboard_message is None or len(starboard_message.embeds) == 0:
+            return None
+
+        author_url = starboard_message.embeds[0].author.url
+    
+        r = r"https:\/\/discordapp\.com\/channels\/\d*\/(\d*)\/(\d*)"
+        match = re.search(r, author_url)
+
+        if not match:
+            return None
+
+        channel_id = match.group(1)
+        message_id = match.group(2)
+
+        channel = self.bot.guild.get_channel(int(channel_id))
+        if channel is None:
+            return None
+        
+        return await channel.get_message(message_id)
+
+    async def get_starboard_message(self, original_message : discord.Message) -> discord.Message:
+        """ Retruns a starboard message from the original message if there is one corresponding
             Returns none otherwise
         """
 
+        if original_message is None:
+            return None
+
+        # Checking if the message itself is a starboard message
+        if self.is_starboard_message(original_message):
+            return original_message
+
         # Generating the footer text we are looking for
-        text = 'id : {0.id}'.format(message)
+        text = 'id : {0.id}'.format(original_message)
 
         # Looking into the history of the starboard channel and looking for an 
         # embed message that has the same footer as the variable 'text'
@@ -157,7 +235,8 @@ class Starboard():
 
         # Creating the embed and content of the message 
         embed   = self.create_embed(message)
-        content = ':star: **x1** {0.mention}'.format(message.channel)
+        emoji   = self.get_star_emoji(self.min_stars)
+        content = '{2} **x{1}** {0.mention}'.format(message.channel, self.min_stars, emoji)
 
         # Sending the message and a log
         await self.star_channel.send(content, embed=embed)
@@ -165,41 +244,20 @@ class Starboard():
 
         return
 
-    def get_star_emoji(self, count : int) -> str:
-        """ Returns the emoji to use of the count of stars """
-
-        # Default emoji is :star:
-        emoji = ":star:"
-
-        # Since the self.stars dict has been sorted, we can check
-        # for each star icon if the count variable is high enough to use it.
-        for number, text in self.stars.items():
-            print(number, text)
-            if int(count) >= int(number):
-                emoji = text
-            else:
-                return emoji
-
-        return emoji
-
-    async def edit_star(self, message: discord.Message, count : int):
+    async def edit_star(self, count: int, starboard_message: discord.Message):
         """ Edits a stared message on the starboard to set a fixed count of stars on it """
-
-        # Fetching the starboard message
-        starboard_message = await self.get_starboard_message(message)
-        if starboard_message is None:
-            return
 
         # Generating the new content of the message
         emoji = self.get_star_emoji(count)
-        text = '{0} **x{1}** {2.mention}'.format(emoji, str(count), message.channel)
+        text = starboard_message.content
+
+        while not text.startswith('<#'):
+            text = text[1:]
+
+        text = '{0} **x{1}** {2}'.format(emoji, str(count), text)
 
         # Editing the starboard message 
-        await starboard_message.edit(content=text)
-        self.bot.logs.print('Stared message with id : {0.id}, has now {1} stars'
-            .format(message, count))
-
-        return
+        return await starboard_message.edit(content=text)
 
     async def unstar_message(self, message : discord.Message):
         """ Removes a stared message from the starboard """
@@ -215,48 +273,71 @@ class Starboard():
         return
 
     # --- Events --- 
-    async def on_reaction_add(self, reaction : discord.Reaction, user: discord.User):
+    async def on_reaction_add(self, reaction, user):
 
         # Checking if the starboard is enabled and if the reaction is a star
-        if not self.check_star(reaction) or not self.check_enabled():
+        if not self.check_enabled() or not self.check_star(reaction):
             return
 
-        # Fetching the starboard message and the reaction count
+        # Fetching the starboard message and the original message
+        original_message  = await self.get_original_message (reaction.message)
         starboard_message = await self.get_starboard_message(reaction.message)
-        count = self.count_stars(reaction.message)
 
-        # If there is no starboard message and there is enough stars: staring the message
-        if count >= self.min_stars and starboard_message is None:
-            await self.star_message(reaction.message)
+        if original_message == None:
+            original_message = reaction.message
+
+        count = await self.count_stars(original_message, starboard_message)
+
+        # If there is no starboard message and if there is enough stars and
+        # if the message isn't a starboard message : staring the message
+        if count >= self.min_stars and starboard_message is None and not self.is_starboard_message(reaction.message):
+            return await self.star_message(reaction.message)
 
         # Editing the message to update the stars count
-        await self.edit_star(reaction.message, count)
+        return await self.edit_star(count, starboard_message)
 
-    async def on_reaction_remove(self, reaction: discord.Reaction, user: discord.User):
+    async def on_reaction_remove(self, reaction, user):
         
         # Checking if the starboard is enabled and if the reaction is a star
         if not self.check_star(reaction) or not self.check_enabled():
             return
 
-        # Counting the number of reactions
-        count = self.count_stars(reaction.message)
+        # Fetching the starboard message and the original message
+        original_message  = await self.get_original_message (reaction.message) 
+        starboard_message = await self.get_starboard_message(reaction.message)
+
+        if original_message == None:
+            original_message = reaction.message
         
-        # If there is not enough stars anymore, unstaring the message
-        if (count < self.min_stars):
-            await self.unstar_message(reaction.message)
-            return
+        count = await self.count_stars(original_message, starboard_message)
+        
+        # If there is not enough stars anymore, and if this message isn't a starboard message :
+        # unstaring the message
+        if count < self.min_stars:
+            return await self.unstar_message(original_message)
 
         # Editing the message to update the star count
-        await self.edit_star(reaction.message, count)
+        return await self.edit_star(count, starboard_message)
 
-    async def on_reaction_clear(self, message: discord.Message, reactions: List[discord.Reaction]):
+    async def on_reaction_clear(self, message, reactions):
         
         # Checking if the starboard is enabled and if there is a star in the reactions
         if not self.check_star(reactions) or not self.check_enabled():
             return
 
+        # Fetching the starboard message and the original message
+        original_message  = await self.get_original_message (message) 
+        starboard_message = await self.get_starboard_message(message)
+
+        if original_message == None:
+            original_message = message
+
+        if message.id == starboard_message.id:
+            count = await self.count_stars(original_message, starboard_message)
+            return await self.edit_star(count, starboard_message)
+            
         #If there is: unstaring the message
-        await self.unstar_message(message)
+        return await self.unstar_message(message)
 
 
 def setup(bot):
