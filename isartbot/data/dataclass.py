@@ -24,8 +24,10 @@
 
 import discord
 
-from isartbot                import Bot
-from isartbot.data.classtype import Class_type
+from isartbot                      import Bot
+from isartbot.data.classtype       import Class_type
+from isartbot.data.assignable_role import *
+
 
 class Data_class():
 
@@ -80,6 +82,29 @@ class Data_class():
             pass
 
         return Class_type.none
+
+    def add_assignable_role(self) -> bool:
+        """ Adds an assignable role corresponding to the class role 
+            Returns true if the operation is successful 
+        """
+
+        iartian_role_id = self.bot.settings.get('bot', 'isartian_role_id')
+        role_type       = discord.utils.get(self.bot.guild.roles, name = self.typename)
+
+        assignable_role = create_self_assignable_role(self.bot, 
+            self.role,                               # Main role
+            [iartian_role_id, self.typename],        # Dependencies
+            [iartian_role_id, self.role, role_type]) # Conflicting roles  
+
+
+        return save_self_assignable_role(self.bot, assignable_role)
+
+    def remove_assignable_role(self) -> bool:
+        """ Removes the assignable role for this class
+            Returns True if the operation is successful
+        """
+
+        return remove_self_assignable_role(self.bot, self.role)
 
     @property
     def typename(self):
