@@ -30,7 +30,7 @@ from isartbot.exceptions     import CogLoadingFailed
 from discord.ext             import commands
 
 class Starboard():
-    """ Starboard class """
+    """ Starboard related commands and tasks """
 
     def __init__(self, bot):
 
@@ -47,6 +47,14 @@ class Starboard():
         self.stars = {int(k):v for k,v in self.stars.items()}
         self.stars = dict(sorted(self.stars.items()))
 
+        # Creating the starboard message buffer.
+        # Since the 'on_reaction_x' events are only trigerred on cashed messages
+        # there is no need to look into the history of the star channel.
+        # So to optimize things we are gonna store those messages to avoid doing 
+        # requests to the discord API.
+        self.star_buffer = set()
+        self.bot.loop.create_task(self.init_starboard_buffer())
+
         # If something failed
         if self.stars is None or self.min_stars is None or self.bot.guild.id is None:
             raise CogLoadingFailed('Failed to load one or more settings')
@@ -58,6 +66,14 @@ class Starboard():
         """ Checks if the starboard is enabled or not """
 
         return self.bot.settings.get("enabled", command='starboard')
+
+    def get_message_url(self, original_message: discord.Message) -> str:
+        """ Returns the url of the message """
+
+        if original_message is None:
+            return ""
+
+        return 'https://discordapp.com/channels/{0.guild.id}/{0.channel.id}/{0.id}'.format(original_message)
 
     def check_star(self, reaction : Union[discord.Reaction, List[discord.Reaction]]) -> bool:
         """ Checks if there is a star in the reactions """
@@ -97,9 +113,10 @@ class Starboard():
             # And if the message has embeds
             if len(message.embeds) > 0:
 
-                # If the footer of the first embed of the message starts with 'id'
-                # Then it's a starboard message
-                return str(message.embeds[0].footer.text).lower().startswith('id')
+                # If the author url of the first embed of the message 
+                # starts with 'https://discordapp.com/channels/', then it's 
+                # a starboard message
+                return str(message.embeds[0].author.url).startswith('https://discordapp.com/channels/')
 
         return False
 
@@ -130,7 +147,7 @@ class Starboard():
             return embed
 
         # Seting the author
-        url = "https://discordapp.com/channels/{0.guild.id}/{0.channel.id}/{0.id}".format(message)
+        url = self.get_message_url(message)
         embed.set_author(name=message.author.display_name,
                          url=url,
                          icon_url=message.author.avatar_url)
@@ -153,10 +170,20 @@ class Starboard():
             if len(value) is not 0:
                 embed.add_field(name='Attachments', value='\n'.join(value), inline=False)
 
-        # Seting the footer 
-        embed.set_footer(text="Id : {0.id}".format(message))
-
         return embed
+
+    async def init_starboard_buffer(self):
+        """ Inits the starboard message buffer """
+
+        # This function is called once per module init. 
+        # This function avoids a bug where reloading the starboard module without
+        # rebooting the bot would create duplicated starboard messages if a reaction event
+        # is fired on a cached message (by the discord.py lib).
+
+        async for message in self.star_channel.history(limit=20):
+            self.star_buffer.add(message)
+
+        return
 
     async def count_stars(self, original_message : discord.Message, 
                                 starboard_message: discord.Message) -> int:
@@ -218,14 +245,14 @@ class Starboard():
         if self.is_starboard_message(original_message):
             return original_message
 
-        # Generating the footer text we are looking for
-        text = 'id : {0.id}'.format(original_message)
+        # Generating author url we are looking for
+        url = self.get_message_url(original_message)
 
         # Looking into the history of the starboard channel and looking for an 
-        # embed message that has the same footer as the variable 'text'
-        async for history_message in self.star_channel.history(limit=20):
+        # embed message that has the same author url than the variable 'url'
+        for history_message in self.star_buffer:
             for embed in history_message.embeds:
-                if isinstance(embed.footer.text, str) and embed.footer.text.lower() == text:
+                if embed.author.url == url:
                     return history_message
 
         return None
@@ -239,7 +266,13 @@ class Starboard():
         content = '{2} **x{1}** {0.mention}'.format(message.channel, self.min_stars, emoji)
 
         # Sending the message and a log
-        await self.star_channel.send(content, embed=embed)
+        message = await self.star_channel.send(content, embed=embed)
+        self.star_buffer.add(message)
+
+        # If the buffer contains more than 30 starboard messages : discarding the older one
+        if len(self.star_buffer) > 30:
+            self.star_buffer.pop()
+
         self.bot.logs.print('Starred message with id : {0.id}'.format(message))
 
         return
@@ -270,6 +303,8 @@ class Starboard():
             self.bot.logs.print('Deleting message from starboard with id : {0.id}'.format(message))
             await starboard_message.delete()
 
+            self.star_buffer.discard(starboard_message)
+            
         return
 
     # --- Events --- 
