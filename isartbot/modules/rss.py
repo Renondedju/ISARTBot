@@ -204,11 +204,11 @@ class Rss():
     async def test(self, ctx):
         """ Test the rss embed """
 
-        feed = feedparser.parse(self.feeds[2]['url'])
+        feed = feedparser.parse(self.feeds[0]['url'])
 
-        for i in range(3):
+        for i in range(1):
             embed = self.get_entry_embed(feed, feed.entries[i],
-                self.feeds[2]['logo'])
+                self.feeds[0]['logo'])
 
             await ctx.send(embed = embed)
 
