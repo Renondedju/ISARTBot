@@ -88,16 +88,23 @@ class Iam_commands():
 
         command = self.bot.get_command(matches.group(1))
         if (not await command.can_run(ctx)):
-            await self.bot.send_fail(ctx, "The checks for this command failed, "
+            await self.bot.send_fail(ctx, 
+                                "The checks for this command failed, "
                                 "maybe you don't have the required rights ?")
             return
 
         for word in re.compile('\w+').findall(command_str.replace(prefix + matches.group(1), '')):
+
+            # if type of 'command' is a discord command, then everything is ready to be executed
+            if type(command) == discord.ext.commands.core.Command:
+                break
+
             command = command.get_command(word)
             if command is None:
                 break
             if (not await command.can_run(ctx)):
-                await self.bot.send_fail(ctx, "The checks for this subcommand failed, "
+                await self.bot.send_fail(ctx,
+                                "The checks for this subcommand failed, "
                                 "maybe you don't have the required rights ?")
                 return
 

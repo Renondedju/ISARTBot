@@ -49,10 +49,10 @@ class Bot(discord.ext.commands.Bot):
         self.logs.print('Using settings file at {}'.format(abspath(self.__settings.path)))
         self.logs.print('Initializing bot ...')
 
-        self.add_check(self.trigger_typing)
         self.add_check(self.globally_block_dms)
         self.add_check(self.log_command)
         self.add_check(self.check_enable)
+        self.add_check(self.trigger_typing)
 
         self.loop.create_task(self.load_cog())
 
