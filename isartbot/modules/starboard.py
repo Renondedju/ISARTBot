@@ -153,7 +153,17 @@ class Starboard():
                          icon_url=message.author.avatar_url)
 
         # Seting the embed content
-        embed.description = message.content
+        if message.content:
+            embed.description = message.content
+        
+        elif len(message.embeds) > 0:
+            embed.description = message.embeds[0].description
+            embed.title       = message.embeds[0].title
+
+            if message.embeds[0].image.url != discord.Embed.Empty:
+                embed.set_image(url=message.embeds[0].image.url)
+        
+            return embed
 
         # Iterating every attachment and adding it the the embed
         has_image = False
