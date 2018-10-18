@@ -122,12 +122,6 @@ class Class_commands():
                     category   = category,
                     overwrites = overwrites)
 
-        #Finally, adding the roles as self assignable
-        assignable_role = ar.create_self_assignable_role(self.bot, role, 
-                                            [self.iartian_role_id],
-                                            [self.iartian_role_id])
-        ar.save_self_assignable_role(self.bot, assignable_role)
-
         await ctx.bot.send_success(ctx,
             f"Successfully added {role.mention} the the available classes",
             "Class creation")
@@ -181,8 +175,6 @@ class Class_commands():
         try:
             for channel in category.channels:
                 await channel.delete()
-
-            ar.remove_self_assignable_role(self.bot, role)
 
             await role.delete()
             await category.delete()
