@@ -43,7 +43,7 @@ class Iam_commands():
 
     @commands.command(pass_context=True)
     async def iam(self, ctx, role : discord.Role):
-        """ Assign a class role to a user"""
+        """ adds a role to a user"""
 
         assignable_roles = get_self_assignable_roles(self.bot)
 
@@ -52,27 +52,26 @@ class Iam_commands():
 
             #If we found the desired role
             if role.id == assignable_role.role.id:
-
-                #Checking for any conflicting role
-                for conflict in assignable_role.conflicting:
-
-                    #If a conflicting role is found : error
-                    if conflict in ctx.author.roles:
-                        return await self.bot.send_fail(ctx, 
-                            "Cannot add you this role: the role named {} is conflicting.".format(conflict.mention), 
-                            "I am")
-
-                #Otherwise adding the requested role
                 await ctx.author.add_roles(role, reason = 'Requested via an iam command')
-
-                #As well as the dependency roles
-                for dependency in assignable_role.dependencies:
-                    await ctx.author.add_roles(dependency, 
-                        reason = 'Requested via an iam command (dependency)')
-
                 return await self.bot.send_success(ctx, "Role added !", "I am")
 
         return await self.bot.send_fail(ctx, "You cannot assing yourself this role !", "I am")
+
+    @commands.command(pass_context=True)
+    async def iamn(self, ctx, role : discord.Role):
+        """ Removes a role to a user"""
+
+        assignable_roles = get_self_assignable_roles(self.bot)
+
+        #For every assignable role
+        for assignable_role in assignable_roles:
+
+            #If we found the desired role
+            if role.id == assignable_role.role.id:
+                await ctx.author.remove_roles(role, reason = 'Requested via an iamn command')
+                return await self.bot.send_success(ctx, "Role removed !", "I am")
+
+        return await self.bot.send_fail(ctx, "This role isn't a self assignable role !", "I am")
 
     @commands.command(pass_context=True, hidden=True, name='as')
     @commands.check(is_admin)
@@ -186,31 +185,36 @@ class Iam_commands():
 
     @commands.command(pass_context=True, hidden=True)
     @commands.check(is_admin)
-    async def asar(self, ctx, role: discord.Role, *args : discord.Role):
-        """ asar stand for 'Add Self Assignable Role' 
-
-            Parameters : @Main_role @Conflict1 @conflict2, etc...
-        """
+    async def asar(self, ctx, role: discord.Role):
+        """ asar stand for 'Add Self Assignable Role' """
 
         if role is None:
             return await self.bot.send_fail(ctx, 
                 "The role you asked for does not exists",
                 "Add self assignable role")
 
-        conflicts = [role]
-        conflicts.extend((arg for arg in args if arg != None))
-        sar = create_self_assignable_role(self.bot, role, [], conflicts)
-
-        if not save_self_assignable_role(self.bot, sar):
+        if not save_self_assignable_role(self.bot, Assignable_role(self.bot, role)):
             return await self.bot.send_fail(ctx,
-                "Failed to add the role {} as a self "
-                "assignable role. This role might already be self assignable".format(role.mention),
+                f"Failed to add the role {role.mention} as a self assignable role.",
                 "Add self assignable role")
 
         return await self.bot.send_success(ctx,
-            "Role successfully added to the self assignable roles"
-            " with the following conflicting roles: {}".format(' '.join([c.mention for c in conflicts])),
+            f"Role successfully added {role.mention} to the self assignable roles",
             "Add self assignable role")
+
+    @commands.command(pass_context=True, hidden=True)
+    @commands.check(is_admin)
+    async def rsar(self, ctx, role: discord.Role):
+        """ rsar stands for 'Remove Self Assignable Role' """
+
+        if remove_self_assignable_role(self.bot, role):
+            return await self.bot.send_success(ctx,
+                "Role successfully removed !",
+                "Remove self assignable role")
+
+        return await self.bot.send_fail(ctx,
+                "No such role to remove !",
+                "Remove self assignable role")
 
 def setup(bot):
     bot.add_cog(Iam_commands(bot))
