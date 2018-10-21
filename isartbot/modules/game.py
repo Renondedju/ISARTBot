@@ -25,6 +25,8 @@
 import discord
 import asyncio
 
+from isartbot.data import assignable_role as ar 
+
 from isartbot.bot_decorators import is_dev, is_admin, is_isartian
 from isartbot.settings       import Settings
 from isartbot.logs           import Logs
@@ -98,7 +100,7 @@ class Game_commands():
 
         return None 
 
-        #Create command
+    #Create command
     @game.command(name='create', hidden=True)
     @commands.check(is_admin)
     async def _create(self, ctx, *, game_name: str):
@@ -149,8 +151,7 @@ class Game_commands():
 
         return
 
-        #Delete command
-    
+    #Delete command
     @game.command(name='delete', hidden=True)
     @commands.check(is_admin)
     async def _delete(self, ctx, *, game_name: str):
@@ -217,7 +218,6 @@ class Game_commands():
             raise commands.CommandError(message="Failed to delete a role or channel !")
         
         ctx.bot.settings.delete(role.name, "games_roles", command="game")
-
 
         embed.description += "\n\nSuccessfully deleted the game {} !".format(game_name)
         embed.color = discord.Color.green()
