@@ -122,12 +122,6 @@ class Class_commands():
                     category   = category,
                     overwrites = overwrites)
 
-        #Finally, adding the roles as self assignable
-        assignable_role = ar.create_self_assignable_role(self.bot, role, 
-                                            [self.iartian_role_id],
-                                            [self.iartian_role_id])
-        ar.save_self_assignable_role(self.bot, assignable_role)
-
         await ctx.bot.send_success(ctx,
             f"Successfully added {role.mention} the the available classes",
             "Class creation")
@@ -181,8 +175,6 @@ class Class_commands():
         try:
             for channel in category.channels:
                 await channel.delete()
-
-            ar.remove_self_assignable_role(self.bot, role)
 
             await role.delete()
             await category.delete()
@@ -241,7 +233,8 @@ class Class_commands():
            (old_category is     None) or \
            (old_role     is     None) or \
            (old_delegate is     None):
-            await ctx.bot.send_fail(ctx, "One of the roles is missing or already exists",
+            return await ctx.bot.send_fail(ctx, 
+                "One of the roles is missing or already exists",
                 "Command failed")
     
         prefix = ctx.bot.settings.get("delegate_role_prefix", command = "class")
@@ -249,11 +242,6 @@ class Class_commands():
         await old_role    .edit(name=new_name)
         await old_category.edit(name=new_name)
         await old_delegate.edit(name=f'{prefix} {new_name}')
-
-        roles = self.bot.settings.get('roles', command = 'class')
-        roles.remove(original_name)
-        roles.append(new_name)
-        self.bot.settings.write(roles, 'roles', command = 'class')
 
         await ctx.bot.send_success(ctx,
             f"The class @{original_name} has successfully renamed to {old_role.mention}",
