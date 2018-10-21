@@ -145,9 +145,6 @@ class Game_commands():
                                 "text"  : [text.id]},
             role.name, "games_roles", command="game")
 
-        assignable_role = ar.create_self_assignable_role(self.bot, role, [], [role])
-        ar.save_self_assignable_role(self.bot, assignable_role)
-
         await ctx.bot.send_success(ctx,
             "Added the game {} to the list of avaliable games".format(role.mention),
             "Create game")
@@ -214,8 +211,6 @@ class Game_commands():
                 vocal = ctx.bot.get_channel(id)
                 if (vocal != None):
                     await vocal.delete(reason=reason)
-
-            ar.remove_self_assignable_role(self.bot, role)
 
             await role.delete()
 
