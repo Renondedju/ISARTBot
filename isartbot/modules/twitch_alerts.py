@@ -71,20 +71,21 @@ class TwitchAlerts():
 
             # checking if the stream started (raising edge)
             if len(prev_stream_state) == 0 and len(current_stream_state) != 0:
-                await self.on_stream_start(current_stream_state)
+                await self.on_stream_start(current_stream_state[0], 
+                    helix.get_games(game_ids=current_stream_state[0]['game_id']))
 
             # checking if the stream stopped (falling edge)
             elif len(prev_stream_state) != 0 and len(current_stream_state) == 0:
-                await self.on_stream_stop(prev_stream_state)
+                await self.on_stream_stop(prev_stream_state[0])
             
             prev_stream_state = current_stream_state
 
         self.bot.logs.print('Twitch notification loop exited !')
 
-    async def on_stream_start(self, stream):
+    async def on_stream_start(self, stream, game):
         """ Event triggered when a stream starts """
 
-        await self.send_notification(stream)
+        await self.send_notification(stream, game)
         self.bot.logs.print('Twitch stream started !')
 
     async def on_stream_stop(self, stream):
@@ -92,9 +93,22 @@ class TwitchAlerts():
 
         self.bot.logs.print('Twitch stream stopped !')
 
-    async def send_notification(self, stream):
+    async def send_notification(self, stream, game):
         """ Sends a notification message """
-        self.message = await self.announce_channel.send(self.notification_message)
+
+        embed = discord.Embed()
+        embed.set_author(
+            name="E-SART Dragons",
+            icon_url="https://static-cdn.jtvnw.net/jtv_user_pictures/twitch-profile_image-8a8c5be2e3b64a9a-70x70.png")
+        embed.url   = "https://www.twitch.tv/esartdragons"
+        embed.title = stream['title']
+        embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/1016327266240991233/9qz6aCD9_400x400.jpg")
+        embed.set_footer(text="Type \"!iam stream\" to get notified next time !")
+
+        if (len(game) != 0):
+            embed.add_field(name='Game', value=game[0]['name'])
+
+        self.message = await self.announce_channel.send(self.notification_message, embed=embed)
 
 def setup(bot):
     bot.add_cog(TwitchAlerts(bot))
