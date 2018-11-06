@@ -103,7 +103,7 @@ class TwitchAlerts():
         embed.url   = "https://www.twitch.tv/esartdragons"
         embed.title = stream['title']
         embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/1016327266240991233/9qz6aCD9_400x400.jpg")
-        embed.set_footer(text="Type \"!iam stream\" to get notified next time !")
+        embed.set_footer(text="Type \"!iam Stream\" to get notified next time !")
 
         if (len(game) != 0):
             embed.add_field(name='Game', value=game[0]['name'])
