@@ -52,7 +52,7 @@ class Game_commands():
         isartian = discord.utils.get(guild.roles, id=self.bot.settings.get('bot', 'isartian_role_id'))
 
         if (isartian is None):
-            self.bot.logs.print("Isartian role not found !")
+            self.bot.logs.print("Isartian role not found!")
             self.bot.logs.print("Aborting game task, restart it by reloading the game module.")
             return
 
@@ -80,7 +80,7 @@ class Game_commands():
                     except:
                         pass
 
-        self.bot.logs.print(f'Auto assign game loop finished !')
+        self.bot.logs.print(f'Auto assign game loop finished!')
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def game(self, ctx):
@@ -104,14 +104,14 @@ class Game_commands():
     @game.command(name='create', hidden=True)
     @commands.check(is_admin)
     async def _create(self, ctx, *, game_name: str):
-        """ Creates a game role if this game does not exists yet (admin only) """
+        """ Creates a game role if this game does not yet exist (admin only) """
 
         game_name = game_name.lower().strip()
 
         #Checking if the game already exists
         if game_name in self.bot.settings.get("games_roles", command="game"):
             await ctx.bot.send_fail(ctx, 
-                "The game named {} already exists !".format(game_name),
+                "The game named {} already exists!".format(game_name),
                 "Create game")
             return
 
@@ -146,7 +146,7 @@ class Game_commands():
             role.name, "games_roles", command="game")
 
         await ctx.bot.send_success(ctx,
-            "Added the game {} to the list of avaliable games".format(role.mention),
+            "Added the game {} to the list of available games".format(role.mention),
             "Create game")
 
         return
@@ -160,7 +160,7 @@ class Game_commands():
 
         #Checking if the game exists
         if game_name not in self.bot.settings.get("games_roles", command="game"):
-            await ctx.bot.send_fail(ctx, "The game named {} does not exists !".format(game_name))
+            await ctx.bot.send_fail(ctx, "The game named {} does not exist!".format(game_name))
             return
 
         game_category = self.get_game_category(ctx)
@@ -180,8 +180,8 @@ class Game_commands():
 
         embed = discord.Embed()
 
-        embed.description = "Are you sure you want to delete the game {} ?".format(role.mention)
-        embed.title       = "Delete game ?"
+        embed.description = "Are you sure you want to delete the game {}?".format(role.mention)
+        embed.title       = "Delete game?"
         embed.set_footer(text="React with 👍 if you want to continue")
 
         message = await ctx.send(embed=embed)
@@ -215,11 +215,11 @@ class Game_commands():
             await role.delete()
 
         except:
-            raise commands.CommandError(message="Failed to delete a role or channel !")
+            raise commands.CommandError(message="Failed to delete a role or channel!")
         
         ctx.bot.settings.delete(role.name, "games_roles", command="game")
 
-        embed.description += "\n\nSuccessfully deleted the game {} !".format(game_name)
+        embed.description += "\n\nSuccessfully deleted the game {}!".format(game_name)
         embed.color = discord.Color.green()
         
         await message.edit(embed=embed)
@@ -233,7 +233,7 @@ class Game_commands():
 
         if isinstance(error, commands.CheckFailure):
             await ctx.bot.send_fail(ctx,
-                "You need to be an admin to do that !"
+                "You need to be an admin to do that!"
                 ,"Command failed")
 
         elif isinstance(error, commands.MissingRequiredArgument):
@@ -245,7 +245,7 @@ class Game_commands():
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry !"
+                "I need some more permissions to do that sorry!"
                 ,"Command failed")
 
         else:
@@ -277,17 +277,17 @@ class Game_commands():
 
         if role in ctx.message.author.roles:
             return await ctx.bot.send_fail(ctx,
-                "You already have this game role !"
+                "You already have this game role!"
                 "\nIf you are lost here is your channel {}".format(text.mention),
                 "Game")
 
         await ctx.message.author.add_roles(role)
 
-        await text.send("{0.mention} just joined the {1}'s world ! Gl & Hf !"
+        await text.send("{0.mention} just joined the {1}'s world! Gl & Hf!"
             .format(ctx.author, game_name))
 
         return await ctx.bot.send_success(ctx, 
-            "Role added ! Have fun in {} !".format(text.mention),
+            "Role added! Have fun in {}!".format(text.mention),
             "Game")
 
     @_add.error
@@ -303,7 +303,7 @@ class Game_commands():
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry !"
+                "I need some more permissions to do that sorry!"
                 ,"Command failed")
 
         else:
@@ -332,7 +332,7 @@ class Game_commands():
             await ctx.message.author.remove_roles(role)
 
             return await ctx.bot.send_success(ctx, 
-                "Game role removed !",
+                "Game role removed!",
                 "Game")
         
         return await ctx.bot.send_fail(ctx, 
@@ -352,7 +352,7 @@ class Game_commands():
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry !"
+                "I need some more permissions to do that sorry!"
                 ,"Command failed")
 
         else:
@@ -393,7 +393,7 @@ class Game_commands():
 
         if isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry !"
+                "I need some more permissions to do that sorry!"
                 ,"Command failed")
 
         else:
