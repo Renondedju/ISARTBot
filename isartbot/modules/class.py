@@ -134,7 +134,7 @@ class Class_commands():
         category, role, delegate_role = self.get_class(ctx, name)
 
         if category is None:
-            await ctx.bot.send_fail(ctx, "This class does not exists!", "Delete class?")
+            await ctx.bot.send_fail(ctx, "This class does not exist!", "Delete class?")
             return
 
         if role is None:
@@ -244,7 +244,7 @@ class Class_commands():
         await old_delegate.edit(name=f'{prefix} {new_name}')
 
         await ctx.bot.send_success(ctx,
-            f"The class @{original_name} has successfully renamed to {old_role.mention}",
+            f"The class @{original_name} has successfully been renamed to {old_role.mention}",
             "Rename class")
 
 def setup(bot):
