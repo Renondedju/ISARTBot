@@ -80,18 +80,18 @@ class TwitchAlerts():
             
             prev_stream_state = current_stream_state
 
-        self.bot.logs.print('Twitch notification loop exited !')
+        self.bot.logs.print('Twitch notification loop exited!')
 
     async def on_stream_start(self, stream, game):
         """ Event triggered when a stream starts """
 
         await self.send_notification(stream, game)
-        self.bot.logs.print('Twitch stream started !')
+        self.bot.logs.print('Twitch stream started!')
 
     async def on_stream_stop(self, stream):
         """ Event trigerred when a stream stops """
 
-        self.bot.logs.print('Twitch stream stopped !')
+        self.bot.logs.print('Twitch stream stopped!')
 
     async def send_notification(self, stream, game):
         """ Sends a notification message """
@@ -102,8 +102,8 @@ class TwitchAlerts():
             icon_url="https://static-cdn.jtvnw.net/jtv_user_pictures/twitch-profile_image-8a8c5be2e3b64a9a-70x70.png")
         embed.url   = "https://www.twitch.tv/esartdragons"
         embed.title = stream['title']
-        embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/1016327266240991233/9qz6aCD9_400x400.jpg")
-        embed.set_footer(text="Type \"!iam Stream\" to get notified next time !")
+        embed.set_thumbnail(url="https://static-cdn.jtvnw.net/jtv_user_pictures/bc76fb0a-341a-4382-a784-fc1aca9ebcf8-profile_image-300x300.png")
+        embed.set_footer(text="Type \"!iam Stream\" to get notified next time!")
 
         if (len(game) != 0):
             embed.add_field(name='Game', value=game[0]['name'])
