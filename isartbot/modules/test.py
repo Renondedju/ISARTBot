@@ -25,7 +25,7 @@
 import asyncio
 import discord
 
-from isartbot.bot_decorators import is_dev, is_admin, dont_run
+from isartbot.bot_decorators import is_dev, is_admin, is_moderator, dont_run
 from discord.ext             import commands
 from json                    import dumps
 
@@ -58,24 +58,39 @@ class Test_commands(commands.Cog):
         if isinstance(error, commands.CheckFailure):
             await ctx.send("You need to be a dev to use this command")
             return
-        
+
         await ctx.bot.on_error(ctx, error)
 
     @test.command(name='admin')
     @commands.check(is_admin)
     async def _admin(self, ctx):
-        await ctx.send("You are an admin !")
+        await ctx.send("You are an admin!")
         return
 
     @_admin.error
     async def _admin_error(self, ctx):
-        await ctx.send("You are not an admin !")
+        await ctx.send("You are not an admin!")
+        return
+
+    @test.command(name='prune', pass_context=True)
+    @commands.check(is_moderator)
+    async def _prune(self, ctx, number : int, member : discord.Member = None):
+        messages = []
+        if (member is None):
+            messages = await ctx.channel.history(limit=number + 1).flatten()
+        else:
+            async for message in ctx.channel.history(limit=number + 1):
+                if (message.author == member):
+                     messages.append(message)
+            messages.append(ctx.message)
+
+        await ctx.channel.delete_messages(set(messages))
         return
 
     @test.command(name='dontrun', pass_context=True)
     @commands.check(dont_run)
     async def dontrun(self, ctx):
-        await ctx.send('Mhhh, i guess there is a problem')
+        await ctx.send('Mhhh, I guess there is a problem')
         return
 
     @dontrun.error

@@ -45,7 +45,7 @@ class Module_commands(commands.Cog):
     async def module(self, ctx):
         
         if ctx.invoked_subcommand is None:
-            await ctx.send("{0.subcommand_passed} doesn't exists".format(ctx))
+            await ctx.send("{0.subcommand_passed} does not exist".format(ctx))
 
     @module.error
     async def module_error(self, ctx, error):

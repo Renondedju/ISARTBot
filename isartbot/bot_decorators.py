@@ -33,9 +33,9 @@ def dont_run(ctx):
     return False
 
 def is_dev(ctx):
-    """ 
+    """
         Checks if the author is one of the
-        authors specified in the settings.json file 
+        authors specified in the settings.json file
     """
 
     for id in ctx.bot.settings.get("bot", "developers_id"):
@@ -44,32 +44,55 @@ def is_dev(ctx):
 
     return False
 
-async def is_isartian(ctx):
-    """
-        Checks if the author is an isartian
-    """
+async def is_author_in_role(ctx, id : int):
+    role = discord.utils.get(ctx.guild.roles, id)
 
-    isartian = discord.utils.get(ctx.guild.roles, 
-        id = ctx.bot.settings.get('bot', 'isartian_role_id'))
-
-    if (isartian is None):
-        ctx.bot.logs.print("Isartian role is empty !")
+    if (role is None):
+        ctx.bot.logs.print("Role with id " + id + " does not exist.")
         return False
 
-    result = isartian in ctx.author.roles
+    result = role in ctx.author.roles
 
     if (result is False):
-        await ctx.bot.send_fail(ctx, 
-            "Sorry but you need to be have the isartian role to do that",
+        await ctx.bot.send_fail(ctx,
+            "Sorry but you need at least the role " + role.name + " to do that",
             "Check")
 
     return result
 
+async def is_isartian(ctx):
+    """
+        Checks if the author is an Isartian
+    """
+    return is_author_in_role(ctx, ctx.bot.settings.get('bot', 'isartian_role_id'))
+    or is_alumni(ctx)
+
+async def is_alumni(ctx):
+    """
+        Checks if the author is an Alumni
+    """
+    return is_author_in_role(ctx, ctx.bot.settings.get('bot', 'alumni_role_id'))
+
+async def is_dragon(ctx):
+    """
+        Checks if the author has the E-SART Dragons role
+    """
+    return is_moderator(ctx) or
+    is_author_in_role(ctx, ctx.bot.settings.get('bot', 'dragon_role_id'))
+
+async def is_moderator(ctx):
+    """
+        Checks if the author is a Moderator
+    """
+    return is_admin(ctx) or
+    is_author_in_role(ctx, ctx.bot.settings.get('bot', 'dragon_role_id'))
+
 def is_admin(ctx):
-    """ 
+    """
         Checks if the author is an admin
     """
+
     if ctx.bot.settings.get("debug") and is_dev(ctx):
         return True
-        
+
     return ctx.author.guild_permissions.administrator
