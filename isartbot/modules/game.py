@@ -25,15 +25,16 @@
 import discord
 import asyncio
 
-from isartbot.data import assignable_role as ar 
+from isartbot.data import assignable_role as ar
 
-from isartbot.bot_decorators import is_dev, is_admin, is_isartian
+from isartbot.bot_decorators import is_dev, is_moderator, is_isartian
 from isartbot.settings       import Settings
 from isartbot.logs           import Logs
 from discord.ext             import commands
 from math                    import ceil
 
-class Game_commands(commands.Cog):
+class GameCommands(commands.Cog, name='game'):
+    """Helps managing games roles and channels"""
 
     def __init__(self, bot):
 
@@ -45,14 +46,14 @@ class Game_commands(commands.Cog):
         self.task.cancel()
 
     async def check_for_games(self):
-        """ Scan games and auto assign """
+        """ Scans for games and auto assigns them"""
 
         guild    = self.bot.guild
         delay    = self.bot.settings.get('auto_assign_refresh_delay', command = "game")
         isartian = discord.utils.get(guild.roles, id=self.bot.settings.get('bot', 'isartian_role_id'))
 
         if (isartian is None):
-            self.bot.logs.print("Isartian role not found!")
+            self.bot.logs.print(isartian.name + " role not found!")
             self.bot.logs.print("Aborting game task, restart it by reloading the game module.")
             return
 
@@ -61,7 +62,7 @@ class Game_commands(commands.Cog):
 
             if not self.bot.settings.get('enabled', command = "game"):
                 pass
-            
+
             for member in guild.members:
 
                 if isartian not in member.roles:
@@ -92,25 +93,25 @@ class Game_commands(commands.Cog):
                 "Game")
 
     def get_game_category(self, ctx):
-        """ Retriving the game category """
+        """ Retrieves the game category"""
 
         for cat in ctx.guild.categories:
             if str(cat.id) == str(ctx.bot.settings.get("category_id", command="game")):
                 return cat
 
-        return None 
+        return None
 
     #Create command
     @game.command(name='create', hidden=True)
-    @commands.check(is_admin)
+    @commands.check(is_moderator)
     async def _create(self, ctx, *, game_name: str):
-        """ Creates a game role if this game does not yet exist (admin only) """
+        """Creates a game role if this game does not yet exist (moderator only)"""
 
         game_name = game_name.lower().strip()
 
         #Checking if the game already exists
         if game_name in self.bot.settings.get("games_roles", command="game"):
-            await ctx.bot.send_fail(ctx, 
+            await ctx.bot.send_fail(ctx,
                 "The game named {} already exists!".format(game_name),
                 "Create game")
             return
@@ -153,9 +154,9 @@ class Game_commands(commands.Cog):
 
     #Delete command
     @game.command(name='delete', hidden=True)
-    @commands.check(is_admin)
+    @commands.check(is_moderator)
     async def _delete(self, ctx, *, game_name: str):
-        """ Deletes a game role (Admin only) """
+        """Deletes a game role (moderator only)"""
         game_name = game_name.lower().strip()
 
         #Checking if the game exists
@@ -195,7 +196,7 @@ class Game_commands(commands.Cog):
 
             embed.description += "\n\nAborted deletion."
             embed.color = discord.Color.red()
-            
+
             await message.edit(embed=embed)
             return
 
@@ -216,12 +217,12 @@ class Game_commands(commands.Cog):
 
         except:
             raise commands.CommandError(message="Failed to delete a role or channel!")
-        
+
         ctx.bot.settings.delete(role.name, "games_roles", command="game")
 
         embed.description += "\n\nSuccessfully deleted the game {}!".format(game_name)
         embed.color = discord.Color.green()
-        
+
         await message.edit(embed=embed)
 
     @_delete.error
@@ -245,21 +246,20 @@ class Game_commands(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry!"
-                ,"Command failed")
+                "I need some more permissions to do that sorry!",
+                "Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
 
         return
 
-        #Add command
-    
+    #Add command
     @game.command(name='add')
     @commands.check(is_isartian)
     async def _add(self, ctx, *, game_name: str):
-        """ Adds a game role to the user """
-        
+        """Adds a game role to the user"""
+
         game_name = game_name.lower().strip()
 
         role = discord.utils.get(ctx.guild.roles,
@@ -269,8 +269,8 @@ class Game_commands(commands.Cog):
             return await ctx.bot.send_fail(ctx,
                 "No corresponding game role found"
                 "\nUse ``{}game list`` to have the list of all the games avaliable for now"
-                .format(self.bot.settings.get("bot", "prefix"))
-                ,"Game")
+                .format(self.bot.settings.get("bot", "prefix")),
+                "Game")
 
         text = ctx.bot.get_channel(ctx.bot.settings.get(
             "games_roles", game_name, "text", command="game")[0])
@@ -286,7 +286,7 @@ class Game_commands(commands.Cog):
         await text.send("{0.mention} just joined the {1}'s world! Gl & Hf!"
             .format(ctx.author, game_name))
 
-        return await ctx.bot.send_success(ctx, 
+        return await ctx.bot.send_success(ctx,
             "Role added! Have fun in {}!".format(text.mention),
             "Game")
 
@@ -303,19 +303,18 @@ class Game_commands(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry!"
-                ,"Command failed")
+                "I need some more permissions to do that sorry!",
+                "Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
 
-        #Remove command
- 
+    #Remove command
     @game.command(name='remove')
     @commands.check(is_isartian)
     async def _remove(self, ctx, *, game_name: str):
-        """ Removes a game role to the user """
-        
+        """Removes a game role from the user"""
+
         game_name = game_name.lower().strip()
 
         role = discord.utils.get(ctx.guild.roles,
@@ -325,17 +324,17 @@ class Game_commands(commands.Cog):
             return await ctx.bot.send_fail(ctx,
                 "No corresponding game role found"
                 "\nUse ``{}game list`` to have the list of all the games avaliable for now"
-                .format(self.bot.settings.get("bot", "prefix"))
-                ,"Game")
+                .format(self.bot.settings.get("bot", "prefix")),
+                "Game")
 
         if role in ctx.message.author.roles:
             await ctx.message.author.remove_roles(role)
 
-            return await ctx.bot.send_success(ctx, 
+            return await ctx.bot.send_success(ctx,
                 "Game role removed!",
                 "Game")
-        
-        return await ctx.bot.send_fail(ctx, 
+
+        return await ctx.bot.send_fail(ctx,
             "Sorry but I can't remove you a role that you don't have",
             "Game")
 
@@ -362,7 +361,7 @@ class Game_commands(commands.Cog):
     @game.command(name='list')
     @commands.check(is_isartian)
     async def _list(self, ctx, page = 1):
-        """ lists the games avaliable """
+        """Lists the games available"""
 
         games     = list(ctx.bot.settings.get("games_roles", command="game").keys())
         max_lines = ctx.bot.settings.get(  "list_max_lines", command="game")
@@ -393,11 +392,11 @@ class Game_commands(commands.Cog):
 
         if isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry!"
-                ,"Command failed")
+                "I need some more permissions to do that sorry!",
+                "Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
 
 def setup(bot):
-    bot.add_cog(Game_commands(bot))
+    bot.add_cog(GameCommands(bot))

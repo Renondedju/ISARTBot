@@ -31,14 +31,14 @@ from discord.ext             import commands
 from isartbot.converters     import upper_clean
 from isartbot.bot_decorators import is_admin
 
-class Class_commands(commands.Cog):
+class ClassCommands(commands.Cog):
 
     def __init__(self, bot):
 
         #Private
         self.bot = bot
 
-        self.iartian_role_id = self.bot.settings.get('bot', 'isartian_role_id')
+        self.isartian_role_id = self.bot.settings.get('bot', 'isartian_role_id')
 
     def get_class(self, ctx, class_name : str):
         """ Checks if a class exists or not """
@@ -56,7 +56,7 @@ class Class_commands(commands.Cog):
     @commands.group(pass_context=True, invoke_without_command=True,
                     name='class', hidden=True)
     async def _class(self, ctx):
-        """ Class modification command """
+        """Class modification command"""
         if ctx.invoked_subcommand is None:
             await ctx.bot.send_fail(ctx,
                 "Class subcommand not recognized.\nIf you need some help please"
@@ -65,7 +65,7 @@ class Class_commands(commands.Cog):
     @_class.command(name='create', hidden=True)
     @commands.check(is_admin)
     async def _create(self, ctx, name : upper_clean):
-        """ Creates a class """
+        """Creates a class"""
 
         cat, role, delegate = self.get_class(ctx, name)
 
@@ -129,7 +129,7 @@ class Class_commands(commands.Cog):
     @_class.command(name='delete', hidden=True)
     @commands.check(is_admin)
     async def _delete(self, ctx, name : upper_clean):
-        """ Deletes a class """
+        """Deletes a class"""
 
         category, role, delegate_role = self.get_class(ctx, name)
 
@@ -168,7 +168,7 @@ class Class_commands(commands.Cog):
         except asyncio.TimeoutError:
             embed.description += "\n\nAborted deletion."
             embed.color = discord.Color.red()
-            
+
             await message.edit(embed=embed)
             return
 
@@ -189,7 +189,7 @@ class Class_commands(commands.Cog):
 
         embed.description += f"\n\nSuccessfully deleted the class {name}!"
         embed.color = discord.Color.green()
-        
+
         await message.edit(embed=embed)
 
     @_create.error
@@ -222,7 +222,7 @@ class Class_commands(commands.Cog):
     @_class.command(name='rename', hidden=True)
     @commands.check(is_admin)
     async def _rename(self, ctx, original_name : upper_clean, new_name : upper_clean):
-        """ Renames a class """
+        """Renames a class"""
 
         old_category, old_role, old_delegate = self.get_class(ctx, original_name)
         new_category, new_role, new_delegate = self.get_class(ctx, new_name)
@@ -233,10 +233,10 @@ class Class_commands(commands.Cog):
            (old_category is     None) or \
            (old_role     is     None) or \
            (old_delegate is     None):
-            return await ctx.bot.send_fail(ctx, 
+            return await ctx.bot.send_fail(ctx,
                 "One of the roles is missing or already exists",
                 "Command failed")
-    
+
         prefix = ctx.bot.settings.get("delegate_role_prefix", command = "class")
 
         await old_role    .edit(name=new_name)
@@ -248,4 +248,4 @@ class Class_commands(commands.Cog):
             "Rename class")
 
 def setup(bot):
-    bot.add_cog(Class_commands(bot))
+    bot.add_cog(ClassCommands(bot))

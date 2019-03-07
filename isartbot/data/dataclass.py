@@ -41,17 +41,17 @@ class Data_class():
         self.bot               = bot
 
     def get_name(self, name : str) -> str:
-        """ Retruns the cleaned name of the class """
+        """ Returns the cleaned name of the class"""
 
         return name.upper().strip()
 
     def get_role(self) -> discord.Role:
-        """ Returns the main name of the class """
+        """ Returns the main name of the class"""
 
         return discord.utils.get(self.bot.guild.roles, name = self.name)
 
     def get_category(self) -> discord.CategoryChannel:
-        """ Returns the category channel of the class """
+        """ Returns the category channel of the class"""
 
         return discord.utils.get(self.bot.guild.categories, name = self.get_name(self.name))
 
@@ -62,7 +62,7 @@ class Data_class():
         return discord.utils.get(self.bot.guild.roles, name = delegate_prefix + ' ' + self.name)
 
     def eval_type(self) -> Class_type:
-        """ Evaluates the class type from the class name (may not be 100% accurate !) """
+        """ Evaluates the class type from the class name (may not be 100% accurate !)"""
 
         #Getting the name of every class type from the classtype enum
         instance = Class_type()
@@ -84,17 +84,17 @@ class Data_class():
         return Class_type.none
 
     def add_assignable_role(self) -> bool:
-        """ Adds an assignable role corresponding to the class role 
-            Returns true if the operation is successful 
+        """ Adds an assignable role corresponding to the class role
+            Returns true if the operation is successful
         """
 
         iartian_role_id = self.bot.settings.get('bot', 'isartian_role_id')
         role_type       = discord.utils.get(self.bot.guild.roles, name = self.typename)
 
-        assignable_role = create_self_assignable_role(self.bot, 
+        assignable_role = create_self_assignable_role(self.bot,
             self.role,                               # Main role
             [iartian_role_id, self.typename],        # Dependencies
-            [iartian_role_id, self.role, role_type]) # Conflicting roles  
+            [iartian_role_id, self.role, role_type]) # Conflicting roles
 
 
         return save_self_assignable_role(self.bot, assignable_role)
@@ -118,7 +118,7 @@ class Data_class():
                 attribute = getattr(Class_type, member)
             except:
                 return ""
-                
+
             if attribute == self.type:
                 return member
 

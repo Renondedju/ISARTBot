@@ -30,11 +30,11 @@ import itertools
 from typing                        import Union, List
 from discord.ext                   import commands
 from isartbot.converters           import upper_clean
-from isartbot.bot_decorators       import is_admin
+from isartbot.bot_decorators       import is_admin, is_moderator
 from isartbot.data.assignable_role import *
 
-class Iam_commands(commands.Cog):
-    """ Role assignment class """
+class IamCommands(commands.Cog, name ='iam'):
+    """Role assignment class"""
 
     def __init__(self, bot):
 
@@ -43,7 +43,7 @@ class Iam_commands(commands.Cog):
 
     @commands.command(pass_context=True)
     async def iam(self, ctx, role : discord.Role):
-        """ Adds a role to a user"""
+        """Adds a role to a user"""
 
         assignable_roles = get_self_assignable_roles(self.bot)
 
@@ -59,7 +59,7 @@ class Iam_commands(commands.Cog):
 
     @commands.command(pass_context=True)
     async def iamn(self, ctx, role : discord.Role):
-        """ Removes a role from a user"""
+        """Removes a role from a user"""
 
         assignable_roles = get_self_assignable_roles(self.bot)
 
@@ -74,7 +74,7 @@ class Iam_commands(commands.Cog):
         return await self.bot.send_fail(ctx, "This role isn't a self assignable role!", "I am")
 
     @commands.command(pass_context=True, hidden=True, name='as')
-    @commands.check(is_admin)
+    @commands.check(is_moderator)
     async def _as(self, ctx, member : discord.Member, *, command_str : str):
 
         prefix = self.bot.settings.get('bot', 'prefix')
@@ -87,7 +87,7 @@ class Iam_commands(commands.Cog):
 
         command = self.bot.get_command(matches.group(1))
         if (not await command.can_run(ctx)):
-            await self.bot.send_fail(ctx, 
+            await self.bot.send_fail(ctx,
                                 "The checks for this command failed, "
                                 "maybe you don't have the required rights ?")
             return
@@ -104,7 +104,7 @@ class Iam_commands(commands.Cog):
             if (not await command.can_run(ctx)):
                 await self.bot.send_fail(ctx,
                                 "The checks for this subcommand failed, "
-                                "maybe you don't have the required rights ?")
+                                "maybe you don't have the required rights?")
                 return
 
         msg: discord.Message = await ctx.send(command_str)
@@ -118,7 +118,7 @@ class Iam_commands(commands.Cog):
 
         if isinstance(error, commands.CheckFailure):
             try:
-                await ctx.bot.send_fail(ctx, "You need to be an admin to use this command")
+                await ctx.bot.send_fail(ctx, "You need to be a moderator to use this command")
             except:
                 pass
 
@@ -128,7 +128,7 @@ class Iam_commands(commands.Cog):
         usage="!for <Users and/or Roles> <'add' or 'remove'> <Roles>")
     @commands.check(is_admin)
     async def _for(self, ctx, *args : Union[discord.Member, discord.Role, str]):
-        """ Removes or adds roles to members of the guild """
+        """Removes or adds roles to members of the guild"""
         selectors, action, roles = [list(items) for _, items in itertools.groupby(args, key=lambda x: isinstance(x, str))]
 
         if len(action) != 1:
@@ -147,7 +147,7 @@ class Iam_commands(commands.Cog):
             if isinstance(selection, discord.Member):
                 selected_members.add(selection)
                 continue
-            
+
             for member in selection.members:
                 selected_members.add(member)
 
@@ -155,7 +155,7 @@ class Iam_commands(commands.Cog):
             for member in selected_members:
                 for role in roles:
                     await member.add_roles(role)
-        
+
         async def remove():
             for member in selected_members:
                 for role in roles:
@@ -189,7 +189,7 @@ class Iam_commands(commands.Cog):
         """ asar stand for 'Add Self Assignable Role' """
 
         if role is None:
-            return await self.bot.send_fail(ctx, 
+            return await self.bot.send_fail(ctx,
                 "The role you asked for does not exists",
                 "Add self assignable role")
 
@@ -217,4 +217,4 @@ class Iam_commands(commands.Cog):
                 "Remove self assignable role")
 
 def setup(bot):
-    bot.add_cog(Iam_commands(bot))
+    bot.add_cog(IamCommands(bot))

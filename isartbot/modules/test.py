@@ -29,7 +29,7 @@ from isartbot.bot_decorators import is_dev, is_admin, is_moderator, dont_run
 from discord.ext             import commands
 from json                    import dumps
 
-class Test_commands(commands.Cog):
+class TestCommands(commands.Cog):
 
     def __init__(self, bot):
 
@@ -39,7 +39,7 @@ class Test_commands(commands.Cog):
     @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
     @commands.check(is_dev)
     async def test(self, ctx):
-        """ Creates a command group """
+        """ Creates a command group"""
 
         if ctx.invoked_subcommand is None:
             await ctx.send("Test !")
@@ -125,11 +125,11 @@ class Test_commands(commands.Cog):
     async def __settings_write(self, ctx, data, key, *args):
 
         if self.__bot.settings.write(data, key, *args):
-            await ctx.send("Settings have been modified successfully !")
+            await ctx.send("Settings have been modified successfully!")
         else:
             await ctx.send("Sorry but the setting you tried to write has been denied.")
 
         return
 
 def setup(bot):
-    bot.add_cog(Test_commands(bot))
+    bot.add_cog(TestCommands(bot))
