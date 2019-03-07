@@ -43,7 +43,7 @@ class Iam_commands(commands.Cog):
 
     @commands.command(pass_context=True)
     async def iam(self, ctx, role : discord.Role):
-        """ adds a role to a user"""
+        """ Adds a role to a user"""
 
         assignable_roles = get_self_assignable_roles(self.bot)
 
@@ -53,13 +53,13 @@ class Iam_commands(commands.Cog):
             #If we found the desired role
             if role.id == assignable_role.role.id:
                 await ctx.author.add_roles(role, reason = 'Requested via an iam command')
-                return await self.bot.send_success(ctx, "Role added !", "I am")
+                return await self.bot.send_success(ctx, "Role added!", "I am")
 
-        return await self.bot.send_fail(ctx, "You cannot assing yourself this role !", "I am")
+        return await self.bot.send_fail(ctx, "You cannot assing yourself this role!", "I am")
 
     @commands.command(pass_context=True)
     async def iamn(self, ctx, role : discord.Role):
-        """ Removes a role to a user"""
+        """ Removes a role from a user"""
 
         assignable_roles = get_self_assignable_roles(self.bot)
 
@@ -69,9 +69,9 @@ class Iam_commands(commands.Cog):
             #If we found the desired role
             if role.id == assignable_role.role.id:
                 await ctx.author.remove_roles(role, reason = 'Requested via an iamn command')
-                return await self.bot.send_success(ctx, "Role removed !", "I am")
+                return await self.bot.send_success(ctx, "Role removed!", "I am")
 
-        return await self.bot.send_fail(ctx, "This role isn't a self assignable role !", "I am")
+        return await self.bot.send_fail(ctx, "This role isn't a self assignable role!", "I am")
 
     @commands.command(pass_context=True, hidden=True, name='as')
     @commands.check(is_admin)
@@ -132,13 +132,13 @@ class Iam_commands(commands.Cog):
         selectors, action, roles = [list(items) for _, items in itertools.groupby(args, key=lambda x: isinstance(x, str))]
 
         if len(action) != 1:
-            await self.bot.send_fail(ctx, "Action should be 'add' or 'remove' !", 'Error')
+            await self.bot.send_fail(ctx, "Action should be 'add' or 'remove'!", 'Error')
             return
 
         action = action[0].lower()
 
         if action not in ['add', 'remove']:
-            await self.bot.send_fail(ctx, "Action should be 'add' or 'remove' !", 'Error')
+            await self.bot.send_fail(ctx, "Action should be 'add' or 'remove'!", 'Error')
             return
 
         selected_members = set()
@@ -209,11 +209,11 @@ class Iam_commands(commands.Cog):
 
         if remove_self_assignable_role(self.bot, role):
             return await self.bot.send_success(ctx,
-                "Role successfully removed !",
+                "Role successfully removed!",
                 "Remove self assignable role")
 
         return await self.bot.send_fail(ctx,
-                "No such role to remove !",
+                "No such role to remove!",
                 "Remove self assignable role")
 
 def setup(bot):
