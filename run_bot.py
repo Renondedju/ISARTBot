@@ -28,7 +28,7 @@ import isartbot
 def run():
 
     #Starting the bot
-    os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     isartbot.Bot()
     return
