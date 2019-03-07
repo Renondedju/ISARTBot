@@ -29,7 +29,7 @@ from typing                  import Union, List
 from isartbot.exceptions     import CogLoadingFailed
 from discord.ext             import commands
 
-class Starboard():
+class Starboard(commands.Cog):
     """ Starboard related commands and tasks """
 
     def __init__(self, bot):

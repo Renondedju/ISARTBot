@@ -29,7 +29,7 @@ from isartbot.bot_decorators import is_dev, is_admin, dont_run
 from discord.ext             import commands
 from json                    import dumps
 
-class Test_commands():
+class Test_commands(commands.Cog):
 
     def __init__(self, bot):
 
@@ -75,7 +75,6 @@ class Test_commands():
     @test.command(name='dontrun', pass_context=True)
     @commands.check(dont_run)
     async def dontrun(self, ctx):
-
         await ctx.send('Mhhh, i guess there is a problem')
         return
 

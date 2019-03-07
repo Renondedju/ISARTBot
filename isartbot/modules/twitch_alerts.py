@@ -26,9 +26,11 @@ import discord
 import asyncio
 import twitch
 
+from discord.ext import commands
+
 from isartbot.exceptions import CogLoadingFailed
 
-class TwitchAlerts():
+class TwitchAlerts(commands.Cog):
     """ Twitch alerts class, mainly used for E-SART Dragons 
     
         https://www.twitch.tv/esartdragons

@@ -33,7 +33,7 @@ from isartbot.logs           import Logs
 from discord.ext             import commands
 from math                    import ceil
 
-class Game_commands():
+class Game_commands(commands.Cog):
 
     def __init__(self, bot):
 
@@ -41,7 +41,7 @@ class Game_commands():
         self.bot = bot
         self.task = self.bot.loop.create_task(self.check_for_games())
 
-    def __unload(self):
+    def cog_unload(self):
         self.task.cancel()
 
     async def check_for_games(self):

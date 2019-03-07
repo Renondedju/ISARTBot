@@ -28,7 +28,7 @@ import discord
 from isartbot.bot_decorators import is_dev
 from discord.ext             import commands
 
-class Module_commands():
+class Module_commands(commands.Cog):
 
     def __init__(self, bot):
 

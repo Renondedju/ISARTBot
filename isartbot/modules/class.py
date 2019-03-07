@@ -31,7 +31,7 @@ from discord.ext             import commands
 from isartbot.converters     import upper_clean
 from isartbot.bot_decorators import is_admin
 
-class Class_commands():
+class Class_commands(commands.Cog):
 
     def __init__(self, bot):
 

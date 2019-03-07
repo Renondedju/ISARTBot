@@ -33,7 +33,7 @@ from isartbot.converters           import upper_clean
 from isartbot.bot_decorators       import is_admin
 from isartbot.data.assignable_role import *
 
-class Iam_commands():
+class Iam_commands(commands.Cog):
     """ Role assignment class """
 
     def __init__(self, bot):
