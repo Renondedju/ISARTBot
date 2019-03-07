@@ -71,7 +71,7 @@ class Class_commands(commands.Cog):
 
         #Checking if the roles/channels already exists
         if cat is not None or role is not None or delegate is not None:
-            await ctx.bot.send_fail(ctx, "This class already exists !", "Error")
+            await ctx.bot.send_fail(ctx, "This class already exists!", "Error")
             return
 
         #If not: fetching data from the settings
@@ -123,7 +123,7 @@ class Class_commands(commands.Cog):
                     overwrites = overwrites)
 
         await ctx.bot.send_success(ctx,
-            f"Successfully added {role.mention} the the available classes",
+            f"Successfully added {role.mention} to the available classes",
             "Class creation")
 
     @_class.command(name='delete', hidden=True)
@@ -134,28 +134,28 @@ class Class_commands(commands.Cog):
         category, role, delegate_role = self.get_class(ctx, name)
 
         if category is None:
-            await ctx.bot.send_fail(ctx, "This class does not exists !", "Delete class ?")
+            await ctx.bot.send_fail(ctx, "This class does not exist!", "Delete class?")
             return
 
         if role is None:
             await ctx.bot.send_fail(ctx,
                 f"There is no role named @{name}.",
-                "Delete class ?")
+                "Delete class?")
             return
 
         prefix = ctx.bot.settings.get("delegate_role_prefix", command = "class")
         if delegate_role is None:
             await ctx.bot.send_fail(ctx,
                 f"There is no role named @{prefix} {name}",
-                "Delete class ?")
+                "Delete class?")
             return
 
         def check(reaction, user):
             return user == ctx.message.author and str(reaction.emoji) == '👍'
 
         embed = discord.Embed()
-        embed.description = f"Are you sure you want to delete the class {role.mention} ?"
-        embed.title       = "Delete class ?"
+        embed.description = f"Are you sure you want to delete the class {role.mention}?"
+        embed.title       = "Delete class?"
         embed.set_footer(text="React with 👍 if you want to continue")
 
         message = await ctx.send(embed=embed)
@@ -181,13 +181,13 @@ class Class_commands(commands.Cog):
             await delegate_role.delete()
 
         except:
-            embed.description += f"\n\nFailed to delete a role or channel !"
+            embed.description += f"\n\nFailed to delete a role or channel!"
             embed.color = discord.Color.red()
 
             await message.edit(embed=embed)
             return
 
-        embed.description += f"\n\nSuccessfully deleted the class {name} !"
+        embed.description += f"\n\nSuccessfully deleted the class {name}!"
         embed.color = discord.Color.green()
         
         await message.edit(embed=embed)
@@ -199,7 +199,7 @@ class Class_commands(commands.Cog):
 
         if isinstance(error, commands.CheckFailure):
             await ctx.bot.send_fail(ctx,
-                "You need to be an admin to do that !"
+                "You need to be an admin to do that!"
                 ,"Command failed")
 
         elif isinstance(error, commands.MissingRequiredArgument):
@@ -211,7 +211,7 @@ class Class_commands(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry !"
+                "I need some more permissions to do that sorry!"
                 ,"Command failed")
 
         else:
@@ -244,7 +244,7 @@ class Class_commands(commands.Cog):
         await old_delegate.edit(name=f'{prefix} {new_name}')
 
         await ctx.bot.send_success(ctx,
-            f"The class @{original_name} has successfully renamed to {old_role.mention}",
+            f"The class @{original_name} has successfully been renamed to {old_role.mention}",
             "Rename class")
 
 def setup(bot):
