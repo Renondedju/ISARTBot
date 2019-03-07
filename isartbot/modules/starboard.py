@@ -48,7 +48,7 @@ class Starboard(commands.Cog):
         self.stars = dict(sorted(self.stars.items()))
 
         # Creating the starboard message buffer.
-        # Since the 'on_reaction_x' events are only trigerred on cashed messages
+        # Since the 'on_reaction_x' events are only triggered on cashed messages
         # there is no need to look into the history of the star channel.
         # So to optimize things we are gonna store those messages to avoid doing 
         # requests to the discord API.
@@ -60,7 +60,7 @@ class Starboard(commands.Cog):
             raise CogLoadingFailed('Failed to load one or more settings')
 
         if self.star_channel is None:
-            raise CogLoadingFailed('There is no starboard channel !')
+            raise CogLoadingFailed('There is no starboard channel!')
 
     def check_enabled(self):
         """ Checks if the starboard is enabled or not """
@@ -146,13 +146,13 @@ class Starboard(commands.Cog):
         if message is None:
             return embed
 
-        # Seting the author
+        # Setting the author
         url = self.get_message_url(message)
         embed.set_author(name=message.author.display_name,
                          url=url,
                          icon_url=message.author.avatar_url)
 
-        # Seting the embed content
+        # Setting the embed content
         if message.content:
             embed.description = message.content
         
@@ -165,7 +165,7 @@ class Starboard(commands.Cog):
         
             return embed
 
-        # Iterating every attachment and adding it the the embed
+        # Iterating every attachment and adding it to the embed
         has_image = False
         if (len(message.attachments) is not 0):
             value = []
@@ -207,7 +207,7 @@ class Starboard(commands.Cog):
                 unique_users = set(await reaction.users().flatten())
                 break
 
-        # If there is still no starboard message, stoping here
+        # If there is still no starboard message, stopping here
         if starboard_message is None:
             return len(unique_users)
 
@@ -279,11 +279,11 @@ class Starboard(commands.Cog):
         message = await self.star_channel.send(content, embed=embed)
         self.star_buffer.add(message)
 
-        # If the buffer contains more than 30 starboard messages : discarding the older one
+        # If the buffer contains more than 30 starboard messages: discarding the older one(s)
         if len(self.star_buffer) > 30:
             self.star_buffer.pop()
 
-        self.bot.logs.print('Starred message with id : {0.id}'.format(message))
+        self.bot.logs.print('Starred message with id: {0.id}'.format(message))
 
         return
 
@@ -310,7 +310,7 @@ class Starboard(commands.Cog):
 
         # And deleting it if it is a valid message
         if starboard_message is not None:
-            self.bot.logs.print('Deleting message from starboard with id : {0.id}'.format(message))
+            self.bot.logs.print('Deleting message from starboard with id: {0.id}'.format(message))
             await starboard_message.delete()
 
             self.star_buffer.discard(starboard_message)
@@ -334,7 +334,7 @@ class Starboard(commands.Cog):
         count = await self.count_stars(original_message, starboard_message)
 
         # If there is no starboard message and if there is enough stars and
-        # if the message isn't a starboard message : staring the message
+        # if the message isn't a starboard message: staring the message
         if count >= self.min_stars and starboard_message is None and not self.is_starboard_message(reaction.message):
             return await self.star_message(reaction.message)
 
@@ -356,7 +356,7 @@ class Starboard(commands.Cog):
         
         count = await self.count_stars(original_message, starboard_message)
         
-        # If there is not enough stars anymore, and if this message isn't a starboard message :
+        # If there is not enough stars anymore, and if this message isn't a starboard message:
         # unstaring the message
         if count < self.min_stars:
             return await self.unstar_message(original_message)
