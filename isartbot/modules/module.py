@@ -43,9 +43,9 @@ class Module_commands(commands.Cog):
     @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
     @commands.check(is_dev)
     async def module(self, ctx):
-        
+
         if ctx.invoked_subcommand is None:
-            await ctx.send("{0.subcommand_passed} does not exist".format(ctx))
+            await ctx.send(f"{ctx.subcommand_passed} does not exist")
 
     @module.error
     async def module_error(self, ctx, error):
@@ -53,11 +53,11 @@ class Module_commands(commands.Cog):
         if isinstance(error, commands.CheckFailure):
             await ctx.send("You need to be a dev to use this command")
         else:
-            await ctx.bot.on_error(ctx, error)            
+            await ctx.bot.on_error(ctx, error)
 
     @module.command(name="load")
     async def _load(self, ctx, *, module : str):
-        """Loads a module."""
+        """Loads a module"""
 
         module = self.get_module_name(module)
 
@@ -70,12 +70,12 @@ class Module_commands(commands.Cog):
                 "Extension")
         else:
             await ctx.bot.send_success(ctx,
-                "Successfully loaded extension named {}".format(module),
+                f"Successfully loaded extension named {module}",
                 "Extension")
 
     @module.command(name="unload")
     async def _unload(self, ctx, *, module : str):
-        """Unloads a module."""
+        """Unloads a module"""
 
         module = self.get_module_name(module)
 
@@ -86,12 +86,12 @@ class Module_commands(commands.Cog):
                 "\n{}: {}".format(type(e).__name__, e), "Extension")
         else:
             await ctx.bot.send_success(ctx,
-            "Successfully unloaded extension named {}".format(module),
+            f"Successfully unloaded extension named {module}",
             "Extension")
 
     @module.command(name='reload')
     async def _reload(self, ctx, *, module : str):
-        """Reloads a module."""
+        """Reloads a module"""
 
         module = self.get_module_name(module)
 
@@ -105,7 +105,7 @@ class Module_commands(commands.Cog):
                 "Extension")
         else:
             await ctx.bot.send_success(ctx,
-            "Successfully reloaded extension named {}".format(module),
+            f"Successfully reloaded extension named {module}",
             "Extension")
 
     @module.command(name='enable')
@@ -113,27 +113,27 @@ class Module_commands(commands.Cog):
 
         if ctx.bot.settings.get(command = module) is None:
             await ctx.bot.send_fail(ctx,
-                f"Module named isartbot.commands.{module} does not exists",
+                f"Module named isartbot.commands.{module} does not exist",
                 "Module")
             return
 
         ctx.bot.settings.write(True, 'enabled', command = module)
-        self.bot.logs.print("Enabled the module named '{}'".format(module))
+        self.bot.logs.print(f"Enabled the module named '{module}'")
         await ctx.bot.send_success(ctx,
             f"Module named isartbot.commands.{module} has successfully been enabled",
             "Module")
 
     @module.command(name='disable')
     async def _disable(self, ctx, module : str):
-        
+
         if ctx.bot.settings.get(command = module) is None:
             await ctx.bot.send_fail(ctx,
-                f"Module named isartbot.commands.{module} does not exists",
+                f"Module named isartbot.commands.{module} does not exist",
                 "Module")
             return
 
         ctx.bot.settings.write(False, 'enabled', command = module)
-        self.bot.logs.print("Disabled the module named '{}'".format(module))
+        self.bot.logs.print(f"Disabled the module named '{module}'")
         await ctx.bot.send_success(ctx,
             f"Module named isartbot.commands.{module} has successfully been disabled",
             "Module")
@@ -146,7 +146,7 @@ class Module_commands(commands.Cog):
             await ctx.bot.send_fail(ctx, str(error), "Module")
             return
 
-        await ctx.bot.on_error(ctx, error)  
+        await ctx.bot.on_error(ctx, error)
 
 def setup(bot):
     bot.add_cog(Module_commands(bot))

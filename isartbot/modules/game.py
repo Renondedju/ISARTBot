@@ -77,11 +77,11 @@ class GameCommands(commands.Cog, name='game'):
                         if role not in member.roles:
                             await member.add_roles(role)
                             self.bot.logs.print(
-                                f'Added the game {role.name} to {member.name}#{member.discriminator}')
+                                f"Added the game {role.name} to {member}")
                     except:
                         pass
 
-        self.bot.logs.print(f'Auto assign game loop finished!')
+        self.bot.logs.print("Auto assign game loop finished!")
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def game(self, ctx):
@@ -147,7 +147,7 @@ class GameCommands(commands.Cog, name='game'):
             role.name, "games_roles", command="game")
 
         await ctx.bot.send_success(ctx,
-            "Added the game {} to the list of available games".format(role.mention),
+            f"Added the game {role.mention} to the list of available games",
             "Create game")
 
         return
@@ -161,7 +161,7 @@ class GameCommands(commands.Cog, name='game'):
 
         #Checking if the game exists
         if game_name not in self.bot.settings.get("games_roles", command="game"):
-            await ctx.bot.send_fail(ctx, "The game named {} does not exist!".format(game_name))
+            await ctx.bot.send_fail(ctx, f"The game named {game_name} does not exist!")
             return
 
         game_category = self.get_game_category(ctx)
@@ -181,7 +181,7 @@ class GameCommands(commands.Cog, name='game'):
 
         embed = discord.Embed()
 
-        embed.description = "Are you sure you want to delete the game {}?".format(role.mention)
+        embed.description = f"Are you sure you want to delete the game {role.mention}?"
         embed.title       = "Delete game?"
         embed.set_footer(text="React with 👍 if you want to continue")
 
@@ -200,7 +200,7 @@ class GameCommands(commands.Cog, name='game'):
             await message.edit(embed=embed)
             return
 
-        reason = "This channel is deleted due to the game role @{} being deleted".format(game_name)
+        reason = f"This channel is deleted due to the game role @{game_name} being deleted"
 
         try:
             for id in ctx.bot.settings.get("games_roles", game_name, "text", command="game"):
@@ -220,7 +220,7 @@ class GameCommands(commands.Cog, name='game'):
 
         ctx.bot.settings.delete(role.name, "games_roles", command="game")
 
-        embed.description += "\n\nSuccessfully deleted the game {}!".format(game_name)
+        embed.description += "\n\nSuccessfully deleted the game {game_name}!"
         embed.color = discord.Color.green()
 
         await message.edit(embed=embed)
@@ -234,8 +234,8 @@ class GameCommands(commands.Cog, name='game'):
 
         if isinstance(error, commands.CheckFailure):
             await ctx.bot.send_fail(ctx,
-                "You need to be an admin to do that!"
-                ,"Command failed")
+                "You need to be an admin to do that!",
+                "Command failed")
 
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.bot.send_fail(ctx,
@@ -268,7 +268,7 @@ class GameCommands(commands.Cog, name='game'):
         if role is None:
             return await ctx.bot.send_fail(ctx,
                 "No corresponding game role found"
-                "\nUse ``{}game list`` to have the list of all the games avaliable for now"
+                "\nUse ``{}game list`` to have the list of all the games available for now"
                 .format(self.bot.settings.get("bot", "prefix")),
                 "Game")
 
@@ -278,16 +278,15 @@ class GameCommands(commands.Cog, name='game'):
         if role in ctx.message.author.roles:
             return await ctx.bot.send_fail(ctx,
                 "You already have this game role!"
-                "\nIf you are lost here is your channel {}".format(text.mention),
+                "\nIf you are lost here is your channel {text.mention}",
                 "Game")
 
         await ctx.message.author.add_roles(role)
 
-        await text.send("{0.mention} just joined the {1}'s world! Gl & Hf!"
-            .format(ctx.author, game_name))
+        await text.send(f"{ctx.author.mention} just joined the {game_name}'s world! Gl & Hf!")
 
         return await ctx.bot.send_success(ctx,
-            "Role added! Have fun in {}!".format(text.mention),
+            f"Role added! Have fun in {text.mention}!",
             "Game")
 
     @_add.error
@@ -323,7 +322,7 @@ class GameCommands(commands.Cog, name='game'):
         if role is None:
             return await ctx.bot.send_fail(ctx,
                 "No corresponding game role found"
-                "\nUse ``{}game list`` to have the list of all the games avaliable for now"
+                "\nUse ``{}game list`` to have the list of all the games available for now"
                 .format(self.bot.settings.get("bot", "prefix")),
                 "Game")
 
@@ -351,8 +350,8 @@ class GameCommands(commands.Cog, name='game'):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry!"
-                ,"Command failed")
+                "I need some more permissions to do that sorry!",
+                "Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
@@ -364,7 +363,7 @@ class GameCommands(commands.Cog, name='game'):
         """Lists the games available"""
 
         games     = list(ctx.bot.settings.get("games_roles", command="game").keys())
-        max_lines = ctx.bot.settings.get(  "list_max_lines", command="game")
+        max_lines = ctx.bot.settings.get("list_max_lines", command="game")
         max_pages = ceil(len(games) / max_lines)
 
         page = max(1, page)

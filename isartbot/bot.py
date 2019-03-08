@@ -62,7 +62,7 @@ class Bot(discord.ext.commands.Bot):
 
     @property
     def guild(self):
-        return self.get_guild(self.settings.get('bot', 'server_id')) 
+        return self.get_guild(self.settings.get('bot', 'server_id'))
 
     async def load_cog(self):
         """ Loads all the cogs of the bot defined into the settings.json file """
@@ -92,7 +92,7 @@ class Bot(discord.ext.commands.Bot):
         return self.__settings
 
     async def send_success(self, ctx, message, title=""):
-        """ Send a successfull message """
+        """ Send a successful message """
 
         embed = discord.Embed(
             title       = title,
@@ -133,7 +133,7 @@ class Bot(discord.ext.commands.Bot):
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
         error = getattr(error, 'original', error)
-        
+
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored):
             return
@@ -143,7 +143,7 @@ class Bot(discord.ext.commands.Bot):
                 return await ctx.author.send("Hey no DMs!")
             except:
                 return
-        
+
         # All other Errors not returned come here... And we can just print the default TraceBack.
         if ctx is not None:
             self.logs.print('Ignoring exception in command {}:'.format(ctx.command))
@@ -162,7 +162,7 @@ class Bot(discord.ext.commands.Bot):
                 "\nPlease [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
                 " on github if this error is recurrent\n" +
                 "Make sure to include a screenshot of this message\n```\n" +
-                errors[len(errors) - 1] + 
+                errors[len(errors) - 1] +
                 "\n```",
                 title = "Error")
 
@@ -181,7 +181,7 @@ class Bot(discord.ext.commands.Bot):
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, 'on_error'):
             return
-        
+
         await self.on_error(ctx, error)
 
     ###Checks
@@ -212,7 +212,7 @@ class Bot(discord.ext.commands.Bot):
 
         if is_dev(ctx):
             return True
-        
+
         command = ctx.command.root_parent
         if (command is None):
             command = ctx.command

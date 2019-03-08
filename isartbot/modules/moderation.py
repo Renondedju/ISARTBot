@@ -48,7 +48,7 @@ class ModerationCommands(commands.Cog, name='mod'):
     #Prune command
     @mod.command(name='prune', pass_context=True, hidden=True)
     @commands.check(is_moderator)
-    async def _prune(self, ctx, number : int, member : discord.Member = None):
+    async def _prune(self, ctx, number: int, member: discord.Member = None):
         """Deletes a certain amount of the latest messages in this text channel"""
         messages = []
         if (member is None):
@@ -61,6 +61,42 @@ class ModerationCommands(commands.Cog, name='mod'):
 
         await ctx.channel.delete_messages(set(messages))
         return
+
+    #Kick command
+    @mod.command(name='kick', pass_context=True, hidden=True)
+    @commands.check(is_moderator)
+    async def _kick(self, ctx, member: discord.Member, *, reason=""):
+        """Kicks a member"""
+        await member.kick(reason=reason)
+
+        string = f"{member} was kicked by {ctx.author}"
+
+        if (reason is not ""):
+            string += f" for reason: {reason}"
+
+        self.bot.logs.print(string)
+
+        return await ctx.bot.send_success(ctx,
+            string,
+            "Kicked member")
+
+    #Ban command
+    @mod.command(name='ban', aliases=["banhammer", "derive_autoritaire", "restriction_de_la_liberte_d_expression"], pass_context=True, hidden=True)
+    @commands.check(is_moderator)
+    async def _ban(self, ctx, member: discord.Member, *, reason=""):
+        """Bans a member"""
+        await member.ban(reason=reason, delete_message_days=0)
+
+        string = f"{member} was banned by {ctx.author}"
+
+        if (reason is not ""):
+            string += f" for reason: {reason}"
+
+        self.bot.logs.print(string)
+
+        return await ctx.bot.send_success(ctx,
+            string,
+            "Banned member")
 
 def setup(bot):
     bot.add_cog(ModerationCommands(bot))

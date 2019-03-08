@@ -40,7 +40,7 @@ class ClassCommands(commands.Cog):
 
         self.isartian_role_id = self.bot.settings.get('bot', 'isartian_role_id')
 
-    def get_class(self, ctx, class_name : str):
+    def get_class(self, ctx, class_name: str):
         """ Checks if a class exists or not """
 
         class_name = class_name.upper().strip()
@@ -64,7 +64,7 @@ class ClassCommands(commands.Cog):
 
     @_class.command(name='create', hidden=True)
     @commands.check(is_admin)
-    async def _create(self, ctx, name : upper_clean):
+    async def _create(self, ctx, name: upper_clean):
         """Creates a class"""
 
         cat, role, delegate = self.get_class(ctx, name)
@@ -128,7 +128,7 @@ class ClassCommands(commands.Cog):
 
     @_class.command(name='delete', hidden=True)
     @commands.check(is_admin)
-    async def _delete(self, ctx, name : upper_clean):
+    async def _delete(self, ctx, name: upper_clean):
         """Deletes a class"""
 
         category, role, delegate_role = self.get_class(ctx, name)
@@ -199,8 +199,8 @@ class ClassCommands(commands.Cog):
 
         if isinstance(error, commands.CheckFailure):
             await ctx.bot.send_fail(ctx,
-                "You need to be an admin to do that!"
-                ,"Command failed")
+                "You need to be an admin to do that!",
+                "Command failed")
 
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.bot.send_fail(ctx,
@@ -211,8 +211,8 @@ class ClassCommands(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.bot.send_fail(ctx,
-                "I need some more permissions to do that sorry!"
-                ,"Command failed")
+                "I need some more permissions to do that sorry!",
+                "Command failed")
 
         else:
             await ctx.bot.on_error(ctx, error)
@@ -221,7 +221,7 @@ class ClassCommands(commands.Cog):
 
     @_class.command(name='rename', hidden=True)
     @commands.check(is_admin)
-    async def _rename(self, ctx, original_name : upper_clean, new_name : upper_clean):
+    async def _rename(self, ctx, original_name: upper_clean, new_name: upper_clean):
         """Renames a class"""
 
         old_category, old_role, old_delegate = self.get_class(ctx, original_name)

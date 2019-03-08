@@ -31,8 +31,8 @@ from discord.ext import commands
 from isartbot.exceptions import CogLoadingFailed
 
 class TwitchAlerts(commands.Cog):
-    """ Twitch alerts class, mainly used for E-SART Dragons 
-    
+    """ Twitch alerts class, mainly used for E-SART Dragons
+
         https://www.twitch.tv/esartdragons
     """
 
@@ -48,7 +48,7 @@ class TwitchAlerts(commands.Cog):
         self.channel_name         = self.bot.settings.get('channel_name'        , command = 'twitch_alerts')
         self.twitch_token         = self.bot.settings.get('twitch_token'        , command = 'twitch_alerts')
         self.enabled              = self.bot.settings.get('enabled'             , command = 'twitch_alerts')
-        
+
         self.message = None
         self.announce_channel = self.bot.get_channel(self.announce_channel_id)
 
@@ -58,7 +58,7 @@ class TwitchAlerts(commands.Cog):
 
         self.task = self.bot.loop.create_task(self.notification_task())
 
-    def __unload(self):
+    def cog_unload(self):
         self.task.cancel()
 
     async def notification_task(self):
@@ -73,13 +73,13 @@ class TwitchAlerts(commands.Cog):
 
             # checking if the stream started (raising edge)
             if len(prev_stream_state) == 0 and len(current_stream_state) != 0:
-                await self.on_stream_start(current_stream_state[0], 
+                await self.on_stream_start(current_stream_state[0],
                     helix.get_games(game_ids=current_stream_state[0]['game_id']))
 
             # checking if the stream stopped (falling edge)
             elif len(prev_stream_state) != 0 and len(current_stream_state) == 0:
                 await self.on_stream_stop(prev_stream_state[0])
-            
+
             prev_stream_state = current_stream_state
 
         self.bot.logs.print('Twitch notification loop exited!')
