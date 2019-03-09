@@ -27,11 +27,11 @@ class Class_type(object):
 
     none = 0
     PA   = 1 # Prepa Art
-    CA   = 2 # Cinema Art
+    CA   = 2 # Cinema Animation
     FX   = 3 # Effects (special)
-    MS   = 4 # Music / Sound
+    MS   = 4 # Music & Sound
     GA   = 5 # Game Art
     GD   = 6 # Game Design
-    GDP  = 7 # Game Design and Programing
-    GP   = 8 # Game Programing
+    GDP  = 7 # Game Design and Programming
+    GP   = 8 # Game Programming
     PRD  = 9 # Producer

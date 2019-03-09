@@ -26,11 +26,13 @@ import discord
 import asyncio
 import twitch
 
+from discord.ext import commands
+
 from isartbot.exceptions import CogLoadingFailed
 
-class TwitchAlerts():
-    """ Twitch alerts class, mainly used for E-SART Dragons 
-    
+class TwitchAlerts(commands.Cog):
+    """ Twitch alerts class, mainly used for E-SART Dragons
+
         https://www.twitch.tv/esartdragons
     """
 
@@ -46,7 +48,7 @@ class TwitchAlerts():
         self.channel_name         = self.bot.settings.get('channel_name'        , command = 'twitch_alerts')
         self.twitch_token         = self.bot.settings.get('twitch_token'        , command = 'twitch_alerts')
         self.enabled              = self.bot.settings.get('enabled'             , command = 'twitch_alerts')
-        
+
         self.message = None
         self.announce_channel = self.bot.get_channel(self.announce_channel_id)
 
@@ -56,7 +58,7 @@ class TwitchAlerts():
 
         self.task = self.bot.loop.create_task(self.notification_task())
 
-    def __unload(self):
+    def cog_unload(self):
         self.task.cancel()
 
     async def notification_task(self):
@@ -71,27 +73,27 @@ class TwitchAlerts():
 
             # checking if the stream started (raising edge)
             if len(prev_stream_state) == 0 and len(current_stream_state) != 0:
-                await self.on_stream_start(current_stream_state[0], 
+                await self.on_stream_start(current_stream_state[0],
                     helix.get_games(game_ids=current_stream_state[0]['game_id']))
 
             # checking if the stream stopped (falling edge)
             elif len(prev_stream_state) != 0 and len(current_stream_state) == 0:
                 await self.on_stream_stop(prev_stream_state[0])
-            
+
             prev_stream_state = current_stream_state
 
-        self.bot.logs.print('Twitch notification loop exited !')
+        self.bot.logs.print('Twitch notification loop exited!')
 
     async def on_stream_start(self, stream, game):
         """ Event triggered when a stream starts """
 
         await self.send_notification(stream, game)
-        self.bot.logs.print('Twitch stream started !')
+        self.bot.logs.print('Twitch stream started!')
 
     async def on_stream_stop(self, stream):
         """ Event trigerred when a stream stops """
 
-        self.bot.logs.print('Twitch stream stopped !')
+        self.bot.logs.print('Twitch stream stopped!')
 
     async def send_notification(self, stream, game):
         """ Sends a notification message """
@@ -102,8 +104,8 @@ class TwitchAlerts():
             icon_url="https://static-cdn.jtvnw.net/jtv_user_pictures/twitch-profile_image-8a8c5be2e3b64a9a-70x70.png")
         embed.url   = "https://www.twitch.tv/esartdragons"
         embed.title = stream['title']
-        embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/1016327266240991233/9qz6aCD9_400x400.jpg")
-        embed.set_footer(text="Type \"!iam stream\" to get notified next time !")
+        embed.set_thumbnail(url="https://static-cdn.jtvnw.net/jtv_user_pictures/bc76fb0a-341a-4382-a784-fc1aca9ebcf8-profile_image-300x300.png")
+        embed.set_footer(text="Type \"!iam Stream\" to get notified next time!")
 
         if (len(game) != 0):
             embed.add_field(name='Game', value=game[0]['name'])
