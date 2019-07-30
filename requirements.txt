@@ -1,4 +1,1 @@
-git+https://github.com/Rapptz/discord.py@rewrite
-aiohttp
-websockets
-python-twitch-client
+-U discord.py

@@ -22,18 +22,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-from v2 import Bot
-
-def run():
-
-    #Starting the bot
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    Bot()
-
-    return
-
-if __name__ == '__main__':
-
-    #Executing the bot
-    run()
+from .bot import Bot

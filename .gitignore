@@ -24,6 +24,7 @@ wheels/
 MANIFEST
 
 settings.json
+settings.ini
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
