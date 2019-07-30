@@ -36,5 +36,9 @@ class TestCommands(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send("Test v2 !")
 
+    @test.command(name='error')
+    async def _error(self, ctx):
+        raise ValueError("Test of unhandled exception")
+
 def setup(bot):
     bot.add_cog(TestCommands())

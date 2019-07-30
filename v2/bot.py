@@ -28,6 +28,7 @@ import asyncio
 import logging
 import logging.config
 import configparser
+import traceback
 
 from   discord.ext import commands
 from   os.path     import abspath
@@ -75,7 +76,6 @@ class Bot(discord.ext.commands.Bot):
             try:
                 self.load_extension('v2.modules.' + module)
                 self.logger.info   ('Loaded the module {} : enabled = {}'.format(module, self.modules.getboolean(module)))
-
             except Exception as e:
                 await self.on_error(None, e)
                 self.logger.error('Failed to load extension named modules.{0}'.format(name))
@@ -95,6 +95,41 @@ class Bot(discord.ext.commands.Bot):
         self.logger.info('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
         self.logger.info('User ID  : {0}'    .format(self.user.id))
         self.logger.info('------------')
+
+    async def on_command_error(self, ctx, error):
+        """ Handles unhandled errors """
+
+        # This prevents any commands with local handlers being handled here in on_command_error.
+        if hasattr(ctx.command, 'on_error'):
+            return
+
+        await self.on_error(ctx, error)
+
+    async def on_error(self, ctx, error):
+        """ Sends errors reports if needed """
+
+        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
+        # If nothing is found. We keep the exception passed to on_command_error.
+        error = getattr(error, 'original', error)
+
+        # Anything in ignored will return and prevent anything happening.
+        if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
+            return
+
+        # All other Errors not returned come here... And we can just print the default TraceBack.
+        if ctx is not None:
+            self.logger.error('Ignoring exception in command {}:'.format(ctx.command))
+        else:
+            self.logger.error('Ctx is empty, this might be comming from the module loading function:')
+
+        for err in traceback.format_exception(type(error), error, error.__traceback__):
+            index = 0
+            for i, char in enumerate(err):
+                if (char == '\n'):
+                    self.logger.error(err[index:i])
+                    index = i + 1
+
+        return
 
     # --- Checks ---
 
