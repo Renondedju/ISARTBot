@@ -36,6 +36,15 @@ class TestCommands(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send("Test v2 !")
 
+    @test.command(pass_context=True, hidden=True)
+    async def lang(self, ctx, lang: str, key: str):
+        """ Returns the content of a language key """
+
+        if (not (lang in ctx.bot.langs) or not (ctx.bot.langs[lang].has_key(key))):
+            await ctx.send("No such lang or key")
+        else:
+            await ctx.send(ctx.bot.langs[lang].get_key(key))
+
     @test.command(name='error')
     async def _error(self, ctx):
         raise ValueError("Test of unhandled exception")

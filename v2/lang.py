@@ -22,5 +22,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .bot  import Bot
-from .lang import Lang
+import asyncio
+
+from os.path import abspath
+
+class Lang():
+
+    def __init__ (self, file: str):
+        self.filename   = file
+        self.dictionary = self.load_language(file)
+
+    def get_key(self, key: str):
+        """Return the value of the given key"""
+        return self.dictionary[key]
+
+    def has_key(self, key: str):
+        """ returns true if the targetted language has the specified key"""
+        return key in self.dictionary
+
+    def load_language(self, name: str):
+        """Create a dictionary (keyword, descrition/quote) from a language file"""
+        language = {}
+        
+        with open(abspath(name), 'rt', encoding='utf-8') as file:
+            for line in file:
+                (key, val) = line.split('=')
+                language[key] = val
+
+        return language

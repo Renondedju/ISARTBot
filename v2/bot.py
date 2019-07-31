@@ -30,8 +30,9 @@ import logging.config
 import configparser
 import traceback
 
-from   discord.ext import commands
-from   os.path     import abspath
+from .lang       import Lang
+from discord.ext import commands
+from os.path     import abspath
 
 class Bot(discord.ext.commands.Bot):
     """ Main bot class """
@@ -54,12 +55,15 @@ class Bot(discord.ext.commands.Bot):
         self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
         self.settings.read(self.config_file)
 
-        self.extensions        = self.settings['extensions']
+        self.extensions     = self.settings['extensions']
         self.command_prefix = self.settings.get('common', 'prefix')
 
-        self.add_check(self.log_command)
-
+        # Loading languages
+        self.langs          = {}
+        self.loop.create_task(self.load_languages())
         self.loop.create_task(self.load_extensions())
+
+        self.add_check(self.log_command)
 
         self.run(self.settings.get('common', 'token'))
 
@@ -82,6 +86,20 @@ class Bot(discord.ext.commands.Bot):
                     self.logger.error(f"Failed to load extension named v2.ext.{name}")
             else:
                 self.logger.info(f"Ignored extension named v2.ext.{extension}")
+
+        return
+
+    async def load_languages(self):
+        """ Loads all the available languages files of the bot"""
+
+        for (lang, file_name) in self.settings.items("languages"):
+
+            try:
+                self.langs[lang] = Lang(file_name)
+                self.logger.info(f"Loaded language named {lang} from {file_name}")
+            except Exception as e:
+                self.logger.error(f"Failed to load a language")
+                await self.on_error(None, e)
 
         return
 
@@ -124,7 +142,7 @@ class Bot(discord.ext.commands.Bot):
         if ctx is not None:
             self.logger.error('Ignoring exception in command {}:'.format(ctx.command))
         else:
-            self.logger.error('Ctx is empty, this might be comming from the module loading function:')
+            self.logger.error('Ignoring exception:')
 
         for err in traceback.format_exception(type(error), error, error.__traceback__):
             index = 0
