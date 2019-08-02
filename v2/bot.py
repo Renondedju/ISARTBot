@@ -30,14 +30,15 @@ import logging.config
 import configparser
 import traceback
 
-from .lang       import Lang
+from v2.lang     import Lang
+from v2.database import Database
 from discord.ext import commands
 from os.path     import abspath
 
 class Bot(discord.ext.commands.Bot):
     """ Main bot class """
 
-    __slots__ = ("settings", "extensions", "config_file")
+    __slots__ = ("settings", "extensions", "config_file", "database")
 
     def __init__(self, *args, **kwargs):
         """ Inits and runs the bot """
@@ -57,6 +58,11 @@ class Bot(discord.ext.commands.Bot):
 
         self.extensions     = self.settings['extensions']
         self.command_prefix = self.settings.get('common', 'prefix')
+
+        # Loading database
+        database_name = f"sqlite:///{abspath(self.settings.get('common', 'database'))}"
+        self.logger.info(f"Connecting to database {database_name}")
+        self.database = Database(self.loop, database_name)
 
         # Loading languages
         self.langs          = {}

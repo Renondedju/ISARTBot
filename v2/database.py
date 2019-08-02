@@ -22,6 +22,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .bot      import Bot
-from .lang     import Lang
-from .database import Database
+import asyncio
+
+from sqlalchemy_aio     import ASYNCIO_STRATEGY
+from sqlalchemy         import create_engine
+from sqlalchemy.schema  import CreateTable
+
+from v2.models import ServerPreferencesTable
+
+class Database:
+
+    __slots__ = ("engine", "connection", "loop")
+
+    def __init__(self, loop, database_name: str):
+        
+        self.loop       = loop
+        self.engine     = create_engine(database_name, strategy=ASYNCIO_STRATEGY)
+        self.connection = None
+
+        self.loop.create_task(self.init())
+
+    def __del__(self): 
+        
+        self.loop.create_task(self.cleanup())
+
+    async def init(self):
+        """ Inits the database connection """
+
+        await self.engine.execute(CreateTable(ServerPreferencesTable.table))
+
+        self.connection = await self.engine.connect()
+
+    async def cleanup(self):
+        """ Cleanups the database connection """
+        
+        await self.connection.close()
+
+        

@@ -22,6 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .bot      import Bot
-from .lang     import Lang
-from .database import Database
+from sqlalchemy import Column, Integer, MetaData, Table, Text
+
+class ServerPreferencesTable:
+
+    table = Table(
+        'ServerPreferences', MetaData(),
+        Column('id', Integer, primary_key=True),
+        Column('discord_id', Integer, unique=True),
+        Column('lang', Text, default="en"),
+    )
+    
