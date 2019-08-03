@@ -40,16 +40,16 @@ class Database:
         self.engine     = create_engine(database_name, strategy=ASYNCIO_STRATEGY)
         self.connection = None
 
-        self.loop.create_task(self.init())
+        self.loop.run_until_complete(self.init())
 
     def __del__(self): 
         
-        self.loop.create_task(self.cleanup())
+        self.loop.run_until_complete(self.cleanup())
 
     async def init(self):
         """ Inits the database connection """
 
-        await self.engine.execute(CreateTable(ServerPreferencesTable.table))
+        #await self.engine.execute(CreateTable(ServerPreferencesTable.table))
 
         self.connection = await self.engine.connect()
 

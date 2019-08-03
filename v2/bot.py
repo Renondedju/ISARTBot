@@ -31,7 +31,9 @@ import configparser
 import traceback
 
 from v2.lang     import Lang
+from v2.models   import ServerPreferencesTable
 from v2.database import Database
+
 from discord.ext import commands
 from os.path     import abspath
 
@@ -108,6 +110,29 @@ class Bot(discord.ext.commands.Bot):
                 await self.on_error(None, e)
 
         return
+
+    async def get_translation(self, ctx, key: str):
+        
+        result = await self.database.connection.execute(ServerPreferencesTable.table.select(ServerPreferencesTable.table.c.discord_id == ctx.guild.id))
+        guilds = await result.fetchall()
+
+        # Checking if the guild is already registered in the database 
+        if (len(guilds) == 0):
+            guilds = await self.register_guild(ctx)
+
+        # There is only one guild per discord id
+        guild = guilds[0]
+
+        return self.langs[guild[ServerPreferencesTable.table.c.lang]].get_key(key)
+
+    async def register_guild(self, ctx):
+        
+        await self.database.connection.execute(ServerPreferencesTable.table.insert().values(discord_id=ctx.guild.id))
+        result = await self.database.connection.execute(ServerPreferencesTable.table.select(ServerPreferencesTable.table.c.discord_id == ctx.guild.id))
+
+        self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
+
+        return await result.fetchall()
 
     # --- Events ---
 

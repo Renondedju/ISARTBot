@@ -34,7 +34,7 @@ class TestCommands(commands.Cog):
         """ Creates a command group"""
 
         if ctx.invoked_subcommand is None:
-            await ctx.send("Test v2 !")
+            await ctx.send(await ctx.bot.get_translation(ctx, 'test'))
 
     @test.command(pass_context=True, hidden=True)
     async def lang(self, ctx, lang: str, key: str):

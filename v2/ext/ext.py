@@ -28,14 +28,15 @@ import logging
 
 from discord.ext import commands
 
-#TODO Add output and checks
+#TODO Add checks
 class ExtCommands(commands.Cog):
 
     @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
     #@commands.check(is_dev)
     async def ext(self, ctx):
+        
         if ctx.invoked_subcommand is None:
-            await ctx.send(f"TODO")
+            await ctx.send(await ctx.bot.get_translation(ctx, 'invalid_command_usage'))
 
     def get_ext_name(self, ext : str) -> str:
 
@@ -48,8 +49,24 @@ class ExtCommands(commands.Cog):
 
         ext = self.get_ext_name(ext)
         ctx.bot.logger.info(f"Loading extension named: {ext}")
+        
+        embed = discord.Embed()
 
-        ctx.bot.load_extension(ext)
+        try:
+            ctx.bot.load_extension(ext)
+
+        except Exception as e:
+            embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
+            embed.description = await ctx.bot.get_translation(ctx, 'ext_load_failure_desc')
+            embed.colour      = discord.Color.red()
+            await ctx.bot.on_error(ctx, e)
+
+        else:
+            embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
+            embed.description = await ctx.bot.get_translation(ctx, 'ext_load_success_desc')
+            embed.colour      = discord.Color.green()
+
+        await ctx.send(embed=embed)
 
     @ext.command(name="unload")
     async def _unload(self, ctx, *, ext : str):
@@ -57,8 +74,24 @@ class ExtCommands(commands.Cog):
 
         ext = self.get_ext_name(ext)
         ctx.bot.logger.info(f"Unloading extension named: {ext}")
+        
+        embed = discord.Embed()
 
-        ctx.bot.unload_extension(ext)
+        try:
+            ctx.bot.unload_extension(ext)
+            
+        except Exception as e:
+            embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
+            embed.description = await ctx.bot.get_translation(ctx, 'ext_unload_failure_desc')
+            embed.colour      = discord.Color.red()
+            await ctx.bot.on_error(ctx, e)
+
+        else:
+            embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
+            embed.description = await ctx.bot.get_translation(ctx, 'ext_unload_success_desc')
+            embed.colour      = discord.Color.green()
+
+        await ctx.send(embed=embed)
 
     @ext.command(name='reload')
     async def _reload(self, ctx, *, ext : str):
@@ -67,8 +100,24 @@ class ExtCommands(commands.Cog):
         ext = self.get_ext_name(ext)
         ctx.bot.logger.info(f"Reloading extension named: {ext}")
 
-        ctx.bot.unload_extension(ext)
-        ctx.bot.load_extension(ext)
+        embed = discord.Embed()        
+
+        try:
+            ctx.bot.unload_extension(ext)
+            ctx.bot.load_extension(ext)
+            
+        except Exception as e:
+            embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
+            embed.description = await ctx.bot.get_translation(ctx, 'ext_reload_failure_desc')
+            embed.colour      = discord.Color.red()
+            await ctx.bot.on_error(ctx, e)
+
+        else:
+            embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
+            embed.description = await ctx.bot.get_translation(ctx, 'ext_reload_success_desc')
+            embed.colour      = discord.Color.green()
+
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(ExtCommands())

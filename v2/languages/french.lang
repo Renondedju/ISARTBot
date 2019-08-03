@@ -1,1 +1,10 @@
-test=Ceci est un simple test
+test=Tout semble fonctionner correctement !
+failure_title=Erreur
+success_title=Succès
+ext_load_failure_desc=Impossible de charger l'extension. Vérifiez les journaux pour plus d'informations.
+ext_load_success_desc=Extension chargée!
+ext_unload_failure_desc=Impossible de décharger l'extension. Vérifiez les journaux pour plus d'informations.
+ext_unload_success_desc=Extension déchargée!
+ext_reload_failure_desc=Impossible de recharger l'extension. Vérifiez les journaux pour plus d'informations.
+ext_reload_success_desc=Extension rechargée!
+invalid_command_usage=Utilisation de commande non valide, veuillez utiliser 'help' pour plus d'informations

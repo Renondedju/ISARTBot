@@ -1,1 +1,10 @@
-test=This is a simple test
+test=Everything seems to be working fine !
+failure_title=Error
+success_title=Success
+ext_load_failure_desc=Failed to load extension. Check logs for more information.
+ext_load_success_desc=Extension loaded !
+ext_unload_failure_desc=Failed to unload extension. Check logs for more information.
+ext_unload_success_desc=Extension unloaded !
+ext_reload_failure_desc=Failed to reload extension. Check logs for more information.
+ext_reload_success_desc=Extension reloaded !
+invalid_command_usage=Invalid command usage, please use 'help' for further information.
