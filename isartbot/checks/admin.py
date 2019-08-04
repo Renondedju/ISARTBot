@@ -22,4 +22,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Init file nothing in here for now, just used to create a python submodule
+async def is_admin(ctx):
+    return ctx.author.permissions_in(ctx.channel).administrator

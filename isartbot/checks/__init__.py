@@ -22,32 +22,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import asyncio
-import discord
-
-from discord.ext import commands
-
-class TestCommands(commands.Cog):
-
-    @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
-    async def test(self, ctx):
-        """ Creates a command group"""
-
-        if ctx.invoked_subcommand is None:
-            await ctx.send(await ctx.bot.get_translation(ctx, 'test'))
-
-    @test.command(pass_context=True, hidden=True)
-    async def lang(self, ctx, lang: str, key: str):
-        """ Returns the content of a language key """
-
-        if (not (lang in ctx.bot.langs) or not (ctx.bot.langs[lang].has_key(key))):
-            await ctx.send("No such lang or key")
-        else:
-            await ctx.send(ctx.bot.langs[lang].get_key(key))
-
-    @test.command(name='error')
-    async def _error(self, ctx):
-        raise ValueError("Test of unhandled exception")
-
-def setup(bot):
-    bot.add_cog(TestCommands())
+from isartbot.checks.admin          import is_admin
+from isartbot.checks.block_dms      import block_dms
+from isartbot.checks.moderator      import is_moderator
+from isartbot.checks.developper     import is_developper , developper
+from isartbot.checks.super_admin    import is_super_admin, super_admin
+from isartbot.checks.log_command    import log_command
+from isartbot.checks.trigger_typing import trigger_typing

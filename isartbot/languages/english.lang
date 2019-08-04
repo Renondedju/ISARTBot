@@ -8,3 +8,6 @@ ext_unload_success_desc=Extension unloaded !
 ext_reload_failure_desc=Failed to reload extension. Check logs for more information.
 ext_reload_success_desc=Extension reloaded !
 invalid_command_usage=Invalid command usage, please use 'help' for further information.
+test_wait=The process has been paused 2 seconds for testing
+user_has_no_groups=has no special bot privileges
+user_has_groups=has the following bot privileges

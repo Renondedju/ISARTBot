@@ -41,7 +41,7 @@ class ExtCommands(commands.Cog):
     def get_ext_name(self, ext : str) -> str:
 
         ext = ext.replace('.py', '')
-        return "v2.ext." + ext
+        return "isartbot.ext." + ext
 
     @ext.command(name="load")
     async def _load(self, ctx, *, ext : str):

@@ -22,4 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Init file nothing in here for now, just used to create a python submodule
+async def trigger_typing(ctx):
+
+    if (not (ctx.invoked_subcommand is None)):
+        await ctx.trigger_typing()
+
+    return True

@@ -22,16 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-class Class_type(object):
-    """ Enum of a class type """
-
-    none = 0
-    PA   = 1 # Prepa Art
-    CA   = 2 # Cinema Animation
-    FX   = 3 # Effects (special)
-    MS   = 4 # Music & Sound
-    GA   = 5 # Game Art
-    GD   = 6 # Game Design
-    GDP  = 7 # Game Design and Programming
-    GP   = 8 # Game Programming
-    PRD  = 9 # Producer
+async def is_moderator(ctx):
+    return ctx.author.permissions_in(ctx.channel).manage_guild or
+           ctx.author.permissions_in(ctx.channel).administrator
