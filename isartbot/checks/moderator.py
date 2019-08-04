@@ -23,5 +23,4 @@
 # SOFTWARE.
 
 async def is_moderator(ctx):
-    return ctx.author.permissions_in(ctx.channel).manage_guild or
-           ctx.author.permissions_in(ctx.channel).administrator
+    return ctx.author.permissions_in(ctx.channel).manage_guild or ctx.author.permissions_in(ctx.channel).administrator

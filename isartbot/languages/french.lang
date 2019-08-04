@@ -11,3 +11,7 @@ invalid_command_usage=Utilisation de commande non valide, veuillez utiliser 'hel
 test_wait=Le processus a été mis en pause 2 secondes pour le test
 user_has_no_groups=n'a aucun privilège particulier vis à vis du bot
 user_has_groups=a les privilèges de bot suivants
+lang_list_title=Langues disponibles
+lang_list_footer=Utilisez !lang set <langue> pour changer le langage du serveur
+lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles
+lang_set=Langue définie avec succès!

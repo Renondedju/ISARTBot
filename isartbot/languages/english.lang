@@ -11,3 +11,7 @@ invalid_command_usage=Invalid command usage, please use 'help' for further infor
 test_wait=The process has been paused 2 seconds for testing
 user_has_no_groups=has no special bot privileges
 user_has_groups=has the following bot privileges
+lang_list_title=Available languages
+lang_list_footer=Use !lang set <language> to change the current language
+lang_not_available=This language does not exists, please use ``!lang list`` to have the full list of available languages
+lang_set=Language successfully set !
