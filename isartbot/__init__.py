@@ -22,8 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .bot            import *
-from .logs           import *
-from .settings       import *
-from .converters     import *
-from .bot_decorators import *
+from .bot      import Bot
+from .lang     import Lang
+from .database import Database

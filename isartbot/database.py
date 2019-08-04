@@ -22,4 +22,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .test import *
+import asyncio
+
+from sqlalchemy_aio     import ASYNCIO_STRATEGY
+from sqlalchemy         import create_engine
+from sqlalchemy.schema  import CreateTable
+
+from isartbot.models import ServerPreferencesTable
+
+class Database:
+
+    __slots__ = ("engine", "connection", "loop")
+
+    def __init__(self, loop, database_name: str):
+        
+        self.loop       = loop
+        self.engine     = create_engine(database_name, strategy=ASYNCIO_STRATEGY)
+        self.connection = None
+
+        self.loop.run_until_complete(self.init())
+
+    def __del__(self): 
+        
+        self.loop.run_until_complete(self.cleanup())
+
+    #TODO Add table sync
+    async def init(self):
+        """ Inits the database connection """
+
+        #await self.engine.execute(CreateTable(ServerPreferencesTable.table))
+
+        self.connection = await self.engine.connect()
+
+    async def cleanup(self):
+        """ Cleanups the database connection """
+        
+        await self.connection.close()
+
+        

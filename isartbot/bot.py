@@ -22,158 +22,135 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import sys
 import discord
 import asyncio
+import logging
+import logging.config
+import configparser
 import traceback
 
-from .logs           import Logs
-from .settings       import Settings
-from .bot_decorators import is_dev
-from  os.path        import abspath
-from  discord.ext    import commands
+from isartbot.lang     import Lang
+from isartbot.models   import ServerPreferencesTable
+from isartbot.checks   import log_command, trigger_typing, block_dms
+from isartbot.database import Database
+
+from discord.ext import commands
+from os.path     import abspath
 
 class Bot(discord.ext.commands.Bot):
     """ Main bot class """
+
+    __slots__ = ("settings", "extensions", "config_file", "database")
 
     def __init__(self, *args, **kwargs):
         """ Inits and runs the bot """
 
         super().__init__(command_prefix = "!", *args, **kwargs)
 
-        #Private
-        self.__settings     = Settings()
-        self.__commands     = self.__settings.get("bot", "commands")
-        self.logs           = Logs(self, enabled = self.__settings.get("logs"))
-        self.command_prefix = self.__settings.get("bot", "prefix")
+        self.config_file = abspath('./settings.ini')
 
-        self.logs.print('Using settings file at {}'.format(abspath(self.__settings.path)))
-        self.logs.print('Initializing bot ...')
+        # Setting up logging
+        logging.config.fileConfig(self.config_file)
+        self.logger = logging.getLogger('isartbot')
 
-        self.add_check(self.globally_block_dms)
-        self.add_check(self.log_command)
-        self.add_check(self.check_enable)
-        self.add_check(self.trigger_typing)
+        # Loading settings
+        self.logger.info('Settings file located at {}'.format(self.config_file))
+        self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
+        self.settings.read(self.config_file)
 
-        self.loop.create_task(self.load_cog())
+        self.extensions     = self.settings['extensions']
+        self.command_prefix = self.settings.get('common', 'prefix')
 
-        self.run(self.__settings.get("bot", "token"))
+        # Loading database
+        database_name = f"sqlite:///{abspath(self.settings.get('common', 'database'))}"
+        self.logger.info(f"Connecting to database {database_name}")
+        self.database = Database(self.loop, database_name)
 
-        self.logs.close()
+        # Loading languages
+        self.langs          = {}
+        self.loop.create_task(self.load_languages())
+        self.loop.create_task(self.load_extensions())
 
-    @property
-    def guild(self):
-        return self.get_guild(self.settings.get('bot', 'server_id'))
+        # Adding checks
+        self.add_check(log_command)
+        self.add_check(block_dms)
+        self.add_check(trigger_typing)
 
-    async def load_cog(self):
-        """ Loads all the cogs of the bot defined into the settings.json file """
+        self.run(self.settings.get('common', 'token'))
+
+    async def load_extensions(self):
+        """ Loads all the cogs of the bot defined into the settings.ini file """
 
         try:
-            await self.wait_for('ready', timeout=30)
+            await self.wait_for("ready", timeout=30)
+            self.logger.info("Loading extensions...")
         except asyncio.futures.TimeoutError:
-            self.logs.print("Wait for on_ready event timed out, loading the cogs anyway.")
+            self.logger.warning("Wait for on_ready event timed out, loading the extensions anyway...")
 
-        for name, enabled in self.__commands.items():
-            if (name != ""):
-                name = name.strip('_')
-
+        for (extension, enabled) in self.settings.items("extensions"):
+            if self.extensions.getboolean(extension):
                 try:
-                    text = str(enabled.get('enabled'))
-                    self.load_extension('isartbot.modules.' + name)
-                    self.logs.print    ('Loaded the module {} : enabled = {}'.format(name, text))
-
+                    self.load_extension("isartbot.ext." + extension)
+                    self.logger.info   (f"Loaded extension named isartbot.ext.{extension}")
                 except Exception as e:
                     await self.on_error(None, e)
-                    self.logs.print('Failed to load extension named modules.{0}'.format(name))
+                    self.logger.error(f"Failed to load extension named isartbot.ext.{name}")
+            else:
+                self.logger.info(f"Ignored extension named isartbot.ext.{extension}")
 
         return
 
-    @property
-    def settings(self):
-        return self.__settings
+    async def load_languages(self):
+        """ Loads all the available languages files of the bot"""
 
-    async def send_success(self, ctx, message, title=""):
-        """ Send a successful message """
+        for (lang, file_name) in self.settings.items("languages"):
 
-        embed = discord.Embed(
-            title       = title,
-            description = message,
-            colour      = discord.Color.green())
+            try:
+                self.langs[lang] = Lang(file_name)
+                self.logger.info(f"Loaded language named {lang} from {file_name}")
+            except Exception as e:
+                self.logger.error(f"Failed to load a language")
+                await self.on_error(None, e)
 
-        return await ctx.send(embed=embed)
+        return
 
-    async def send_fail(self, ctx, message, title=""):
-        """ Send a failed message """
+    async def get_translation(self, ctx, key: str):
+        
+        result = await self.database.connection.execute(ServerPreferencesTable.table.select(ServerPreferencesTable.table.c.discord_id == ctx.guild.id))
+        guilds = await result.fetchall()
 
-        embed = discord.Embed(
-            title       = title,
-            description = message,
-            colour      = discord.Color.red())
+        # Checking if the guild is already registered in the database 
+        if (len(guilds) == 0):
+            guilds = await self.register_guild(ctx)
 
-        return await ctx.send(embed=embed)
+        # There is only one guild per discord id
+        guild = guilds[0]
 
-    #Events
+        return self.langs[guild[ServerPreferencesTable.table.c.lang]].get_key(key)
+
+    async def register_guild(self, ctx):
+        
+        await self.database.connection.execute(ServerPreferencesTable.table.insert().values(discord_id=ctx.guild.id))
+        result = await self.database.connection.execute(ServerPreferencesTable.table.select(ServerPreferencesTable.table.c.discord_id == ctx.guild.id))
+
+        self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
+
+        return await result.fetchall()
+
+    # --- Events ---
+
     async def on_ready(self):
         """
             Executed when the bot is connected
             to discord and ready to operate
         """
 
-        self.logs.print('------------')
-        self.logs.print('Logged in as')
-        self.logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
-        self.logs.print('User ID  : {0}'    .format(self.user.id))
-        self.logs.print('------------')
-
-    async def on_error(self, ctx, error):
-        """ Sends errors reports if needed """
-
-        ignored = (commands.CommandNotFound,
-                   commands.UserInputError,
-                   commands.CheckFailure)
-        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
-        # If nothing is found. We keep the exception passed to on_command_error.
-        error = getattr(error, 'original', error)
-
-        # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored):
-            return
-
-        if isinstance(error, commands.NoPrivateMessage):
-            try:
-                return await ctx.author.send("Hey no DMs!")
-            except:
-                return
-
-        # All other Errors not returned come here... And we can just print the default TraceBack.
-        if ctx is not None:
-            self.logs.print('Ignoring exception in command {}:'.format(ctx.command))
-        else:
-            self.logs.print('Ctx is empty, this might be comming from the module loading function:')
-
-        for err in traceback.format_exception(type(error), error, error.__traceback__):
-            if (err[len(err) - 1] == '\n'):
-                err = err[:-1]
-            self.logs.print(err)
-
-        try:
-            errors = traceback.format_tb(error.__traceback__)
-            embed  = discord.Embed(description =
-                "Oops an unexpected error occurred !" +
-                "\nPlease [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
-                " on github if this error is recurrent\n" +
-                "Make sure to include a screenshot of this message\n```\n" +
-                errors[len(errors) - 1] +
-                "\n```",
-                title = "Error")
-
-            embed.set_footer(text=self.logs.get_time)
-            embed.colour = discord.Colour.red()
-
-            await ctx.send(embed = embed)
-        except:
-            return
-
-        return
+        self.logger.info("------------")
+        self.logger.info("Logged in as")
+        self.logger.info("Username : {0}#{1}".format(self.user.name, self.user.discriminator))
+        self.logger.info("User ID  : {0}"    .format(self.user.id))
+        self.logger.info("------------")
 
     async def on_command_error(self, ctx, error):
         """ Handles unhandled errors """
@@ -184,53 +161,29 @@ class Bot(discord.ext.commands.Bot):
 
         await self.on_error(ctx, error)
 
-    ###Checks
-    async def trigger_typing(self, ctx):
-        """ Triggers typing """
+    async def on_error(self, ctx, error):
+        """ Sends errors reports if needed """
 
-        await ctx.trigger_typing()
+        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
+        # If nothing is found. We keep the exception passed to on_command_error.
+        error = getattr(error, 'original', error)
 
-        return True
+        # Anything in ignored will return and prevent anything happening.
+        if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
+            self.logger.warning(f"Ignored exception : {error}")
+            return
 
-    async def globally_block_dms(self, ctx):
-        """
-            Checks if the messages provides from
-            a guild or a DM
-        """
+        # All other Errors not returned come here... And we can just print the default TraceBack.
+        if ctx is not None:
+            self.logger.error('Ignoring exception in command {}:'.format(ctx.command))
+        else:
+            self.logger.error('Ignoring exception:')
 
-        result = not (ctx.guild is None)
+        for err in traceback.format_exception(type(error), error, error.__traceback__):
+            index = 0
+            for i, char in enumerate(err):
+                if (char == '\n'):
+                    self.logger.error(err[index:i])
+                    index = i + 1
 
-        if result is False:
-            raise commands.NoPrivateMessage()
-
-        return result
-
-    async def check_enable(self, ctx):
-        """
-            Checks if the command is enabled or not
-        """
-
-        if is_dev(ctx):
-            return True
-
-        command = ctx.command.root_parent
-        if (command is None):
-            command = ctx.command
-
-        enabled = ctx.bot.settings.get("enabled", command=command.name)
-
-        if (enabled == False):
-            await self.send_fail(ctx,
-                "Sorry, but this command is disabled for now !",
-                'Error')
-
-        return enabled
-
-    async def log_command(self, ctx):
-        """ Logs every command """
-        author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
-        channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
-
-        self.logs.print('{0} {1} : {2}'.format(author, channel, ctx.message.content))
-
-        return True
+        return

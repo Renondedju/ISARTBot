@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 import os
-from v2 import Bot
+from isartbot import Bot
 
 def run():
 

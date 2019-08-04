@@ -22,22 +22,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import asyncio
 
-class CogLoadingFailed(Exception):
-    """ CogLoadingFailed exception """
+from os.path import abspath
 
-    def __init__(self, message):
-        self.message = message
+class Lang():
 
-#Rss exceptions
-class EmptyRssFeed(Exception):
-    """ EmptyRssFeed exception """
+    def __init__ (self, file: str):
+        self.filename   = file
+        self.dictionary = self.load_language(file)
 
-    def __init__(self, message = 'Feed is empty'):
-        self.message = message
+    def get_key(self, key: str):
+        """Return the value of the given key"""
+        return self.dictionary[key]
 
-class AlreadyExistingFeed(Exception):
-    """ AlreadyExistingFeed exception """
+    def has_key(self, key: str):
+        """ returns true if the targetted language has the specified key"""
+        return key in self.dictionary
 
-    def __init__(self, message = 'The feed is already in the list'):
-        self.message = message
+    def load_language(self, name: str):
+        """Create a dictionary (keyword, descrition/quote) from a language file"""
+        language = {}
+        
+        with open(abspath(name), 'rt', encoding='utf-8') as file:
+
+            for line in file:
+                #Ignoring comments 
+                if line.startswith('#'):
+                    continue
+                    
+                (key, val) = line.split('=')
+                language[key] = val.strip('\n\r')
+
+        return language
