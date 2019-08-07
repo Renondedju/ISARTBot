@@ -15,3 +15,4 @@ lang_list_title=Langues disponibles
 lang_list_footer=Utilisez !lang set <langue> pour changer le langage du serveur
 lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles
 lang_set=Langue définie avec succès!
+missing_perms_error=Oops ! Il semblerais qu'il vous manque l'une des permissions suivantes pour exécuter cette commande

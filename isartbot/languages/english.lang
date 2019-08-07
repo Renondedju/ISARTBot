@@ -15,3 +15,4 @@ lang_list_title=Available languages
 lang_list_footer=Use !lang set <language> to change the current language
 lang_not_available=This language does not exists, please use ``!lang list`` to have the full list of available languages
 lang_set=Language successfully set !
+missing_perms_error=Oops ! It looks like you're missing one of the following permissions to run this command

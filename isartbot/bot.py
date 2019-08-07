@@ -26,27 +26,26 @@ import sys
 import discord
 import asyncio
 import logging
-import logging.config
-import configparser
 import traceback
+import configparser
+import logging.config
 
 from isartbot.lang     import Lang
-from isartbot.models   import ServerPreferencesTable
+from isartbot.models   import ServerPreferences
 from isartbot.checks   import log_command, trigger_typing, block_dms
 from isartbot.database import Database
 
 from discord.ext import commands
 from os.path     import abspath
 
+
 class Bot(discord.ext.commands.Bot):
     """ Main bot class """
 
-    __slots__ = ("settings", "extensions", "config_file", "database")
+    __slots__ = ("settings", "extensions", "config_file", "database", "logger", "langs", "dev_mode")
 
     def __init__(self, *args, **kwargs):
         """ Inits and runs the bot """
-
-        super().__init__(command_prefix = "!", *args, **kwargs)
 
         self.config_file = abspath('./settings.ini')
 
@@ -59,8 +58,10 @@ class Bot(discord.ext.commands.Bot):
         self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
         self.settings.read(self.config_file)
 
-        self.extensions     = self.settings['extensions']
-        self.command_prefix = self.settings.get('common', 'prefix')
+        super().__init__(command_prefix = discord.ext.commands.when_mentioned_or(self.settings.get('common', 'prefix')), *args, **kwargs)
+
+        self.dev_mode   = self.settings.getboolean('debug', 'developement_mode')
+        self.extensions = self.settings['extensions']
 
         # Loading database
         database_name = f"sqlite:///{abspath(self.settings.get('common', 'database'))}"
@@ -94,8 +95,8 @@ class Bot(discord.ext.commands.Bot):
                     self.load_extension("isartbot.ext." + extension)
                     self.logger.info   (f"Loaded extension named isartbot.ext.{extension}")
                 except Exception as e:
-                    await self.on_error(None, e)
                     self.logger.error(f"Failed to load extension named isartbot.ext.{name}")
+                    raise e
             else:
                 self.logger.info(f"Ignored extension named isartbot.ext.{extension}")
 
@@ -111,13 +112,13 @@ class Bot(discord.ext.commands.Bot):
                 self.logger.info(f"Loaded language named {lang} from {file_name}")
             except Exception as e:
                 self.logger.error(f"Failed to load a language")
-                await self.on_error(None, e)
+                raise e
 
         return
 
     async def get_translation(self, ctx, key: str):
         
-        result = await self.database.connection.execute(ServerPreferencesTable.table.select(ServerPreferencesTable.table.c.discord_id == ctx.guild.id))
+        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
         guilds = await result.fetchall()
 
         # Checking if the guild is already registered in the database 
@@ -127,12 +128,12 @@ class Bot(discord.ext.commands.Bot):
         # There is only one guild per discord id
         guild = guilds[0]
 
-        return self.langs[guild[ServerPreferencesTable.table.c.lang]].get_key(key)
+        return self.langs[guild[ServerPreferences.table.c.lang]].get_key(key)
 
     async def register_guild(self, ctx):
         
-        await self.database.connection.execute(ServerPreferencesTable.table.insert().values(discord_id=ctx.guild.id))
-        result = await self.database.connection.execute(ServerPreferencesTable.table.select(ServerPreferencesTable.table.c.discord_id == ctx.guild.id))
+        await self.database.connection.execute(ServerPreferences.table.insert().values(discord_id=ctx.guild.id))
+        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
 
         self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
 
@@ -146,38 +147,25 @@ class Bot(discord.ext.commands.Bot):
             to discord and ready to operate
         """
 
-        self.logger.info("------------")
-        self.logger.info("Logged in as")
-        self.logger.info("Username : {0}#{1}".format(self.user.name, self.user.discriminator))
-        self.logger.info("User ID  : {0}"    .format(self.user.id))
-        self.logger.info("------------")
+        self.logger.info( "------------")
+        self.logger.info( "Logged in as")
+        self.logger.info(f"Username : {self.user.name}#{self.user.discriminator}")
+        self.logger.info(f"User ID  : {self.user.id}")
+        self.logger.info( "------------")
 
     async def on_command_error(self, ctx, error):
-        """ Handles unhandled errors """
-
-        # This prevents any commands with local handlers being handled here in on_command_error.
-        if hasattr(ctx.command, 'on_error'):
-            return
-
-        await self.on_error(ctx, error)
-
-    async def on_error(self, ctx, error):
-        """ Sends errors reports if needed """
-
-        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
-        # If nothing is found. We keep the exception passed to on_command_error.
-        error = getattr(error, 'original', error)
+        """ Handles command errors """
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
-            self.logger.warning(f"Ignored exception : {error}")
+            return
+
+        if isinstance(error, commands.MissingPermissions):
+            await self.missing_permissions_error(ctx, error)
             return
 
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        if ctx is not None:
-            self.logger.error('Ignoring exception in command {}:'.format(ctx.command))
-        else:
-            self.logger.error('Ignoring exception:')
+        self.logger.error(f"Ignoring exception in command \"{self.command_prefix}{ctx.command}\":")
 
         for err in traceback.format_exception(type(error), error, error.__traceback__):
             index = 0
@@ -187,3 +175,20 @@ class Bot(discord.ext.commands.Bot):
                     index = i + 1
 
         return
+
+    async def on_error(self, *args, **kwargs):
+        """ Sends errors reports """
+
+        self.logger.critical("Critical error report:")
+        for err in traceback.format_exc().split('\n'):
+            self.logger.critical(err)
+
+    async def missing_permissions_error(self, ctx, error):
+
+        embed = discord.Embed()
+
+        embed.title       =    await self.get_translation(ctx, 'error_title')
+        embed.description = f"{await self.get_translation(ctx, 'missing_perms_error')} : {error.missing_perms}"
+        embed.color       = discord.Color.red()
+
+        await ctx.send(embed=embed)

@@ -28,7 +28,7 @@ from sqlalchemy_aio     import ASYNCIO_STRATEGY
 from sqlalchemy         import create_engine
 from sqlalchemy.schema  import CreateTable
 
-from isartbot.models import ServerPreferencesTable
+from isartbot.models import ServerPreferences
 
 class Database:
 
@@ -50,7 +50,7 @@ class Database:
     async def init(self):
         """ Inits the database connection """
 
-        #await self.engine.execute(CreateTable(ServerPreferencesTable.table))
+        #await self.engine.execute(CreateTable(ServerPreferences.table))
 
         self.connection = await self.engine.connect()
 

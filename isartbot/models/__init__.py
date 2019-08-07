@@ -22,6 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-__slots__ = ("ServerPreferencesTable")
+__slots__ = ("ServerPreferences")
 
-from .server_preferences import ServerPreferencesTable
+from .server_preferences import ServerPreferences

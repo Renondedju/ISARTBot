@@ -24,7 +24,7 @@
 
 from sqlalchemy import Column, Integer, MetaData, Table, Text
 
-class ServerPreferencesTable:
+class ServerPreferences:
 
     table = Table(
         'ServerPreferences', MetaData(),

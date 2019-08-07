@@ -26,7 +26,7 @@ import asyncio
 import discord
 import logging
 
-from isartbot.models import ServerPreferencesTable
+from isartbot.models import ServerPreferences
 from discord.ext     import commands
 from isartbot.checks import is_moderator
 
@@ -73,8 +73,8 @@ class LangCommands(commands.Cog):
 
     async def set_language(self, ctx, lang):
         await ctx.bot.database.connection.execute(
-            ServerPreferencesTable.table.update().\
-                where (ServerPreferencesTable.table.c.discord_id == ctx.guild.id).\
+            ServerPreferences.table.update().\
+                where (ServerPreferences.table.c.discord_id == ctx.guild.id).\
                 values(lang=lang)
         )
 
