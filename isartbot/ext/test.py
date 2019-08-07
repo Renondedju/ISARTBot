@@ -26,18 +26,19 @@ import asyncio
 import discord
 
 from discord.ext     import commands
-from isartbot.checks import super_admin, developper
+from isartbot.checks import super_admin, developper, is_developper
 
 class TestCommands(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
+    @commands.check(is_developper)
     async def test(self, ctx):
         """ Creates a command group"""
 
         if ctx.invoked_subcommand is None:
             await ctx.send(await ctx.bot.get_translation(ctx, 'test'))
 
-    @test.command(pass_context=True)
+    @test.command()
     async def lang(self, ctx, lang: str, key: str):
         """ Returns the content of a language key """
 
@@ -47,22 +48,22 @@ class TestCommands(commands.Cog):
             await ctx.send(ctx.bot.langs[lang].get_key(key))
 
     @test.command()
-    async def error(self):
+    async def error(self, ctx):
         raise ValueError("Test of unhandled exception")
 
-    @test.command(pass_context=True)
+    @test.command()
     async def delay(self, ctx):
         await asyncio.sleep(2)
         await ctx.send(await ctx.bot.get_translation(ctx, 'test_wait'))
 
-    @test.command(pass_context=True)
+    @test.command()
     async def groups(self, ctx, user: discord.Member = None):
         
         if user is None : user = ctx.author
 
         groups = []
-        if await super_admin(ctx, user) : groups.append("Super admin") 
-        if await developper (ctx, user) : groups.append("Developper" )
+        if super_admin(ctx, user) : groups.append("Super admin") 
+        if developper (ctx, user) : groups.append("Developper" )
 
         if len(groups) == 0:
             await ctx.send(f"{user.mention} {await ctx.bot.get_translation(ctx, 'user_has_no_groups')}")
