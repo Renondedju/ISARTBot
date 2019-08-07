@@ -22,5 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from isartbot.checks.developper import developper
+
 async def is_admin(ctx):
-    return ctx.author.permissions_in(ctx.channel).administrator
+    return ctx.author.permissions_in(ctx.channel).administrator or (ctx.bot.dev_mode and developper(ctx, ctx.author))

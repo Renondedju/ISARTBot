@@ -23,8 +23,8 @@
 # SOFTWARE.
 
 async def is_developper(ctx):
-    return await developper(ctx, ctx.author)
+    return developper(ctx, ctx.author)
 
 # Manual check
-async def developper(ctx, user):
+def developper(ctx, user):
     return str(user.id) in ctx.bot.settings.get('debug', 'developer_ids')

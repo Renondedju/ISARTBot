@@ -22,9 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from isartbot.checks.developper import developper
+
 async def is_super_admin(ctx):
-    return await super_admin(ctx, ctx.author)
+    return super_admin(ctx, ctx.author)
 
 # Manual check
-async def super_admin(ctx, user):
-    return str(user.id) in ctx.bot.settings.get('common', 'super_admins')
+def super_admin(ctx, user):
+    return str(user.id) in ctx.bot.settings.get('common', 'super_admins') or\
+         (ctx.bot.dev_mode and developper(ctx, user))
