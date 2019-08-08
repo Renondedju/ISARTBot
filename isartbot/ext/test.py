@@ -28,7 +28,7 @@ import discord
 from discord.ext     import commands
 from isartbot.checks import super_admin, developper, is_developper
 
-class TestCommands(commands.Cog):
+class TestExt(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
     @commands.check(is_developper)
@@ -71,4 +71,4 @@ class TestCommands(commands.Cog):
             await ctx.send(f"{user.mention} {await ctx.bot.get_translation(ctx, 'user_has_groups')}: {groups}")
 
 def setup(bot):
-    bot.add_cog(TestCommands())
+    bot.add_cog(TestExt())

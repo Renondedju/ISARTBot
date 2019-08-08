@@ -30,7 +30,7 @@ from isartbot.models import ServerPreferences
 from discord.ext     import commands
 from isartbot.checks import is_moderator
 
-class LangCommands(commands.Cog):
+class LangExt(commands.Cog):
 
     @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
     async def lang(self, ctx):
@@ -79,4 +79,4 @@ class LangCommands(commands.Cog):
         )
 
 def setup(bot):
-    bot.add_cog(LangCommands())
+    bot.add_cog(LangExt())

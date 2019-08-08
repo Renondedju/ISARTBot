@@ -29,7 +29,7 @@ import logging
 from discord.ext import commands
 
 #TODO Add checks
-class ExtCommands(commands.Cog):
+class ExtExt(commands.Cog):
 
     @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
     #@commands.check(is_dev)
@@ -103,8 +103,7 @@ class ExtCommands(commands.Cog):
         embed = discord.Embed()        
 
         try:
-            ctx.bot.unload_extension(ext)
-            ctx.bot.load_extension(ext)
+            ctx.bot.reload_extension(ext)
             
         except Exception as e:
             embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
@@ -120,4 +119,4 @@ class ExtCommands(commands.Cog):
         await ctx.send(embed=embed)
 
 def setup(bot):
-    bot.add_cog(ExtCommands())
+    bot.add_cog(ExtExt())
