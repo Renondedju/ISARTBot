@@ -92,11 +92,11 @@ class Bot(discord.ext.commands.Bot):
         for (extension, enabled) in self.settings.items("extensions"):
             if self.extensions.getboolean(extension):
                 try:
-                    self.load_extension("isartbot.ext." + extension)
+                    self.load_extension(f"isartbot.ext.{extension}")
                     self.logger.info   (f"Loaded extension named isartbot.ext.{extension}")
                 except Exception as e:
-                    self.logger.error(f"Failed to load extension named isartbot.ext.{name}")
-                    raise e
+                    self.logger.error(f"Failed to load extension named isartbot.ext.{extension}")
+                    await self.on_error(e)
             else:
                 self.logger.info(f"Ignored extension named isartbot.ext.{extension}")
 
@@ -110,9 +110,9 @@ class Bot(discord.ext.commands.Bot):
             try:
                 self.langs[lang] = Lang(file_name)
                 self.logger.info(f"Loaded language named {lang} from {file_name}")
-            except Exception as e:
+            except:
                 self.logger.error(f"Failed to load a language")
-                raise e
+                await self.on_error(e)
 
         return
 
@@ -165,7 +165,7 @@ class Bot(discord.ext.commands.Bot):
             return
 
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.logger.error(f"Ignoring exception in command \"{self.command_prefix}{ctx.command}\":")
+        self.logger.error(f"Ignoring exception in command \"{ctx.command}\":")
 
         for err in traceback.format_exception(type(error), error, error.__traceback__):
             index = 0
@@ -179,7 +179,7 @@ class Bot(discord.ext.commands.Bot):
     async def on_error(self, *args, **kwargs):
         """ Sends errors reports """
 
-        self.logger.critical("Critical error report:")
+        self.logger.critical("Unhandled exception occurred:")
         for err in traceback.format_exc().split('\n'):
             self.logger.critical(err)
 
