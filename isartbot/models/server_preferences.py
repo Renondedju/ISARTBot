@@ -31,5 +31,6 @@ class ServerPreferences:
         Column('id', Integer, primary_key=True),
         Column('discord_id', Integer, unique=True),
         Column('lang', Text, default="en"),
+        Column('starboard_id', Integer, default=0),
     )
     

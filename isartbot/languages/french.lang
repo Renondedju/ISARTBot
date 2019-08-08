@@ -16,3 +16,6 @@ lang_list_footer=Utilisez !lang set <langue> pour changer le langage du serveur
 lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles
 lang_set=Langue définie avec succès!
 missing_perms_error=Oops ! Il semblerais qu'il vous manque l'une des permissions suivantes pour exécuter cette commande
+missing_bot_perms_error=Oops ! Il semblerais qu'il manque au bot l'une des permissions suivantes pour exécuter cette commande
+success_starboard_set=Le starboard a été configuré avec succès sur le canal suivant
+success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur
