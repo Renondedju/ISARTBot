@@ -39,7 +39,7 @@ from discord.ext import commands
 from os.path     import abspath
 
 
-class Bot(discord.ext.commands.Bot):
+class Bot(commands.Bot):
     """ Main bot class """
 
     __slots__ = ("settings", "extensions", "config_file", "database", "logger", "langs", "dev_mode")
@@ -74,9 +74,9 @@ class Bot(discord.ext.commands.Bot):
         self.loop.create_task(self.load_extensions())
 
         # Adding checks
-        self.add_check(log_command)
-        self.add_check(block_dms)
-        self.add_check(trigger_typing)
+        self.add_check(log_command    , call_once=True)
+        self.add_check(block_dms      , call_once=True)
+        self.add_check(trigger_typing , call_once=True)
 
         self.run(self.settings.get('common', 'token'))
 
@@ -147,11 +147,7 @@ class Bot(discord.ext.commands.Bot):
             to discord and ready to operate
         """
 
-        self.logger.info( "------------")
-        self.logger.info( "Logged in as")
-        self.logger.info(f"Username : {self.user.name}#{self.user.discriminator}")
-        self.logger.info(f"User ID  : {self.user.id}")
-        self.logger.info( "------------")
+        self.logger.info(f"Logged in as {self.user.name}#{self.user.discriminator} - {self.user.id}")
 
     async def on_command_error(self, ctx, error):
         """ Handles command errors """
