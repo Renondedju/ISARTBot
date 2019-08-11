@@ -24,4 +24,5 @@
 
 from .bot      import Bot
 from .lang     import Lang
+from .help	   import HelpCommand
 from .database import Database

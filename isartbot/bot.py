@@ -30,6 +30,7 @@ import traceback
 import configparser
 import logging.config
 
+from isartbot.help     import HelpCommand
 from isartbot.lang     import Lang
 from isartbot.models   import ServerPreferences
 from isartbot.checks   import log_command, trigger_typing, block_dms
@@ -67,6 +68,9 @@ class Bot(commands.Bot):
         database_name = f"sqlite:///{abspath(self.settings.get('common', 'database'))}"
         self.logger.info(f"Connecting to database {database_name}")
         self.database = Database(self.loop, database_name)
+
+        # Creating the help command
+        self.help_command = HelpCommand()
 
         # Loading languages
         self.langs          = {}
