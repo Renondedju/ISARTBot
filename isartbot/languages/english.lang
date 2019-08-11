@@ -19,3 +19,5 @@ missing_perms_error=Oops ! It looks like you're missing one of the following per
 missing_bot_perms_error=Oops ! It looks like the bot is missing one of the following permissions to run this command
 success_starboard_set=The starboard has successfully been configured on the following text channel
 success_starboard_unset=The starboard has successfully been disabled for this server
+help_opening_note=Use `{0}{1} [command]` for more info on a command.\nYou can also use `{0}{1} [category]` for more info on a category.
+commands_heading=Available commands

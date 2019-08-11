@@ -19,3 +19,5 @@ missing_perms_error=Oops ! Il semblerais qu'il vous manque l'une des permissions
 missing_bot_perms_error=Oops ! Il semblerais qu'il manque au bot l'une des permissions suivantes pour exécuter cette commande
 success_starboard_set=Le starboard a été configuré avec succès sur le canal suivant
 success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur
+help_opening_note=Utilisez `{0}{1} [commande]` pour plus d'info sur une commande.\nVous pouvez également utiliser `{0}{1} [catégorie]` pour plus d'informations une une catégorie.
+commands_heading=Commandes disponibles
