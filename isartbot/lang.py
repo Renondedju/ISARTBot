@@ -52,6 +52,6 @@ class Lang():
                     continue
                     
                 (key, val) = line.split('=')
-                language[key] = val.strip('\n\r')
+                language[key] = val.strip('\n\r').replace("\\n", '\n')
 
         return language
