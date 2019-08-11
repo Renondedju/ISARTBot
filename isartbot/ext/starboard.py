@@ -33,7 +33,7 @@ from isartbot.models.server_preferences import ServerPreferences
 class StarboardExt(commands.Cog):
     """ Starboard related commands and tasks """
 
-    __slots__ = ("bot", "stars")
+    __slots__ = ("bot", "stars", "minimum_stars")
 
     def __init__(self, bot, *args, **kwargs):
 
@@ -106,7 +106,7 @@ class StarboardExt(commands.Cog):
 
     # Methods
 
-    def is_starboard_message(self, message: discord.Message) -> bool:
+    async def is_starboard_message(self, message: discord.Message) -> bool:
         """ Checks if the message is a starboard message """
 
         if message is None:
