@@ -32,7 +32,7 @@ from isartbot.checks import is_moderator
 
 class LangExt(commands.Cog):
 
-    @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
+    @commands.group(pass_context=True, invoke_without_command=True)
     async def lang(self, ctx):
         
         if ctx.invoked_subcommand is None:

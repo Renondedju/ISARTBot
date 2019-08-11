@@ -22,4 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .test import *
+from .ext       import *
+from .test      import *
+from .lang      import *
+from .starboard import *
+from .diffusion import *
