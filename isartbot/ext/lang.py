@@ -28,17 +28,32 @@ import logging
 
 from isartbot.models import ServerPreferences
 from discord.ext     import commands
-from isartbot.checks import is_moderator
+from isartbot.checks import is_moderator, is_super_admin
 
 class LangExt(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def lang(self, ctx):
-        
+
         if ctx.invoked_subcommand is None:
             await ctx.send(await ctx.bot.get_translation(ctx, 'invalid_command_usage'))
 
-    @lang.command(pass_context=True)
+    @lang.command()
+    @commands.check(is_super_admin)
+    async def reload(self, ctx):
+        """ Reloads all the langs from the files """
+
+        await ctx.bot.load_languages()
+
+        embed = discord.Embed()
+
+        embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
+        embed.description = await ctx.bot.get_translation(ctx, 'language_reload_success')
+        embed.colour      = discord.Color.green()
+
+        await ctx.send(embed=embed)
+
+    @lang.command()
     async def list(self, ctx):
         """ Lists all the available languages for this server """
 
@@ -51,7 +66,7 @@ class LangExt(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @lang.command(pass_context=True)
+    @lang.command()
     @commands.check(is_moderator)
     async def set(self, ctx, lang: str):
         """ Sets a language for the current server """
