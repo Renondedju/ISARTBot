@@ -33,7 +33,11 @@ class Lang():
         self.dictionary = self.load_language(file)
 
     def get_key(self, key: str):
-        """Return the value of the given key"""
+        """ Return the value of the given key """
+
+        if (not self.has_key(key)):
+            return f"Key named \"{key}\" is missing in language file \"{self.filename}\""
+
         return self.dictionary[key]
 
     def has_key(self, key: str):
@@ -43,14 +47,14 @@ class Lang():
     def load_language(self, name: str):
         """Create a dictionary (keyword, descrition/quote) from a language file"""
         language = {}
-        
+
         with open(abspath(name), 'rt', encoding='utf-8') as file:
 
             for line in file:
-                #Ignoring comments 
+                #Ignoring comments
                 if line.startswith('#'):
                     continue
-                    
+
                 (key, val) = line.split('=')
                 language[key] = val.strip('\n\r').replace("\\n", '\n')
 
