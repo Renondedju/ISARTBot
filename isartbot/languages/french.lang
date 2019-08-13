@@ -29,3 +29,4 @@ no_subcommand=La commande "{0.qualified_name}" n'a pas de sous commandes.
 no_subcommand_named=La commande "{0.qualified_name}" n'a pas de sous commande nommée {1}
 missing_moderator_permissions=Seul un modérateur peut éxécuter cette commande
 denied_failure=Quelque chose ne marche pas comme il faut !
+class_description=[TODO] Description longue de la command class
