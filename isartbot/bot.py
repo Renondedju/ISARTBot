@@ -124,13 +124,19 @@ class Bot(commands.Bot):
 
         return
 
-    async def get_translations(self, ctx, keys: list):
+    async def get_translations(self, ctx, keys: list, force_fetch: bool = False):
         """ Returns a set of translations """
+
+        if (force_fetch):
+            await self.fetch_guild_language(ctx)
 
         return dict([(key, self.langs[ctx.guild.description].get_key(key)) for key in keys])
 
-    async def get_translation(self, ctx, key: str):
+    async def get_translation(self, ctx, key: str, force_fetch: bool = False):
         """ Returns a translation """
+
+        if (force_fetch):
+            await self.fetch_guild_language(ctx)
 
         return self.langs[ctx.guild.description].get_key(key)
 
@@ -174,6 +180,7 @@ class Bot(commands.Bot):
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
+            print(error)
             return
 
         if isinstance(error, commands.MissingPermissions):

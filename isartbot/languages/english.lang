@@ -36,3 +36,5 @@ diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffu
 diffusion_operator_help=Operator subcommands
 diffusion_subscribe_help=Subscribes to a diffusion channel
 diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
+missing_moderator_permissions=You need to be a moderator to use this command
+denied_failure=Something went wrong !

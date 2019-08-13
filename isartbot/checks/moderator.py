@@ -22,9 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import discord
+
+from discord.ext.commands       import MissingPermissions
 from isartbot.checks.developper import developper
 
 async def is_moderator(ctx):
-    return ctx.author.permissions_in(ctx.channel).manage_guild or\
-           ctx.author.permissions_in(ctx.channel).administrator or\
+    return  ctx.author.permissions_in(ctx.channel).manage_guild  or\
+            ctx.author.permissions_in(ctx.channel).administrator or\
             (ctx.bot.dev_mode and developper(ctx, ctx.author))
