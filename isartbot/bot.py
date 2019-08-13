@@ -82,6 +82,8 @@ class Bot(commands.Bot):
         self.add_check(log_command    , call_once=True)
         self.add_check(trigger_typing , call_once=True)
 
+        self.before_invoke(self.fetch_guild_language)
+
         self.run(self.settings.get('common', 'token'))
 
     async def load_extensions(self):
@@ -125,33 +127,12 @@ class Bot(commands.Bot):
     async def get_translations(self, ctx, keys: list):
         """ Returns a set of translations """
 
-        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
-        guilds = await result.fetchall()
-
-        # Checking if the guild is already registered in the database
-        if (len(guilds) == 0):
-            guilds = await self.register_guild(ctx)
-
-        # There is only one guild per discord id
-        guild = guilds[0]
-        lang  = ServerPreferences.table.c.lang
-
-        return dict([(key, self.langs[guild[lang]].get_key(key)) for key in keys])
+        return dict([(key, self.langs[ctx.guild.description].get_key(key)) for key in keys])
 
     async def get_translation(self, ctx, key: str):
         """ Returns a translation """
 
-        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
-        guilds = await result.fetchall()
-
-        # Checking if the guild is already registered in the database
-        if (len(guilds) == 0):
-            guilds = await self.register_guild(ctx)
-
-        # There is only one guild per discord id
-        guild = guilds[0]
-
-        return self.langs[guild[ServerPreferences.table.c.lang]].get_key(key)
+        return self.langs[ctx.guild.description].get_key(key)
 
     async def register_guild(self, ctx):
         """ Registers the guild into the database, this method is automatically called the first time a command is trigerred in a new guild """
@@ -162,6 +143,21 @@ class Bot(commands.Bot):
         self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
 
         return await result.fetchall()
+
+    async def fetch_guild_language(self, ctx):
+        """ An event that is called when a command is found and is about to be invoked. """
+
+        # Fetching the guild language and injects it into the context
+        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
+        guilds = await result.fetchall()
+
+        # Checking if the guild is already registered in the database
+        if (len(guilds) == 0):
+            guilds = await self.register_guild(ctx)
+
+        # We are gonna use the guild description to store the language of the guild
+        # since this is not used by discord anyways
+        ctx.guild.description = guilds[0][ServerPreferences.table.c.lang]
 
     # --- Events ---
 
