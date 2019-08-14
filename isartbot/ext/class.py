@@ -57,15 +57,29 @@ class ClassExt (commands.Cog):
 
     @_class.command(help="class_create_help", description="class_create_description")
     @commands.check(is_moderator)
+    @commands.bot_has_permissions(manage_roles = True)
     async def create(self, ctx, name: upper_clean):
         """Creates a class"""
 
         role, delegate = self.get_class(ctx, name)
 
-        #Checking if the roles/channels already exists
         if role is not None or delegate is not None:
             await ctx.bot.send_fail(ctx, "This class already exists!", "Error")
             return
+
+        role_color     = ctx.bot.settings.get("class", "role_color")
+        delegate_color = ctx.bot.settings.get("class", "delegate_role_color")
+        prefix         = ctx.bot.settings.get("class", "delegate_role_prefix")
+
+        role = await ctx.guild.create_role(
+            name        = name,
+            colour      = discord.Colour(int(role_color, 16)),
+            mentionable = True)
+
+        delegate = await ctx.guild.create_role(
+            name        = f'{prefix} {name}',
+            colour      = discord.Colour(int(delegate_color, 16)),
+            mentionable = True)
 
     @_class.command(help="class_delete_help", description="class_delete_description")
     @commands.check(is_moderator)

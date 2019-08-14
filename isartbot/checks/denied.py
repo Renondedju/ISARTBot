@@ -22,5 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from discord.ext.commands import CheckFailure
+
+class DeniedFailed(CheckFailure):
+    pass
+
 async def denied(ctx):
+    raise DeniedFailed("Access denied")
     return False

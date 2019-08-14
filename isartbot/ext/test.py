@@ -32,7 +32,6 @@ class TestExt(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
     @commands.check(is_developper)
-    @commands.check(another_check)
     async def test(self, ctx):
         """ Creates a command group"""
 
