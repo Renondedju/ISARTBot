@@ -51,8 +51,9 @@ class Lang():
         with open(abspath(name), 'rt', encoding='utf-8') as file:
 
             for line in file:
-                #Ignoring comments
-                if line.startswith('#'):
+
+                #Ignoring comments and empty lines
+                if line.startswith('#') or len(line) <= 2:
                     continue
 
                 (key, val) = line.split('=')

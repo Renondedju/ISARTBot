@@ -86,16 +86,41 @@ class HelpCommand(commands.MinimalHelpCommand):
 
         await self.send_pages()
 
+    async def send_cog_help(self, cog):
+
+        bot = self.context.bot
+
+        note = self.get_opening_note()
+        if note:
+            self.paginator.add_line(note, empty=True)
+
+        if cog.description:
+            self.paginator.add_line(await bot.get_translation(self.context, cog.description), empty=True)
+
+        filtered = await self.filter_commands(cog.get_commands(), sort=self.sort_commands)
+        if filtered:
+            self.paginator.add_line('**%s**' % (self.commands_heading))
+            for command in filtered:
+                await self.add_subcommand_formatting(command)
+
+            note = self.get_ending_note()
+            if note:
+                self.paginator.add_line()
+                self.paginator.add_line(note)
+
+        await self.send_pages()
+
     async def send_group_help(self, group):
         """ Sends the command group help """
 
         await self.add_command_formatting(group)
 
+        note = self.get_opening_note()
+        if note:
+            self.paginator.add_line(note, empty=True)
+
         filtered = await self.filter_commands(group.commands, sort=self.sort_commands)
         if filtered:
-            note = self.get_opening_note()
-            if note:
-                self.paginator.add_line(note, empty=True)
 
             self.paginator.add_line('**%s**' % self.commands_heading)
             for command in filtered:
