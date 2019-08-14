@@ -58,7 +58,7 @@ class Bot(commands.Bot):
         # Loading settings
         self.logger.info('Settings file located at {}'.format(self.config_file))
         self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
-        self.settings.read(self.config_file)
+        self.settings.read(self.config_file, encoding='utf-8')
 
         super().__init__(command_prefix = discord.ext.commands.when_mentioned_or(self.settings.get('common', 'prefix')), *args, **kwargs)
 
