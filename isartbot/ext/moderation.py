@@ -49,17 +49,25 @@ class ModerationExt(commands.Cog):
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
     async def prune(self, ctx, number: int, member: discord.Member = None):
         """Deletes a certain amount of the latest messages in this text channel"""
+
+        embed = discord.Embed()
+        embed.title = "Sucess"
+        embed.colour = discord.Color.green()
+
         messages = []
         if (member is None):
+            embed.description = f"Last {number} messages has been removed"
             messages = await ctx.channel.history(limit=number + 1).flatten()
         else:
             async for message in ctx.channel.history(limit=number + 1):
                 if (message.author == member):
                      messages.append(message)
             messages.append(ctx.message)
+            embed.description = f"Last {number} messages from {member.mention} has been removed"
 
         await ctx.channel.delete_messages(set(messages))
-        return
+
+        await ctx.send(embed=embed)
 
     #Kick command
     @mod.command(help="mod_kick_help", description="mod_kick_description")
