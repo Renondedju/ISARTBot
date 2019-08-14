@@ -22,8 +22,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from isartbot.exceptions import UnauthorizedCommand
+
 async def is_developper(ctx):
-    return developper(ctx, ctx.author)
+    value = developper(ctx, ctx.author)
+
+    if (not value):
+        raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "developper_status", force_fetch = True))
+
+    return True
 
 # Manual check
 def developper(ctx, user):

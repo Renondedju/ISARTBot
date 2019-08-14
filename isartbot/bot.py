@@ -30,11 +30,12 @@ import traceback
 import configparser
 import logging.config
 
-from isartbot.help     import HelpCommand
-from isartbot.lang     import Lang
-from isartbot.models   import ServerPreferences
-from isartbot.checks   import log_command, trigger_typing, block_dms
-from isartbot.database import Database
+from isartbot.exceptions import UnauthorizedCommand
+from isartbot.help       import HelpCommand
+from isartbot.lang       import Lang
+from isartbot.models     import ServerPreferences
+from isartbot.checks     import log_command, trigger_typing, block_dms
+from isartbot.database   import Database
 
 from discord.ext import commands
 from os.path     import abspath
@@ -178,9 +179,22 @@ class Bot(commands.Bot):
     async def on_command_error(self, ctx, error):
         """ Handles command errors """
 
+        if isinstance(error, UnauthorizedCommand):
+            if ctx.channel.permissions_for(ctx.guild.me).send_messages:
+                translations = await self.get_translations(ctx, ["failure_title", "unauthorized_command"], force_fetch=True)
+
+                embed = discord.Embed(
+                    title       = translations["failure_title"],
+                    description = translations["unauthorized_command"].format(error.missing_status),
+                    color       = discord.Color.red()
+                )
+
+                await ctx.send(embed = embed)
+
+            return
+
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
-            print(error)
             return
 
         if isinstance(error, commands.MissingPermissions):

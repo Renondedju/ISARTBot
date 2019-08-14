@@ -22,10 +22,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.checks.developper import developper
+from isartbot.exceptions import UnauthorizedCommand
+from isartbot.checks     import developper
 
 async def is_super_admin(ctx):
-    return super_admin(ctx, ctx.author)
+    value = super_admin(ctx, ctx.author)
+
+    if (not value):
+        raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "super_admin_status", force_fetch = True))
+
+    return True
 
 # Manual check
 def super_admin(ctx, user):

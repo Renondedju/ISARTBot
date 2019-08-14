@@ -22,5 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from isartbot.exceptions import UnauthorizedCommand
+
 async def denied(ctx):
-    return False
+    raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "denied_status", force_fetch = True))

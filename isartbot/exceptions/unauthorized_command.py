@@ -22,13 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.exceptions import UnauthorizedCommand
-from isartbot.checks     import developper
+from discord.ext.commands import CheckFailure
 
-async def is_admin(ctx):
-    value = ctx.author.permissions_in(ctx.channel).administrator or (ctx.bot.dev_mode and developper(ctx, ctx.author))
+class UnauthorizedCommand(CheckFailure):
+    """ Exception raised when the user had not the required rights to execute the command """
 
-    if (not value):
-        raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "admin_status", force_fetch = True))
+    __slots__ = ("missing_status")
 
-    return True
+    def __init__(self, missing_status="", *args):
+
+        super().__init__("", *args)
+        self.missing_status = missing_status
