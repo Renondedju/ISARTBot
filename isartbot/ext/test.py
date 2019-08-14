@@ -39,15 +39,6 @@ class TestExt(commands.Cog):
             await ctx.send(await ctx.bot.get_translation(ctx, 'test'))
 
     @test.command()
-    async def lang(self, ctx, lang: str, key: str):
-        """ Returns the content of a language key """
-
-        if (not (lang in ctx.bot.langs) or not (ctx.bot.langs[lang].has_key(key))):
-            await ctx.send("No such lang or key")
-        else:
-            await ctx.send(ctx.bot.langs[lang].get_key(key))
-
-    @test.command()
     async def error(self, ctx):
         raise ValueError("Test of unhandled exception")
 

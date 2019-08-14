@@ -28,7 +28,7 @@ import logging
 
 from isartbot.models import ServerPreferences
 from discord.ext     import commands
-from isartbot.checks import is_moderator, is_super_admin
+from isartbot.checks import is_moderator, is_super_admin, is_developper
 
 class LangExt(commands.Cog):
 
@@ -85,6 +85,16 @@ class LangExt(commands.Cog):
             embed.colour      = discord.Color.green()
 
         await ctx.send(embed=embed)
+
+    @lang.command()
+    @commands.check(is_developper)
+    async def key(self, ctx, lang: str, key: str):
+        """ Returns the content of a language key """
+
+        if (not (lang in ctx.bot.langs) or not (ctx.bot.langs[lang].has_key(key))):
+            await ctx.send(await ctx.bot.get_translation(ctx, 'lang_not_available'))
+        else:
+            await ctx.send(ctx.bot.langs[lang].get_key(key))
 
     async def set_language(self, ctx, lang):
         await ctx.bot.database.connection.execute(
