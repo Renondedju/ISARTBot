@@ -36,3 +36,6 @@ diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffu
 diffusion_operator_help=Operator subcommands
 diffusion_subscribe_help=Subscribes to a diffusion channel
 diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
+mod_prune_help=Deletes a certain amount of the latest messages in this text channel
+mod_kick_help=Kick a member
+mod_ban_help=Ban a member
