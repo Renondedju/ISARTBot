@@ -22,9 +22,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.checks.developper import developper
+import discord
+
+from isartbot.exceptions import UnauthorizedCommand
+from isartbot.checks     import developper
 
 async def is_moderator(ctx):
-    return ctx.author.permissions_in(ctx.channel).manage_guild or\
-           ctx.author.permissions_in(ctx.channel).administrator or\
+    value =  ctx.author.permissions_in(ctx.channel).manage_guild  or\
+             ctx.author.permissions_in(ctx.channel).administrator or\
             (ctx.bot.dev_mode and developper(ctx, ctx.author))
+
+    if (not value):
+        raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "moderator_status", force_fetch = True))
+
+    return True

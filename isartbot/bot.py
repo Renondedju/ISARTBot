@@ -30,11 +30,12 @@ import traceback
 import configparser
 import logging.config
 
-from isartbot.help     import HelpCommand
-from isartbot.lang     import Lang
-from isartbot.models   import ServerPreferences
-from isartbot.checks   import log_command, trigger_typing, block_dms
-from isartbot.database import Database
+from isartbot.exceptions import UnauthorizedCommand
+from isartbot.help       import HelpCommand
+from isartbot.lang       import Lang
+from isartbot.models     import ServerPreferences
+from isartbot.checks     import log_command, trigger_typing, block_dms
+from isartbot.database   import Database
 
 from discord.ext import commands
 from os.path     import abspath
@@ -57,7 +58,7 @@ class Bot(commands.Bot):
         # Loading settings
         self.logger.info('Settings file located at {}'.format(self.config_file))
         self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
-        self.settings.read(self.config_file)
+        self.settings.read(self.config_file, encoding='utf-8')
 
         super().__init__(command_prefix = discord.ext.commands.when_mentioned_or(self.settings.get('common', 'prefix')), *args, **kwargs)
 
@@ -81,6 +82,8 @@ class Bot(commands.Bot):
         self.add_check(block_dms      , call_once=True)
         self.add_check(log_command    , call_once=True)
         self.add_check(trigger_typing , call_once=True)
+
+        self.before_invoke(self.fetch_guild_language)
 
         self.run(self.settings.get('common', 'token'))
 
@@ -122,36 +125,21 @@ class Bot(commands.Bot):
 
         return
 
-    async def get_translations(self, ctx, keys: list):
+    async def get_translations(self, ctx, keys: list, force_fetch: bool = False):
         """ Returns a set of translations """
 
-        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
-        guilds = await result.fetchall()
+        if (force_fetch):
+            await self.fetch_guild_language(ctx)
 
-        # Checking if the guild is already registered in the database
-        if (len(guilds) == 0):
-            guilds = await self.register_guild(ctx)
+        return dict([(key, self.langs[ctx.guild.description].get_key(key)) for key in keys])
 
-        # There is only one guild per discord id
-        guild = guilds[0]
-        lang  = ServerPreferences.table.c.lang
-
-        return dict([(key, self.langs[guild[lang]].get_key(key)) for key in keys])
-
-    async def get_translation(self, ctx, key: str):
+    async def get_translation(self, ctx, key: str, force_fetch: bool = False):
         """ Returns a translation """
 
-        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
-        guilds = await result.fetchall()
+        if (force_fetch):
+            await self.fetch_guild_language(ctx)
 
-        # Checking if the guild is already registered in the database
-        if (len(guilds) == 0):
-            guilds = await self.register_guild(ctx)
-
-        # There is only one guild per discord id
-        guild = guilds[0]
-
-        return self.langs[guild[ServerPreferences.table.c.lang]].get_key(key)
+        return self.langs[ctx.guild.description].get_key(key)
 
     async def register_guild(self, ctx):
         """ Registers the guild into the database, this method is automatically called the first time a command is trigerred in a new guild """
@@ -162,6 +150,21 @@ class Bot(commands.Bot):
         self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
 
         return await result.fetchall()
+
+    async def fetch_guild_language(self, ctx):
+        """ An event that is called when a command is found and is about to be invoked. """
+
+        # Fetching the guild language and injects it into the context
+        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
+        guilds = await result.fetchall()
+
+        # Checking if the guild is already registered in the database
+        if (len(guilds) == 0):
+            guilds = await self.register_guild(ctx)
+
+        # We are gonna use the guild description to store the language of the guild
+        # since this is not used by discord anyways
+        ctx.guild.description = guilds[0][ServerPreferences.table.c.lang]
 
     # --- Events ---
 
@@ -176,12 +179,20 @@ class Bot(commands.Bot):
     async def on_command_error(self, ctx, error):
         """ Handles command errors """
 
+        if isinstance(error, UnauthorizedCommand):
+            await self.unauthorized_command_error(ctx, error)
+            return
+
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
             return
 
         if isinstance(error, commands.MissingPermissions):
             await self.missing_permissions_error(ctx, error)
+            return
+
+        if isinstance(error, commands.BotMissingPermissions):
+            await self.bot_missing_permissions_error(ctx, error)
             return
 
         # All other Errors not returned come here... And we can just print the default TraceBack.
@@ -203,12 +214,52 @@ class Bot(commands.Bot):
         for err in traceback.format_exc().split('\n'):
             self.logger.critical(err)
 
+    async def unauthorized_command_error(self, ctx, error):
+        """ Sends a missing permission error """
+
+        self.logger.info(f"Access unauthorized, command has been denied.")
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
+
+        translations = await self.get_translations(ctx, ["failure_title", "unauthorized_command"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["unauthorized_command"].format(error.missing_status),
+            color       = discord.Color.red()
+            )
+
+        await ctx.send(embed = embed)
+
     async def missing_permissions_error(self, ctx, error):
+        """ Sends a missing permission error """
 
-        embed = discord.Embed()
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
 
-        embed.title       =    await self.get_translation(ctx, 'error_title')
-        embed.description = f"{await self.get_translation(ctx, 'missing_perms_error')} : {error.missing_perms}"
-        embed.color       = discord.Color.red()
+        translations = await self.get_translations(ctx, ["error_title", "missing_perms_error"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["error_title"],
+            description = translations["missing_perms_error"].format(error.missing_perms),
+            color       = discord.Color.red()
+        )
 
         await ctx.send(embed=embed)
+
+    async def bot_missing_permissions_error(self, ctx, error):
+        """ Sends a missing permission error """
+
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
+
+        translations = await self.get_translations(ctx, ["error_title", "bot_missing_perms_error"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["error_title"],
+            description = translations["bot_missing_perms_error"].format(error.missing_perms),
+            color       = discord.Color.red()
+        )
+
+        await ctx.send(embed=embed)
+

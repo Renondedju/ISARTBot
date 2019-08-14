@@ -26,7 +26,7 @@ import asyncio
 import discord
 
 from discord.ext     import commands
-from isartbot.checks import super_admin, developper, is_developper
+from isartbot.checks import super_admin, developper, is_developper, denied
 
 class TestExt(commands.Cog):
 
@@ -57,12 +57,17 @@ class TestExt(commands.Cog):
         await ctx.send(await ctx.bot.get_translation(ctx, 'test_wait'))
 
     @test.command()
+    @commands.check(denied)
+    async def denied(self, ctx):
+        await ctx.send(await ctx.bot.get_translation(ctx, 'denied_failure'))
+
+    @test.command()
     async def groups(self, ctx, user: discord.Member = None):
-        
+
         if user is None : user = ctx.author
 
         groups = []
-        if super_admin(ctx, user) : groups.append("Super admin") 
+        if super_admin(ctx, user) : groups.append("Super admin")
         if developper (ctx, user) : groups.append("Developper" )
 
         if len(groups) == 0:

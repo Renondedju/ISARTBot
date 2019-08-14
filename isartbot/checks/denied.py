@@ -23,12 +23,6 @@
 # SOFTWARE.
 
 from isartbot.exceptions import UnauthorizedCommand
-from isartbot.checks     import developper
 
-async def is_admin(ctx):
-    value = ctx.author.permissions_in(ctx.channel).administrator or (ctx.bot.dev_mode and developper(ctx, ctx.author))
-
-    if (not value):
-        raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "admin_status", force_fetch = True))
-
-    return True
+async def denied(ctx):
+    raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "denied_status", force_fetch = True))

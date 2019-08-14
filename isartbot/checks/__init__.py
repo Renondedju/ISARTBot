@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from isartbot.checks.denied         import denied
 from isartbot.checks.admin          import is_admin
 from isartbot.checks.block_dms      import block_dms
 from isartbot.checks.moderator      import is_moderator

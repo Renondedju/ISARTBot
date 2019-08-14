@@ -1,4 +1,4 @@
 discord.py
 emoji
-SQLAlchemy
-SQLAlchemy_aio
+sqlalchemy
+sqlalchemy_aio
