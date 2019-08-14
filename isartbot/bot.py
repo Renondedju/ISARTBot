@@ -180,17 +180,7 @@ class Bot(commands.Bot):
         """ Handles command errors """
 
         if isinstance(error, UnauthorizedCommand):
-            if ctx.channel.permissions_for(ctx.guild.me).send_messages:
-                translations = await self.get_translations(ctx, ["failure_title", "unauthorized_command"], force_fetch=True)
-
-                embed = discord.Embed(
-                    title       = translations["failure_title"],
-                    description = translations["unauthorized_command"].format(error.missing_status),
-                    color       = discord.Color.red()
-                )
-
-                await ctx.send(embed = embed)
-
+            await self.unauthorized_command_error(ctx, error)
             return
 
         # Anything in ignored will return and prevent anything happening.
@@ -199,6 +189,10 @@ class Bot(commands.Bot):
 
         if isinstance(error, commands.MissingPermissions):
             await self.missing_permissions_error(ctx, error)
+            return
+
+        if isinstance(error, commands.BotMissingPermissions):
+            await self.bot_missing_permissions_error(ctx, error)
             return
 
         # All other Errors not returned come here... And we can just print the default TraceBack.
@@ -220,12 +214,52 @@ class Bot(commands.Bot):
         for err in traceback.format_exc().split('\n'):
             self.logger.critical(err)
 
+    async def unauthorized_command_error(self, ctx, error):
+        """ Sends a missing permission error """
+
+        self.logger.info(f"Access unauthorized, command has been denied.")
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
+
+        translations = await self.get_translations(ctx, ["failure_title", "unauthorized_command"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["unauthorized_command"].format(error.missing_status),
+            color       = discord.Color.red()
+            )
+
+        await ctx.send(embed = embed)
+
     async def missing_permissions_error(self, ctx, error):
+        """ Sends a missing permission error """
 
-        embed = discord.Embed()
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
 
-        embed.title       =    await self.get_translation(ctx, 'error_title')
-        embed.description = f"{await self.get_translation(ctx, 'missing_perms_error')} : {error.missing_perms}"
-        embed.color       = discord.Color.red()
+        translations = await self.get_translations(ctx, ["error_title", "missing_perms_error"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["error_title"],
+            description = translations["missing_perms_error"].format(error.missing_perms),
+            color       = discord.Color.red()
+        )
 
         await ctx.send(embed=embed)
+
+    async def bot_missing_permissions_error(self, ctx, error):
+        """ Sends a missing permission error """
+
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
+
+        translations = await self.get_translations(ctx, ["error_title", "bot_missing_perms_error"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["error_title"],
+            description = translations["bot_missing_perms_error"].format(error.missing_perms),
+            color       = discord.Color.red()
+        )
+
+        await ctx.send(embed=embed)
+
