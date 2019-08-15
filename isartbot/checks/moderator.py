@@ -24,8 +24,8 @@
 
 import discord
 
-from isartbot.exceptions import UnauthorizedCommand
-from isartbot.checks     import developper
+from isartbot.exceptions        import UnauthorizedCommand
+from isartbot.checks.developper import developper
 
 async def is_moderator(ctx):
     value =  ctx.author.permissions_in(ctx.channel).manage_guild  or\

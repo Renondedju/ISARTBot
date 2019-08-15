@@ -25,9 +25,14 @@
 import discord
 import asyncio
 
-from discord.ext         import commands
-from isartbot.converters import upper_clean
-from isartbot.checks     import is_moderator
+from discord.ext          import commands
+from isartbot.converters  import upper_clean
+from isartbot.checks      import is_moderator
+from discord.ext.commands import RoleConverter
+
+class ClassConverter(RoleConverter):
+    async def convert(self, ctx, argument):
+        return await super().convert(ctx, argument.strip().upper())
 
 class ClassExt (commands.Cog):
 
@@ -45,15 +50,15 @@ class ClassExt (commands.Cog):
 
         return role, delegate_role
 
-    async def error_embed(self, ctx, description: str, args):
+    async def error_embed(self, ctx, description: str, *args):
         """Create an error embed"""
 
         return discord.Embed(
             title       = await ctx.bot.get_translation(ctx, "failure_title"),
-            description = (await ctx.bot.get_translation(ctx, description)).format(args),
+            description = (await ctx.bot.get_translation(ctx, description)).format(*args),
             color       = discord.Color.red())
 
-    async def success_embed(self, ctx, description: str, args):
+    async def success_embed(self, ctx, description: str, *args):
         """Create a success embed"""
 
         return discord.Embed(
@@ -69,7 +74,7 @@ class ClassExt (commands.Cog):
         """Class modification command"""
 
         if ctx.invoked_subcommand is None:
-            await ctx.send(await ctx.bot.get_translation(ctx, 'class'))
+            await ctx.send(await ctx.bot.get_translation(ctx, 'invalid_command_usage'))
 
     @_class.command(help="class_create_help", description="class_create_description")
     @commands.check(is_moderator)
@@ -102,14 +107,10 @@ class ClassExt (commands.Cog):
     @_class.command(help="class_delete_help", description="class_delete_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
-    async def delete(self, ctx, name: upper_clean):
+    async def delete(self, ctx, role: ClassConverter):
         """Deletes a class"""
 
-        role, delegate = self.get_class(ctx, name)
-
-        if role is None or delegate is None:
-            await ctx.send(embed= await self.error_embed(ctx, 'class_delete_error', name))
-            return
+        _, delegate = self.get_class(ctx, role.name)
 
         def check(reaction, user):
             return user == ctx.message.author and str(reaction.emoji) == '👍'
@@ -137,8 +138,12 @@ class ClassExt (commands.Cog):
             await message.edit(embed=embed)
             return
 
-        await role    .delete()
-        await delegate.delete()
+        name = role.name
+
+        await role.delete()
+
+        if (delegate is not None):
+            await delegate.delete()
 
         await message.clear_reactions()
 
@@ -148,25 +153,34 @@ class ClassExt (commands.Cog):
     @_class.command(help="class_rename_help", description="class_rename_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
-    async def rename(self, ctx, old_name: upper_clean, new_name: upper_clean):
+    async def rename(self, ctx, old_role: ClassConverter, new_name: upper_clean):
         """Renames a class"""
 
-        old_role, old_delegate = self.get_class(ctx, old_name)
+        _, old_delegate        = self.get_class(ctx, old_role.name)
         new_role, new_delegate = self.get_class(ctx, new_name)
 
         if (new_role     is not None) or \
            (new_delegate is not None) or \
-           (old_role     is     None) or \
            (old_delegate is     None):
-            await ctx.send(embed= await self.error_embed(ctx, 'class_rename_error', old_name))
+            await ctx.send(embed= await self.error_embed(ctx, 'class_rename_error', None))
             return
 
-        prefix = ctx.bot.settings.get("class", "delegate_role_prefix")
-        
+        prefix   = ctx.bot.settings.get("class", "delegate_role_prefix")
+        old_name = old_role.name
+
         await old_role    .edit(name=new_name)
         await old_delegate.edit(name=f'{prefix} {new_name}')
 
-        await ctx.send(embed= await self.success_embed(ctx, 'class_rename_success', [old_name, old_role.mention]))
+        await ctx.send(embed= await self.success_embed(ctx, 'class_rename_success', old_name, old_role.mention))
+
+    @delete.error
+    @rename.error
+    async def class_error(self, ctx, error):
+        """Handles class command errors"""
+
+        if (isinstance(error, commands.BadArgument)):
+            await ctx.send(embed= await self.error_embed(ctx, 'class_invalid_argument', None))
+
 
 def setup(bot):
     bot.add_cog(ClassExt(bot))
