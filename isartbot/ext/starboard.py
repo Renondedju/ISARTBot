@@ -27,8 +27,8 @@ import discord
 
 from discord.ext import commands
 
-from isartbot.checks.moderator          import is_moderator
-from isartbot.models.server_preferences import ServerPreferences
+from isartbot.checks   import is_moderator
+from isartbot.database import ServerPreferences
 
 class StarboardExt(commands.Cog):
     """ Starboard related commands and tasks """
@@ -70,14 +70,14 @@ class StarboardExt(commands.Cog):
 
             await ctx.send(embed=embed)
             return
-        
+
         self.bot.logger.info(f"Starboard set to channel {channel.id} for server named {ctx.guild.name}")
 
-        await self.bot.database.connection.execute(
-            ServerPreferences.table.update().\
-                where (ServerPreferences.table.c.discord_id == ctx.guild.id).\
-                values(starboard_id=channel.id)
-        )
+        self.bot.database.session.query(ServerPreferences).\
+            filter(ServerPreferences.discord_id == ctx.guild.id).\
+            update({ServerPreferences.starboard_channel_id : channel.id})
+
+        self.bot.database.session.commit()
 
         embed.title       = await ctx.bot.get_translation(ctx, "success_title")
         embed.description = f"{await ctx.bot.get_translation(ctx, 'success_starboard_set')}: {channel.mention}"
@@ -90,13 +90,13 @@ class StarboardExt(commands.Cog):
         """ Disables the starboard for the current server, use "!starboard set <channel name>" to re enable it """
 
         self.bot.logger.info(f"Starboard disabled for server named {ctx.guild.name}")
-        
-        await self.bot.database.connection.execute(
-            ServerPreferences.table.update().\
-                where (ServerPreferences.table.c.discord_id == ctx.guild.id).\
-                values(starboard_id=0)
-            )
-                    
+
+        self.bot.database.session.query(ServerPreferences).\
+            filter(ServerPreferences.discord_id == ctx.guild.id).\
+            update({ServerPreferences.starboard_channel_id : 0})
+
+        self.bot.database.session.commit()
+
         embed = discord.Embed()
         embed.title       = await ctx.bot.get_translation(ctx, "success_title")
         embed.description = await ctx.bot.get_translation(ctx, "success_starboard_unset")
@@ -149,7 +149,7 @@ class StarboardExt(commands.Cog):
 
         embed.timestamp = message.created_at
         embed.colour    = discord.Color.gold()
-        embed.set_author(name     = message.author.display_name, 
+        embed.set_author(name     = message.author.display_name,
                          url      = message.jump_url,
                          icon_url = message.author.avatar_url_as(format='png'))
 
@@ -179,7 +179,7 @@ class StarboardExt(commands.Cog):
             )
         servers = await result.fetchall()
 
-        # Something is wrong, either the server is not registered in the database, 
+        # Something is wrong, either the server is not registered in the database,
         # either there is more than one server with this id, which shouldn't be possible
         if (len(servers) != 1):
             self.bot.logger.warning("Starboard configuration ambiguity ! Please check the database integrity.")
@@ -211,7 +211,7 @@ class StarboardExt(commands.Cog):
         if (reaction_emoji == self.bot.settings.get('starboard', 'control_emoji')):
             if (await self.get_server_starboard_channel_id(reaction.message.guild) != 0):
                 return True
-        
+
         return False
 
     # Events
