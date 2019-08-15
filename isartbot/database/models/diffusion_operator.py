@@ -19,11 +19,19 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-__slots__ = ("ServerPreferences", "DiffusionOperator", "Diffusion")
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship
 
-from .diffusion          import Diffusion
-from .diffusion_operator import DiffusionOperator
-from .server_preferences import ServerPreferences
+from isartbot.database import TableBase
+
+class DiffusionOperator(TableBase):
+
+    __tablename__ = 'diffusion_operators'
+
+    id          = Column('id'        , Integer, primary_key = True, unique = True)
+    discord_id  = Column('discord_id', Integer, nullable    = False)
+    parent_id   = Column(Integer, ForeignKey('diffusions.id'))
+    diffusion   = relationship('Diffusion', back_populates = 'operators')
