@@ -31,7 +31,7 @@ class DiffusionOperator(TableBase):
 
     __tablename__ = 'diffusion_operators'
 
-    id          = Column('id'        , Integer, primary_key = True, unique = True)
-    discord_id  = Column('discord_id', Integer, nullable    = False)
-    parent_id   = Column(Integer, ForeignKey('diffusions.id'))
-    diffusion   = relationship('Diffusion', back_populates = 'operators')
+    id           = Column('id'        , Integer, primary_key = True, unique = True)
+    discord_id   = Column('discord_id', Integer, nullable    = False)
+    diffusion_id = Column(Integer, ForeignKey('diffusions.id'))
+    diffusion    = relationship('Diffusion', back_populates = 'operators')

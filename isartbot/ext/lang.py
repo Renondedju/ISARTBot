@@ -60,9 +60,8 @@ class LangExt(commands.Cog):
         embed = discord.Embed()
 
         embed.title       = await ctx.bot.get_translation(ctx, 'lang_list_title')
-        embed.description = '\n'.join(['• ' + lang for (lang, file_name) in ctx.bot.settings.items("languages")])
+        embed.description = '\n'.join(['\u2022 ' + lang for (lang, file_name) in ctx.bot.settings.items("languages")])
         embed.colour      = discord.Color.green()
-        embed.set_footer(text = await ctx.bot.get_translation(ctx, 'lang_list_footer'))
 
         await ctx.send(embed=embed)
 

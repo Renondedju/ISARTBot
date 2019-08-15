@@ -63,3 +63,7 @@ denied_status=god
 mod_prune_help=Deletes a certain amount of the latest messages in this text channel
 mod_kick_help=Kick a member
 mod_ban_help=Ban a member
+diffusion_already_exists=This diffusion already exists ! Please choose a unique diffusion name.
+diffusion_doesnt_exists=The diffusion named "{0}" doesn't exists.\nPlease use ``{1}diffusion list`` to get a list of all the existing diffusions
+diffusion_created=The diffusion named "{0}" has successfully been created
+diffusion_deleted=The diffusion named "{0}" has successfully been deleted
