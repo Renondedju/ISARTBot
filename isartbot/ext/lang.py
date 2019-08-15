@@ -26,9 +26,9 @@ import asyncio
 import discord
 import logging
 
-from isartbot.models import ServerPreferences
-from discord.ext     import commands
-from isartbot.checks import is_moderator, is_super_admin, is_developper
+from isartbot.database import ServerPreferences
+from discord.ext       import commands
+from isartbot.checks   import is_moderator, is_super_admin, is_developper
 
 class LangExt(commands.Cog):
 
@@ -78,7 +78,7 @@ class LangExt(commands.Cog):
             embed.description = await ctx.bot.get_translation(ctx, 'lang_not_available')
             embed.colour      = discord.Color.red()
         else:
-            await self.set_language(ctx, lang)
+            self.set_language(ctx, lang)
 
             embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
             embed.description = await ctx.bot.get_translation(ctx, 'lang_set')
@@ -96,12 +96,13 @@ class LangExt(commands.Cog):
         else:
             await ctx.send(ctx.bot.langs[lang].get_key(key))
 
-    async def set_language(self, ctx, lang):
-        await ctx.bot.database.connection.execute(
-            ServerPreferences.table.update().\
-                where (ServerPreferences.table.c.discord_id == ctx.guild.id).\
-                values(lang=lang)
-        )
+    def set_language(self, ctx, lang: str):
+
+        ctx.bot.database.session.query(ServerPreferences).\
+            filter(ServerPreferences.discord_id == ctx.guild.id).\
+            update({ServerPreferences.lang : lang})
+
+        ctx.bot.database.session.commit()
 
 def setup(bot):
     bot.add_cog(LangExt())

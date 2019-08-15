@@ -1,4 +1,3 @@
 discord.py
 emoji
 sqlalchemy
-sqlalchemy_aio

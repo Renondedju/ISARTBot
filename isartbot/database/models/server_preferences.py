@@ -19,18 +19,18 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-from sqlalchemy import Column, Integer, MetaData, Table, Text
+from sqlalchemy import Column, Integer, Text
 
-class ServerPreferences:
+from isartbot.database import TableBase
 
-    table = Table(
-        'ServerPreferences', MetaData(),
-        Column('id', Integer, primary_key=True),
-        Column('discord_id', Integer, unique=True),
-        Column('lang', Text, default="en"),
-        Column('starboard_id', Integer, default=0),
-    )
-    
+class ServerPreferences(TableBase):
+
+    __tablename__ = 'server_preferences'
+
+    id                   = Column('id'          , Integer, primary_key = True, unique = True)
+    lang                 = Column('lang'        , Text   , default     = "en")
+    discord_id           = Column('discord_id'  , Integer, unique      = True)
+    starboard_channel_id = Column('starboard_id', Integer, default     = 0)

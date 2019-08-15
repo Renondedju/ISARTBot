@@ -33,7 +33,7 @@ import logging.config
 from isartbot.exceptions import UnauthorizedCommand
 from isartbot.help       import HelpCommand
 from isartbot.lang       import Lang
-from isartbot.models     import ServerPreferences
+from isartbot.database   import ServerPreferences
 from isartbot.checks     import log_command, trigger_typing, block_dms
 from isartbot.database   import Database
 
@@ -96,7 +96,7 @@ class Bot(commands.Bot):
         except asyncio.futures.TimeoutError:
             self.logger.warning("Wait for on_ready event timed out, loading the extensions anyway...")
 
-        for (extension, enabled) in self.settings.items("extensions"):
+        for (extension, _) in self.settings.items("extensions"):
             if self.extensions.getboolean(extension):
                 try:
                     self.load_extension(f"isartbot.ext.{extension}")
@@ -119,7 +119,7 @@ class Bot(commands.Bot):
             try:
                 self.langs[lang] = Lang(file_name)
                 self.logger.info(f"Loaded language named {lang} from {file_name}")
-            except:
+            except Exception as e:
                 self.logger.error(f"Failed to load a language")
                 await self.on_error(e)
 
@@ -141,30 +141,34 @@ class Bot(commands.Bot):
 
         return self.langs[ctx.guild.description].get_key(key)
 
-    async def register_guild(self, ctx):
+    def register_guild(self, ctx):
         """ Registers the guild into the database, this method is automatically called the first time a command is trigerred in a new guild """
 
-        await self.database.connection.execute(ServerPreferences.table.insert().values(discord_id=ctx.guild.id))
-        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
+        new_server_preferences = ServerPreferences(discord_id=ctx.guild.id)
+
+        self.database.session.add(new_server_preferences)
+        self.database.session.commit()
 
         self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
 
-        return await result.fetchall()
+        return new_server_preferences
 
     async def fetch_guild_language(self, ctx):
         """ An event that is called when a command is found and is about to be invoked. """
 
         # Fetching the guild language and injects it into the context
-        result = await self.database.connection.execute(ServerPreferences.table.select(ServerPreferences.table.c.discord_id == ctx.guild.id))
-        guilds = await result.fetchall()
+        lang = self.database.session.query(ServerPreferences.lang).\
+            filter(ServerPreferences.discord_id == ctx.guild.id).first()
 
         # Checking if the guild is already registered in the database
-        if (len(guilds) == 0):
-            guilds = await self.register_guild(ctx)
+        if (lang == None):
+            lang = (self.register_guild(ctx)).lang
+        else:
+            lang = lang[0]
 
         # We are gonna use the guild description to store the language of the guild
         # since this is not used by discord anyways
-        ctx.guild.description = guilds[0][ServerPreferences.table.c.lang]
+        ctx.guild.description = lang
 
     # --- Events ---
 
