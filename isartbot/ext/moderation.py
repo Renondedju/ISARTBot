@@ -25,10 +25,8 @@
 import discord
 import asyncio
 
-from discord.ext                        import commands
-
-from isartbot.checks.moderator          import is_moderator
-from isartbot.models.server_preferences import ServerPreferences
+from discord.ext     import commands
+from isartbot.checks import is_moderator
 
 class ModerationExt(commands.Cog, name='mod'):
     """Helps with moderation"""
