@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018-2019 Renondedju
+# Copyright (c) 2018 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,5 +22,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.converters.upper_clean     import upper_clean
-from isartbot.converters.class_converter import ClassConverter
+from discord.ext    import commands
+
+class ClassConverter(commands.RoleConverter):
+    async def convert(self, ctx, argument):
+        if (argument == ""):
+            raise commands.BadArgument("", "")
+
+        try:
+            role = await super().convert(ctx, argument.strip().upper())
+            return role
+        except:
+            return None

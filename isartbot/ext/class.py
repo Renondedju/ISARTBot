@@ -1,38 +1,13 @@
-# -*- coding: utf-8 -*-
 
-# MIT License
-
-# Copyright (c) 2018 Renondedju
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
 import discord
 import asyncio
 
 from discord.ext          import commands
 from isartbot.converters  import upper_clean
+from isartbot.converters  import ClassConverter
 from isartbot.checks      import is_moderator
 from discord.ext.commands import RoleConverter
-
-class ClassConverter(RoleConverter):
-    async def convert(self, ctx, argument):
-        return await super().convert(ctx, argument.strip().upper())
 
 class ClassExt (commands.Cog):
 
@@ -114,6 +89,10 @@ class ClassExt (commands.Cog):
     async def delete(self, ctx, name: ClassConverter):
         """Deletes a class"""
 
+        if (name is None):
+            await ctx.send(embed= await self.error_embed(ctx, 'class_invalid_argument', None))
+            return
+
         _, delegate = self.get_class(ctx, name.name)
 
         def check(reaction, user):
@@ -160,6 +139,10 @@ class ClassExt (commands.Cog):
     async def rename(self, ctx, old_name: ClassConverter, new_name: upper_clean):
         """Renames a class"""
 
+        if (old_name is None):
+            await ctx.send(embed= await self.error_embed(ctx, 'class_invalid_argument', None))
+            return
+
         _, old_delegate        = self.get_class(ctx, old_name.name)
         new_role, new_delegate = self.get_class(ctx, new_name)
 
@@ -175,15 +158,7 @@ class ClassExt (commands.Cog):
         await old_name    .edit(name=new_name)
         await old_delegate.edit(name=f'{prefix} {new_name}')
 
-        await ctx.send(embed= await self.success_embed(ctx, 'class_rename_success', name, old_name.mention))
-
-    @delete.error
-    @rename.error
-    async def class_error(self, ctx, error):
-        """Handles class command errors"""
-
-        if (isinstance(error, commands.BadArgument)):
-            await ctx.send(embed= await self.error_embed(ctx, 'class_invalid_argument', None))
+        await ctx.send(embed= await self.success_embed(ctx, 'class_rename_success', name, old_name.mention))        
 
 def setup(bot):
     bot.add_cog(ClassExt(bot))
