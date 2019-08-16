@@ -22,4 +22,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.converters.upper_clean import upper_clean
+from .upper_clean import upper_clean
+from .diffusion   import DiffusionConverter

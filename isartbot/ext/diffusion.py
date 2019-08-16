@@ -24,35 +24,11 @@
 
 import discord
 
-from discord.ext       import commands
-from isartbot.checks   import is_super_admin, is_moderator
-from isartbot.database import Diffusion, DiffusionOperator, DiffusionSubscription
+from discord.ext import commands
 
-class DiffusionDoesNotExists(commands.CommandError):
-
-    __slots__ = ("diffusion_name")
-
-    def __init__(self, diffusion_name: str):
-        self.diffusion_name = diffusion_name
-        super().__init__(message="This diffusion does not exists")
-
-class DiffusionAlreadyExists(commands.CommandError):
-
-    __slots__ = ("diffusion_name")
-
-    def __init__(self, diffusion_name: str):
-        self.diffusion_name = diffusion_name
-        super().__init__(message="This diffusion already exists")
-
-class DiffusionOperatorAlreadyOperator(commands.CommandError):
-
-    __slots__ = ("operator", "diffusion_name")
-
-    def __init__(self, diffusion_name: str, operator: discord.Member):
-        self.operator       = operator
-        self.diffusion_name = diffusion_name
-        super().__init__(message="This member is already an operator")
-
+from isartbot.checks     import is_super_admin, is_moderator
+from isartbot.database   import Diffusion, DiffusionOperator, DiffusionSubscription
+from isartbot.converters import DiffusionConverter
 
 class DiffusionExt(commands.Cog):
     """ Diffusion channels extension class """
@@ -84,7 +60,7 @@ class DiffusionExt(commands.Cog):
         """ Creates a diffusion channel, this commands is reserved to super admins """
 
         # Checking if the diffusion already exists
-        if (self.bot.database.session.query(Diffusion).filter(Diffusion.name == diffusion_name).first() != None):
+        if (await DiffusionConverter().convert(ctx, diffusion_name) != None):
             return await self.diffusion_already_exists_error(ctx, diffusion_name)
 
         # Otherwise, creating a new diffusion
@@ -103,24 +79,21 @@ class DiffusionExt(commands.Cog):
 
     @diffusion.command(help="diffusion_delete_help", description="diffusion_delete_description")
     @commands.check(is_super_admin)
-    async def delete(self, ctx, diffusion_name: str):
+    async def delete(self, ctx, diffusion: DiffusionConverter):
         """ Deletes a diffusion channel, this commands is reserved to super admins """
 
         # Checking if the diffusion exists
-        if (self.bot.database.session.query(Diffusion).filter(Diffusion.name == diffusion_name).first() == None):
-            return await self.diffusion_does_not_exists_error(ctx, diffusion_name)
+        if (diffusion == None):
+            return await self.diffusion_does_not_exists_error(ctx, diffusion.name)
 
         # Otherwise, deleting the diffusion
-        diffusion = self.bot.database.session.query(Diffusion).\
-            filter(Diffusion.name == diffusion_name).first()
-
         self.bot.database.session.delete(diffusion)
         self.bot.database.session.commit()
 
         translations = await self.bot.get_translations(ctx, ["success_title", "diffusion_deleted"])
         embed = discord.Embed(
             title       = translations["success_title"],
-            description = translations["diffusion_deleted"].format(diffusion_name),
+            description = translations["diffusion_deleted"].format(diffusion.name),
             color       = discord.Color.green()
         )
 
@@ -139,15 +112,11 @@ class DiffusionExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @operator.command(help="diffusion_operator_add_help", description="diffusion_operator_add_description")
-    async def add(self, ctx, diffusion_name: str, new_operator: discord.Member):
+    async def add(self, ctx, diffusion: DiffusionConverter, new_operator: discord.Member):
         """ Adds a new diffusion operator to the selected diffusion """
-
-        diffusion = self.bot.database.session.query(Diffusion).\
-            filter(Diffusion.name == diffusion_name).first()
-
         # Checking if the diffusion exists
         if (diffusion == None):
-            return await self.diffusion_does_not_exists_error(ctx, diffusion_name)
+            return await self.diffusion_does_not_exists_error(ctx, diffusion.name)
 
         # Checking if this member is already an operator
         operator = self.bot.database.session.query(DiffusionOperator.discord_id).\
@@ -155,7 +124,7 @@ class DiffusionExt(commands.Cog):
                    DiffusionOperator.discord_id == new_operator.id).count()
 
         if (operator > 0):
-            return await self.member_is_already_operator(ctx, new_operator, diffusion_name)
+            return await self.member_is_already_operator(ctx, new_operator, diffusion.name)
 
         # Adding the new operator to the database
         self.bot.database.session.add(DiffusionOperator(diffusion = diffusion, discord_id = new_operator.id))
@@ -164,22 +133,19 @@ class DiffusionExt(commands.Cog):
         translations = await self.bot.get_translations(ctx, ["success_title", "diffusion_operator_added"])
         embed = discord.Embed(
             title       = translations["success_title"],
-            description = translations["diffusion_operator_added"].format(new_operator.mention, diffusion_name),
+            description = translations["diffusion_operator_added"].format(new_operator.mention, diffusion.name),
             color       = discord.Color.green()
         )
 
         await ctx.send(embed=embed)
 
     @operator.command(help="diffusion_operator_remove_help", description="diffusion_operator_remove_description")
-    async def remove(self, ctx, diffusion_name: str, old_operator: discord.Member):
+    async def remove(self, ctx, diffusion: DiffusionConverter, old_operator: discord.Member):
         """ Removes a diffusion operator from the selected diffusion """
-
-        diffusion = self.bot.database.session.query(Diffusion).\
-            filter(Diffusion.name == diffusion_name).first()
 
         # Checking if the diffusion exists
         if (diffusion == None):
-            return await self.diffusion_does_not_exists_error(ctx, diffusion_name)
+            return await self.diffusion_does_not_exists_error(ctx, diffusion.name)
 
         # Checking if this member is already an operator
         operator = self.bot.database.session.query(DiffusionOperator).\
@@ -187,7 +153,7 @@ class DiffusionExt(commands.Cog):
                    DiffusionOperator.discord_id == old_operator.id).first()
 
         if (operator == None):
-            return await self.member_not_operator(ctx, old_operator, diffusion_name)
+            return await self.member_not_operator(ctx, old_operator, diffusion.name)
 
         self.bot.database.session.delete(operator)
         self.bot.database.session.commit()
@@ -195,7 +161,7 @@ class DiffusionExt(commands.Cog):
         translations = await self.bot.get_translations(ctx, ["success_title", "diffusion_operator_removed"])
         embed = discord.Embed(
             title       = translations["success_title"],
-            description = translations["diffusion_operator_removed"].format(old_operator.mention, diffusion_name),
+            description = translations["diffusion_operator_removed"].format(old_operator.mention, diffusion.name),
             color       = discord.Color.green()
         )
 
@@ -203,22 +169,19 @@ class DiffusionExt(commands.Cog):
 
 
     @operator.command(name="list", help="diffusion_operator_list_help", description="diffusion_operator_list_description")
-    async def operator_list(self, ctx, diffusion_name: str):
+    async def operator_list(self, ctx, diffusion: DiffusionConverter):
         """ Lists all the current operators for a certain diffusion """
-
-        diffusion = self.bot.database.session.query(Diffusion).\
-            filter(Diffusion.name == diffusion_name).first()
 
         # Checking if the diffusion exists
         if (diffusion == None):
-            return await self.diffusion_does_not_exists_error(ctx, diffusion_name)
+            return await self.diffusion_does_not_exists_error(ctx, diffusion.name)
 
         operators_id = self.bot.database.session.query(DiffusionOperator.discord_id).\
             filter(DiffusionOperator.diffusion == diffusion).all()
 
         embed = discord.Embed()
 
-        embed.title       = (await ctx.bot.get_translation(ctx, 'diffusion_operator_list_title')).format(diffusion_name)
+        embed.title       = (await ctx.bot.get_translation(ctx, 'diffusion_operator_list_title')).format(diffusion.name)
         embed.description = '\n'.join([f"\u2022 {(await self.bot.fetch_user(id[0])).mention}" for id in operators_id])
         embed.colour      = discord.Color.green()
 
@@ -226,19 +189,19 @@ class DiffusionExt(commands.Cog):
 
 
     @diffusion.command(help="diffusion_diffuse_help", description="diffusion_diffuse_description")
-    async def diffuse(self, ctx, diffusion_name: str, message: discord.Message):
+    async def diffuse(self, ctx, diffusion: DiffusionConverter, message: discord.Message):
         """ Diffuses a messages to all subscribers """
         pass
 
     @diffusion.command(help="diffusion_subscribe_help", description="diffusion_subscribe_description")
     @commands.check(is_moderator)
-    async def subscribe(self, ctx, diffusion_name: str, channel: discord.TextChannel, diffusion_tag: discord.Role = None):
+    async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: discord.Role = None):
         """ Subscribes to a diffusion """
         pass
 
     @diffusion.command(help="diffusion_unsubscribe_help", description="diffusion_unsubscribe_description")
     @commands.check(is_moderator)
-    async def unsubscribe(self, ctx, diffusion_name: str):
+    async def unsubscribe(self, ctx, diffusion: DiffusionConverter):
         """ Unsubscribes off a diffusion """
         pass
 

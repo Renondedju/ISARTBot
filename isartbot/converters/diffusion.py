@@ -19,21 +19,16 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from sqlalchemy     import Column, Integer, Text, ForeignKey
-from sqlalchemy.orm import relationship, backref
+import discord
+import asyncio
 
-from isartbot.database import TableBase
+from discord.ext       import commands
+from isartbot.database import Diffusion
 
-class DiffusionSubscription(TableBase):
-
-    __tablename__ = 'diffusion_subscriptions'
-
-    id                 = Column('id'         , Integer, primary_key=True, unique=True)
-    discord_server_id  = Column('server_id'  , Integer, nullable=False)
-    discord_channel_id = Column('channel_id' , Integer, nullable=False)
-    tag                = Column('discord_tag', Integer)
-    diffusion_id       = Column(Integer, ForeignKey('diffusions.id'))
-    diffusion          = relationship('Diffusion', backref = backref('subscriptions', cascade='all,delete'))
+class DiffusionConverter(commands.Converter):
+    async def convert(self, ctx, diffusion_name):
+        diffusion = ctx.bot.database.session.query(Diffusion).filter(Diffusion.name == diffusion_name).first()
+        return diffusion if diffusion != None else None
