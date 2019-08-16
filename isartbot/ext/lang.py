@@ -48,7 +48,7 @@ class LangExt(commands.Cog):
         embed = discord.Embed()
 
         embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
-        embed.description = await ctx.bot.get_translation(ctx, 'language_reload_success')
+        embed.description = await ctx.bot.get_translation(ctx, 'lang_reload_success')
         embed.colour      = discord.Color.green()
 
         await ctx.send(embed=embed)

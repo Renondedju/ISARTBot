@@ -1,43 +1,28 @@
-test=Everything seems to be working fine !
-failure_title=Error
-success_title=Success
-ext_load_failure_desc=Failed to load extension. Check logs for more information.
-ext_load_success_desc=Extension loaded !
-ext_unload_failure_desc=Failed to unload extension. Check logs for more information.
-ext_unload_success_desc=Extension unloaded !
-ext_reload_failure_desc=Failed to reload extension. Check logs for more information.
-ext_reload_success_desc=Extension reloaded !
-invalid_command_usage=Invalid command usage, please use 'help' for further information.
-test_wait=The process has been paused 2 seconds for testing
-user_has_no_groups=has no special bot privileges
-user_has_groups=has the following bot privileges
-lang_list_title=Available languages
-lang_list_footer=Use !lang set <language> to change the current language
-lang_not_available=This language does not exists, please use ``!lang list`` to have the full list of available languages
-lang_set=Language successfully set !
-missing_perms_error=Oops ! It looks like you're missing one of the following permissions to run this command : {0}
-missing_bot_perms_error=Oops ! It looks like the bot is missing one of the following permissions to run this command
-success_starboard_set=The starboard has successfully been configured on the following text channel
-success_starboard_unset=The starboard has successfully been disabled for this server
+# English language file
+
+# Help
+
 help_opening_note=Use `{0}{1} [command]` for more info on a command.\nYou can also use `{0}{1} [category]` for more info on a category.
 commands_heading=Available commands
-diffusion_description=Diffusion command long description
-language_reload_success=Reloaded every languages !
 help_title=Help
-command_not_found=No command called "{}" found.
-no_subcommand=Command "{0.qualified_name}" has no subcommands.
-no_subcommand_named=Command "{0.qualified_name}" has no subcommand named {1}
-diffusion_create_help=Creates a diffusion channel
-diffusion_create_description=Creates a diffusion channel, <diffusion_name> being the name of the diffusion channel. The <diffusion_name> must be unique.
-diffusion_delete_help=Deletes a diffusion channel
-diffusion_delete_description=Deletes a diffusion channel, <diffusion_name> being the name of the diffusion channel to delete.
-diffusion_diffuse_help=Diffuses a messages
-diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion_name> : Name of the diffusion channel\n<message> : Id of the message to diffuse
-diffusion_operator_help=Operator subcommands
-diffusion_subscribe_help=Subscribes to a diffusion channel
-diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
-missing_moderator_permissions=You need to be a moderator to use this command
-denied_failure=Something went wrong !
+
+# General
+
+failure_title=Error
+success_title=Success
+
+missing_perms_error=Oops ! It looks like you're missing one of the following permissions to run this command : {0}
+missing_bot_perms_error=Oops ! It looks like the bot is missing one of the following permissions to run this command
+unauthorized_command=Only {0}s are able to use this command
+
+moderator_status=moderator
+super_admin_status=super administrator
+developper_status=developper
+admin_status=administrator
+denied_status=god
+
+# Class extension
+
 class_create_error=Class {0} already exists.
 class_create_success=Class {0} successfully created !
 class_delete_success=Class @{0} successfully deleted !
@@ -53,15 +38,9 @@ class_delete_help=Deletes a class
 class_delete_description=Deletes a class role with the given name.\n Also deletes the associated delegate role.\n Giving either the name or the mention (@class) will work.
 class_rename_help=Renames a class
 class_rename_description=Renames a class role with the given name.\n Also renames the associated delegate role.\n Giving either the name or the mention (@class) will work.
-unauthorized_command=Only {0}s are able to use this command
-moderator_status=moderator
-super_admin_status=super administrator
-developper_status=developper
-admin_status=administrator
-denied_status=god
-mod_prune_help=Deletes a certain amount of the latest messages in this text channel
-mod_kick_help=Kick a member
-mod_ban_help=Ban a member
+
+# Diffusion extension
+
 diffusion_already_exists=This diffusion already exists ! Please choose a unique diffusion name.
 diffusion_doesnt_exists=The diffusion named "{0}" doesn't exists.\nPlease use ``{1}diffusion list`` to get a list of all the existing diffusions
 diffusion_created=The diffusion named "{0}" has successfully been created
@@ -71,3 +50,50 @@ diffusion_operator_list_title=Operators of "{0}" diffusion
 diffusion_not_operator={0} isn't an operator of the diffusion named "{1}"
 diffusion_operator_added={0} is now an operator of the diffusion named "{1}"
 diffusion_operator_removed={0} is no more an operator of the diffusion named "{1}"
+
+diffusion_description=Diffusion command long description
+diffusion_create_help=Creates a diffusion channel
+diffusion_create_description=Creates a diffusion channel, <diffusion_name> being the name of the diffusion channel. The <diffusion_name> must be unique.
+diffusion_delete_help=Deletes a diffusion channel
+diffusion_delete_description=Deletes a diffusion channel, <diffusion_name> being the name of the diffusion channel to delete.
+diffusion_diffuse_help=Diffuses a messages
+diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion_name> : Name of the diffusion channel\n<message> : Id of the message to diffuse
+diffusion_operator_help=Operator subcommands
+diffusion_subscribe_help=Subscribes to a diffusion channel
+diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
+
+# Ext extension
+
+ext_load_failure_desc=Failed to load extension. Check logs for more information.
+ext_load_success_desc=Extension loaded !
+ext_unload_failure_desc=Failed to unload extension. Check logs for more information.
+ext_unload_success_desc=Extension unloaded !
+ext_reload_failure_desc=Failed to reload extension. Check logs for more information.
+ext_reload_success_desc=Extension reloaded !
+
+# Lang extension
+
+lang_reload_success=Reloaded every languages !
+lang_list_title=Available languages
+lang_list_footer=Use !lang set <language> to change the current language
+lang_not_available=This language does not exists, please use ``!lang list`` to have the full list of available languages
+lang_set=Language successfully set !
+
+# Moderation extension
+
+mod_prune_help=Deletes a certain amount of the latest messages in this text channel
+mod_kick_help=Kick a member
+mod_ban_help=Ban a member
+
+# Starboard extension
+
+success_starboard_set=The starboard has successfully been configured on the following text channel
+success_starboard_unset=The starboard has successfully been disabled for this server
+
+# Test extension
+
+denied_failure=Something went wrong !
+test_wait=The process has been paused 2 seconds for testing
+user_has_no_groups=has no special bot privileges
+user_has_groups=has the following bot privileges
+test=Everything seems to be working fine !
