@@ -1,42 +1,84 @@
-test=Tout semble fonctionner correctement !
+# French language file
+
+# Help
+
+commands_heading=Commandes disponibles
+
+help_opening_note=Utilisez `{0}{1} [commande]` pour plus d'info sur une commande.\nVous pouvez également utiliser `{0}{1} [catégorie]` pour plus d'informations une une catégorie.
+help_title=Aide
+
+# General
+
 failure_title=Erreur
 success_title=Succès
-ext_load_failure_desc=Impossible de charger l'extension. Vérifiez les journaux pour plus d'informations.
-ext_load_success_desc=Extension chargée!
-ext_unload_failure_desc=Impossible de décharger l'extension. Vérifiez les journaux pour plus d'informations.
-ext_unload_success_desc=Extension déchargée!
-ext_reload_failure_desc=Impossible de recharger l'extension. Vérifiez les journaux pour plus d'informations.
-ext_reload_success_desc=Extension rechargée!
-invalid_command_usage=Utilisation de commande non valide, veuillez utiliser 'help' pour plus d'informations
-test_wait=Le processus a été mis en pause 2 secondes pour le test
-user_has_no_groups=n'a aucun privilège particulier vis à vis du bot
-user_has_groups=a les privilèges de bot suivants
-lang_list_title=Langues disponibles
-lang_list_footer=Utilisez !lang set <langue> pour changer le langage du serveur
-lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles
-lang_set=Langue définie avec succès!
+
 missing_perms_error=Oops ! Il semblerais qu'il vous manque l'une des permissions suivantes pour exécuter cette commande : {0}
 missing_bot_perms_error=Oops ! Il semblerais qu'il manque au bot l'une des permissions suivantes pour exécuter cette commande
-success_starboard_set=Le starboard a été configuré avec succès sur le canal suivant
-success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur
-help_opening_note=Utilisez `{0}{1} [commande]` pour plus d'info sur une commande.\nVous pouvez également utiliser `{0}{1} [catégorie]` pour plus d'informations une une catégorie.
-commands_heading=Commandes disponibles
-diffusion_description=Longue description de la commande diffusion
-language_reload_success=Toutes les langues ont été rechargées !
-help_title=Aide
-command_not_found=Aucune commande nommée "{}" n'a été trouvée.
-no_subcommand=La commande "{0.qualified_name}" n'a pas de sous commandes.
-no_subcommand_named=La commande "{0.qualified_name}" n'a pas de sous commande nommée {1}
-missing_moderator_permissions=Seul un modérateur peut éxécuter cette commande
-denied_failure=Quelque chose ne marche pas comme il faut !
-class_description=[TODO] Description longue de la command class
+
 unauthorized_command=Seuls les {0}s peuvent utiliser cette commande
 moderator_status=modérateur
 super_admin_status=super administrateur
 developper_status=développeur
 admin_status=administrateur
 denied_status=divin
+
+# Class extension
+
+class_create_error=La classe {0} existe déjà.
+class_create_success=La classe {0} a été créee avec succès !
+class_delete_success=La classe @{0} a été supprimée avec succès!
+class_delete_confirmation_title=Supprimer la classe?
+class_delete_confirmation_description=Êtes-vous sûr de vouloir supprimer la classe {0} ?
+class_delete_footer=Réagissez avec 👍 si vous voulez continuer
+class_delete_aborted=Suppression annulée.
+class_rename_error=Cette classe existe déjà.
+class_rename_success=La classe @{0} a bien été renommée en {1} !
+class_invalid_argument=Argument invalide, merci d'indiquer une classe valide.
+class_description=Commandes de classe facilitant leur création, suppression et renommage.
+class_create_help=Crée une classe
+class_create_description=Crée une classe avec le nom donné.\nCrée également le rôle délégué associé.
+class_delete_help=Supprime une classe
+class_delete_description=Supprime une classe avec le nom donné.\n Supprime également le rôle délégué associé.\n Donner le nom ou le tag fonctionnera.
+class_rename_help=Renomme une classe
+class_rename_description=Renomme une classe avec le nom donné.\n Renomme également le rôle délégué associé.\n Donner le nom ou le tag fonctionnera.
+
+# Diffusion extension
+
+diffusion_description=Longue description de la commande diffusion
+
+# Ext extension
+
+ext_load_failure_desc=Impossible de charger l'extension. Vérifiez les journaux pour plus d'informations.
+ext_load_success_desc=Extension chargée!
+ext_unload_failure_desc=Impossible de décharger l'extension. Vérifiez les journaux pour plus d'informations.
+ext_unload_success_desc=Extension déchargée!
+ext_reload_failure_desc=Impossible de recharger l'extension. Vérifiez les journaux pour plus d'informations.
+ext_reload_success_desc=Extension rechargée!
+
+# Lang extension
+
+lang_list_title=Langues disponibles
+lang_list_footer=Utilisez !lang set <langue> pour changer le langage du serveur
+lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles
+lang_set=Langue définie avec succès!
+lang_reload_success=Toutes les langues ont été rechargées !
+
+# Moderation extension
+
 success_prune_message=Les {0} derniers messages ont été supprimés
 success_prune_member=Les {0} derniers messages de {1} ont été supprimés
 success_kick={0} s'est fait botter le cul par {1} pour la raison suivante : {2}
 success_ban={0} a été envoyé en exil forcé par {1} pour la raison suivante : {2}
+
+# Starboard extension
+
+success_starboard_set=Le starboard a été configuré avec succès sur le canal suivant
+success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur
+
+# Test extension
+
+test=Tout semble fonctionner correctement !
+test_wait=Le processus a été mis en pause 2 secondes pour le test
+user_has_no_groups=n'a aucun privilège particulier vis à vis du bot
+user_has_groups=a les privilèges de bot suivants
+denied_failure=Quelque chose ne marche pas comme il faut !
