@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 from sqlalchemy     import Column, Integer, Text, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from isartbot.database import TableBase
 
@@ -34,4 +34,4 @@ class DiffusionOperator(TableBase):
     id           = Column('id'        , Integer, primary_key = True, unique = True)
     discord_id   = Column('discord_id', Integer, nullable    = False)
     diffusion_id = Column(Integer, ForeignKey('diffusions.id'))
-    diffusion    = relationship('Diffusion', back_populates = 'operators')
+    diffusion    = relationship('Diffusion', backref = backref('operators', cascade='all,delete'))

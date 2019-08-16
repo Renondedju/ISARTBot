@@ -23,7 +23,7 @@
 # SOFTWARE.
 
 from sqlalchemy     import Column, Integer, Text, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from isartbot.database import TableBase
 
@@ -36,4 +36,4 @@ class DiffusionSubscription(TableBase):
     discord_channel_id = Column('channel_id' , Integer, nullable   =False)
     tag                = Column('discord_tag', Text)
     diffusion_id       = Column(Integer, ForeignKey('diffusions.id'))
-    diffusion          = relationship('Diffusion', back_populates = 'subscriptions')
+    diffusion          = relationship('Diffusion', backref = backref('subscriptions', cascade='all,delete'))

@@ -28,10 +28,9 @@ from sqlalchemy.orm import relationship
 from isartbot.database import TableBase
 
 class Diffusion(TableBase):
-
     __tablename__ = 'diffusions'
 
     id            = Column('id'   , Integer, primary_key=True , unique=True)
     name          = Column('name' , Text   , nullable   =False, unique=True)
-    operators     = relationship('DiffusionOperator')
-    subscriptions = relationship('DiffusionSubscription')
+    operators     = relationship('DiffusionOperator'    , cascade='all,delete')
+    subscriptions = relationship('DiffusionSubscription', cascade='all,delete')
