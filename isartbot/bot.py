@@ -188,7 +188,11 @@ class Bot(commands.Bot):
             return
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, (commands.CommandNotFound, commands.UserInputError, commands.CheckFailure)):
+        if isinstance(error, (commands.CommandNotFound, commands.CheckFailure)):
+            return
+
+        if isinstance(error, commands.UserInputError):
+            await ctx.send_help(ctx.command)
             return
 
         if isinstance(error, commands.MissingPermissions):
