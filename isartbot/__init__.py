@@ -22,7 +22,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .bot      import Bot
-from .lang     import Lang
-from .help	   import HelpCommand
-from .database import Database
+__title__     = 'Isartbot'
+__authors__   = ('Renondedju', '6xray', 'Torayl', 'Lunatik')
+__license__   = 'MIT'
+__version__   = '2.0.0-dev'
+__copyright__ = 'Copyright 2018-2019 Renondedju'
+
+from collections import namedtuple
+
+VersionInfo  = namedtuple('VersionInfo', 'major minor micro releaselevel')
+version_info = VersionInfo(major=2, minor=0, micro=0, releaselevel='dev')
+
+from .bot import Bot

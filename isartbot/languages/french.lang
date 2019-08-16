@@ -46,7 +46,6 @@ class_rename_description=Renomme une classe avec le nom donné.\n Renomme égale
 
 diffusion_description=Longue description de la commande diffusion
 
-
 # Ext extension
 
 ext_load_failure_desc=Impossible de charger l'extension. Vérifiez les journaux pour plus d'informations.

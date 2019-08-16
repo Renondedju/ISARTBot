@@ -23,17 +23,9 @@
 # SOFTWARE.
 
 import os
-from isartbot import Bot
-
-def run():
-
-    #Starting the bot
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    Bot()
-
-    return
+import isartbot
 
 if __name__ == '__main__':
 
-    #Executing the bot
-    run()
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    isartbot.Bot()
