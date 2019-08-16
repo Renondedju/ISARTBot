@@ -67,3 +67,7 @@ diffusion_already_exists=This diffusion already exists ! Please choose a unique 
 diffusion_doesnt_exists=The diffusion named "{0}" doesn't exists.\nPlease use ``{1}diffusion list`` to get a list of all the existing diffusions
 diffusion_created=The diffusion named "{0}" has successfully been created
 diffusion_deleted=The diffusion named "{0}" has successfully been deleted
+success_prune_message=Last {0} messages has been removed
+success_prune_member=Last {0} messages from {1} has been removed
+success_kick={0} was kicked by {1} for reason: {2}
+success_ban={0} was banned by {1} for reason: {2}

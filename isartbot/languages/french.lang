@@ -36,3 +36,7 @@ super_admin_status=super administrateur
 developper_status=développeur
 admin_status=administrateur
 denied_status=divin
+success_prune_message=Les {0} derniers messages ont été supprimés
+success_prune_member=Les {0} derniers messages de {1} ont été supprimés
+success_kick={0} s'est fait botter le cul par {1} pour la raison suivante : {2}
+success_ban={0} a été envoyé en exil forcé par {1} pour la raison suivante : {2}
