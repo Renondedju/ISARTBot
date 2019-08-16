@@ -55,8 +55,8 @@ class ClassExt (commands.Cog):
     async def create(self, ctx, name: upper_clean):
         """Creates a class"""
         
-        check = await RoleConverter().convert(ctx, name)
-
+        check = await ClassConverter().convert(ctx, name)
+        
         if (check is not None):
             await ctx.send(embed= await self.error_embed(ctx, 'class_create_error', check.mention))
             return
@@ -102,7 +102,7 @@ class ClassExt (commands.Cog):
             description = (await ctx.bot.get_translation(ctx, 'class_delete_confirmation_description')).format(name.mention),
             title       = await ctx.bot.get_translation(ctx, 'class_delete_confirmation_title'))
             
-        embed.set_footer(text = "React with 👍 if you want to continue")
+        embed.set_footer(text = await ctx.bot.get_translation(ctx, 'class_delete_footer'))
 
         message = await ctx.send(embed=embed)
         
@@ -112,7 +112,7 @@ class ClassExt (commands.Cog):
             await ctx.bot.wait_for('reaction_add', timeout=5.0, check=check)
 
         except asyncio.TimeoutError:
-            embed.description = "Aborted deletion."
+            embed.description = await ctx.bot.get_translation(ctx, 'class_delete_aborted')
             embed.color = discord.Color.red()
             embed.set_footer()
             
