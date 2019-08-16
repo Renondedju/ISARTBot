@@ -66,22 +66,20 @@ class ClassExt (commands.Cog):
             description = (await ctx.bot.get_translation(ctx, description)).format(*args),
             color       = discord.Color.green())
 
-    @commands.group(pass_context=True, invoke_without_command=True, 
-                    help="class_help", description="class_description", 
-                    name="class")
+    @commands.group(pass_context=True, help="class_help", 
+                    description="class_description", name="class")
     @commands.check(is_moderator)
     async def _class(self, ctx):
         """Class modification command"""
 
-        if ctx.invoked_subcommand is None:
-            await ctx.send(await ctx.bot.get_translation(ctx, 'invalid_command_usage'))
+        pass
 
     @_class.command(help="class_create_help", description="class_create_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
     async def create(self, ctx, name: upper_clean):
         """Creates a class"""
-
+        
         check = await RoleConverter().convert(ctx, name)
 
         if (check is not None):
