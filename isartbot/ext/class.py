@@ -6,6 +6,7 @@ import asyncio
 from discord.ext          import commands
 from isartbot.converters  import upper_clean
 from isartbot.converters  import ClassConverter
+from isartbot.converters  import MemberConverter
 from isartbot.checks      import is_moderator
 from discord.ext.commands import RoleConverter
 
@@ -55,15 +56,20 @@ class ClassExt (commands.Cog):
     async def create(self, ctx, name: upper_clean):
         """Creates a class"""
         
-        check = await ClassConverter().convert(ctx, name)
+        user_check = await MemberConverter().convert(ctx, name)
+        role_check = await ClassConverter().convert(ctx, name)
         
-        if (check is not None):
-            await ctx.send(embed= await self.error_embed(ctx, 'class_create_error', check.mention))
+        if (role_check is not None):
+            await ctx.send(embed= await self.error_embed(ctx, 'class_create_error', role_check.mention))
+            return
+
+        if (user_check is not None):
+            await ctx.send(embed= await self.error_embed(ctx, 'class_create_error', user_check.mention))
             return
 
         role, delegate = self.get_class(ctx, name)
 
-        if role is not None or delegate is not None:
+        if (role is not None or delegate is not None):
             await ctx.send(embed= await self.error_embed(ctx, 'class_create_error', role.mention))
             return
 
@@ -141,6 +147,13 @@ class ClassExt (commands.Cog):
 
         if (old_name is None):
             await ctx.send(embed= await self.error_embed(ctx, 'class_invalid_argument', None))
+            return
+
+        class_check  = await ClassConverter().convert(ctx, new_name)
+        member_check = await MemberConverter().convert(ctx, new_name)
+
+        if (class_check is not None or member_check is not None):
+            await ctx.send(embed= await self.error_embed(ctx, 'class_rename_error', None))
             return
 
         _, old_delegate        = self.get_class(ctx, old_name.name)

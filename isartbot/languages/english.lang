@@ -101,6 +101,10 @@ lang_set=Language successfully set !
 mod_prune_help=Deletes a certain amount of the latest messages in this text channel
 mod_kick_help=Kick a member
 mod_ban_help=Ban a member
+success_prune_message=Last {0} messages has been removed
+success_prune_member=Last {0} messages from {1} has been removed
+success_kick={0} was kicked by {1} for reason: {2}
+success_ban={0} was banned by {1} for reason: {2}
 
 # Starboard extension
 

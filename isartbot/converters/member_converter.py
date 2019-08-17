@@ -24,13 +24,13 @@
 
 from discord.ext import commands
 
-class ClassConverter(commands.RoleConverter):
+class MemberConverter(commands.MemberConverter):
     async def convert(self, ctx, argument):
         if (argument == ""):
             raise commands.BadArgument("", "")
 
         try:
-            role = await super().convert(ctx, argument.strip().upper())
-            return role
+            member = await super().convert(ctx, argument.strip().upper())
+            return member
         except:
             return None
