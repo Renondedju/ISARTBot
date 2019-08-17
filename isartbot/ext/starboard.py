@@ -64,12 +64,7 @@ class StarboardExt(commands.Cog):
         required_perms.update(send_messages=True, manage_messages=True, read_messages=True)
 
         if (not required_perms.is_subset(channel.permissions_for(ctx.guild.me))):
-            embed.title       = await ctx.bot.get_translation(ctx, "failure_title")
-            embed.description = f"{await ctx.bot.get_translation(ctx, 'missing_bot_perms_error')}: [send_messages, manage_messages, read_messages]"
-            embed.colour      = discord.Color.red()
-
-            await ctx.send(embed=embed)
-            return
+            raise commands.BotMissingPermissions(["send_messages", "manage_messages", "read_messages"])
 
         self.bot.logger.info(f"Starboard set to channel {channel.id} for server named {ctx.guild.name}")
 
