@@ -27,3 +27,4 @@ from .test      import *
 from .lang      import *
 from .starboard import *
 from .diffusion import *
+from .game      import *

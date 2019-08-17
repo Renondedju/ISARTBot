@@ -24,9 +24,10 @@ denied_status=god
 
 # Class extension
 
-class_create_error=Class {} already exists.
-class_create_success=Class {} successfully created !
-class_delete_success=Class @{} successfully deleted !
+class_create_error=Class {0} already exists.
+class_create_name_error=Invalid class name.
+class_create_success=Class {0} successfully created !
+class_delete_success=Class @{0} successfully deleted !
 class_delete_confirmation_title=Delete class?
 class_delete_confirmation_description=Are you sure you want to delete the class {} ?
 class_delete_footer=React with 👍 if you want to continue
