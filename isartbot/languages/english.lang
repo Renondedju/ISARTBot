@@ -10,6 +10,7 @@ help_title=Help
 
 failure_title=Error
 success_title=Success
+confirmation_footer=React with 👍 if you want to continue
 
 missing_perms_error=Oops ! It looks like you're missing one of the following permissions to run this command : {0}
 missing_bot_perms_error=Oops ! It looks like the bot is missing one of the following permissions to run this command
@@ -17,7 +18,7 @@ unauthorized_command=Only {0}s are able to use this command
 
 moderator_status=moderator
 super_admin_status=super administrator
-developper_status=developper
+developper_status=developer
 admin_status=administrator
 denied_status=god
 
@@ -43,8 +44,18 @@ class_rename_description=Renames a class role with the given name.\n Also rename
 
 # Diffusion extension
 
+diffusion_delete_title=Delete a diffusion ?
+diffusion_delete_aborted=Aborted deletion
+diffusion_delete_content=Are you sure to want to delete the diffusion named "{0}".\nThis will also delete all subscriptions to this diffusion.
+diffusion_operator_remove_content=Do you really want to remove {0} from the "{1}" diffusion operators ?
+diffusion_operator_remove_content_failure=Operation aborted
+diffusion_operator_remove_title=Remove operator ?
+diffusion_subscription_list_empty=This server does not have any subscriptions !
+diffusion_subscription_list_title=Subscription list for this server
+diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion !
+diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{0}diffusion subscribe`` to subscribe to a diffusion first.
 diffusion_already_exists=This diffusion already exists ! Please choose a unique diffusion name.
-diffusion_doesnt_exists=The diffusion named "{0}" doesn't exists.\nPlease use ``{1}diffusion list`` to get a list of all the existing diffusions
+diffusion_doesnt_exists=This diffusion doesn't exists.\nPlease use ``{0}diffusion list`` to get a list of all the existing diffusions
 diffusion_created=The diffusion named "{0}" has successfully been created
 diffusion_deleted=The diffusion named "{0}" has successfully been deleted
 diffusion_already_operator={0} is already an operator of the diffusion named "{1}"
@@ -52,6 +63,9 @@ diffusion_operator_list_title=Operators of "{0}" diffusion
 diffusion_not_operator={0} isn't an operator of the diffusion named "{1}"
 diffusion_operator_added={0} is now an operator of the diffusion named "{1}"
 diffusion_operator_removed={0} is no more an operator of the diffusion named "{1}"
+diffusion_subscription_already_exists=This subscription already exists.\nUse ``{0}diffusion unsubscribe`` to unsubscribe from this diffusion.
+diffusion_subscribe_success=Successfully subscribed to this diffusion !
+diffusion_list_title=Available diffusions
 
 diffusion_description=Diffusion command long description
 diffusion_create_help=Creates a diffusion channel
@@ -63,6 +77,7 @@ diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffu
 diffusion_operator_help=Operator subcommands
 diffusion_subscribe_help=Subscribes to a diffusion channel
 diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
+diffusion_subscribe_description=TODO
 
 # Ext extension
 
