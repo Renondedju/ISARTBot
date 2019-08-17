@@ -25,6 +25,7 @@ denied_status=divin
 # Class extension
 
 class_create_error=La classe {0} existe déjà.
+class_create_name_error=Nom de classe invalide.
 class_create_success=La classe {0} a été créee avec succès !
 class_delete_success=La classe @{0} a été supprimée avec succès!
 class_delete_confirmation_title=Supprimer la classe?

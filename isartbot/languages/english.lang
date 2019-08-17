@@ -25,6 +25,7 @@ denied_status=god
 # Class extension
 
 class_create_error=Class {0} already exists.
+class_create_name_error=Invalid class name.
 class_create_success=Class {0} successfully created !
 class_delete_success=Class @{0} successfully deleted !
 class_delete_confirmation_title=Delete class?
