@@ -22,10 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import emoji
 import asyncio
 import discord
-
-import emoji
 
 class Helper():
 
@@ -58,6 +57,17 @@ class Helper():
     async def ask_confirmation(ctx, channel: discord.TextChannel,
         title: str, initial_content: str       , success_content: str       , failure_content: str,
                     initial_format : tuple = (), success_format : tuple = (), failure_format: tuple = ()) -> bool:
+        
+        value, _, _ = await Helper.ask_confirmation_and_get_message(ctx, channel, title,
+            initial_content, success_content, failure_content,
+            initial_format , success_format , failure_format)
+
+        return value
+
+    @staticmethod
+    async def ask_confirmation_and_get_message(ctx, channel: discord.TextChannel,
+        title: str, initial_content: str       , success_content: str       , failure_content: str,
+                    initial_format : tuple = (), success_format : tuple = (), failure_format: tuple = ()):
 
         translations = await ctx.bot.get_translations(ctx, [initial_content, title, failure_content, "confirmation_footer", success_content])
 
@@ -87,7 +97,7 @@ class Helper():
             
             await message.edit(embed = embed)
 
-            return False
+            return False, message, embed
 
         embed.description = translations[success_content].format(*success_format)
         embed.color       = discord.Color.green()
@@ -95,4 +105,4 @@ class Helper():
 
         await message.edit(embed = embed)
 
-        return True
+        return True, message, embed
