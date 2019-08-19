@@ -28,7 +28,7 @@ import discord
 from discord.ext import commands
 
 from isartbot.checks   import is_moderator
-from isartbot.database import ServerPreferences
+from isartbot.database import Server
 
 class StarboardExt(commands.Cog):
     """ Starboard related commands and tasks """
@@ -68,9 +68,9 @@ class StarboardExt(commands.Cog):
 
         self.bot.logger.info(f"Starboard set to channel {channel.id} for server named {ctx.guild.name}")
 
-        self.bot.database.session.query(ServerPreferences).\
-            filter(ServerPreferences.discord_id == ctx.guild.id).\
-            update({ServerPreferences.starboard_channel_id : channel.id})
+        self.bot.database.session.query(Server).\
+            filter(Server.discord_id == ctx.guild.id).\
+            update({Server.starboard_channel_id : channel.id})
 
         self.bot.database.session.commit()
 
@@ -86,9 +86,9 @@ class StarboardExt(commands.Cog):
 
         self.bot.logger.info(f"Starboard disabled for server named {ctx.guild.name}")
 
-        self.bot.database.session.query(ServerPreferences).\
-            filter(ServerPreferences.discord_id == ctx.guild.id).\
-            update({ServerPreferences.starboard_channel_id : 0})
+        self.bot.database.session.query(Server).\
+            filter(Server.discord_id == ctx.guild.id).\
+            update({Server.starboard_channel_id : 0})
 
         self.bot.database.session.commit()
 
@@ -169,10 +169,9 @@ class StarboardExt(commands.Cog):
     async def get_server_starboard_channel_id(self, server: discord.Guild) -> int:
         """ Returns the setuped starboard channel id for a given server """
 
-        result = await self.bot.database.connection.execute(
-                ServerPreferences.table.select(ServerPreferences.table.c.discord_id == server.id)
-            )
-        servers = await result.fetchall()
+        servers = self.bot.database.session.query(Server).\
+            filter(Server.discord_id == server.id).\
+            all()
 
         # Something is wrong, either the server is not registered in the database,
         # either there is more than one server with this id, which shouldn't be possible
@@ -182,7 +181,7 @@ class StarboardExt(commands.Cog):
 
         server = servers[0]
 
-        return server[ServerPreferences.table.c.starboard_id]
+        return server.starboard_id
 
     async def get_server_starboard_channel(self, server: discord.Guild) -> discord.TextChannel:
 

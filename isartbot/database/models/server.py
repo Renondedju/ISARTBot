@@ -19,13 +19,20 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-__slots__ = ("Server", "DiffusionOperator", "Diffusion", "DiffusionSubscription", "Game")
+from sqlalchemy     import Column, Integer, Text
+from sqlalchemy.orm import relationship
 
-from .game                   import Game
-from .server                 import Server
-from .diffusion              import Diffusion
-from .diffusion_operator     import DiffusionOperator
-from .diffusion_subscription import DiffusionSubscription
+from isartbot.database import TableBase
+
+class Server(TableBase):
+
+    __tablename__ = 'servers'
+
+    id                   = Column('id'          , Integer, primary_key = True, unique = True)
+    lang                 = Column('lang'        , Text   , default     = "en")
+    discord_id           = Column('discord_id'  , Integer, unique      = True)
+    starboard_channel_id = Column('starboard_id', Integer, default     = 0)
+    games                = relationship('Game', cascade='all,delete')

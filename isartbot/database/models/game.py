@@ -22,15 +22,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
 from isartbot.database import TableBase
 
-class ServerPreferences(TableBase):
+class Game(TableBase):
 
-    __tablename__ = 'server_preferences'
+    __tablename__ = 'games'
 
-    id                   = Column('id'          , Integer, primary_key = True, unique = True)
-    lang                 = Column('lang'        , Text   , default     = "en")
-    discord_id           = Column('discord_id'  , Integer, unique      = True)
-    starboard_channel_id = Column('starboard_id', Integer, default     = 0)
+    id              = Column('id'             , Integer, primary_key = True, unique = True)
+    discord_role_id = Column('discord_role_id', Integer, nullable    = False)
+    display_name    = Column('display_name'   , Text   , nullable    = False)
+    discord_name    = Column('discord_name'   , Text   , nullable    = False)
+    server_id       = Column(Integer, ForeignKey('servers.id'))
+    server          = relationship('Server', backref = backref('games', cascade='all,delete'))

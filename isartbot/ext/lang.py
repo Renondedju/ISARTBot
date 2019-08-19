@@ -26,7 +26,7 @@ import asyncio
 import discord
 import logging
 
-from isartbot.database import ServerPreferences
+from isartbot.database import Server
 from discord.ext       import commands
 from isartbot.checks   import is_moderator, is_super_admin, is_developper
 
@@ -97,9 +97,9 @@ class LangExt(commands.Cog):
 
     def set_language(self, ctx, lang: str):
 
-        ctx.bot.database.session.query(ServerPreferences).\
-            filter(ServerPreferences.discord_id == ctx.guild.id).\
-            update({ServerPreferences.lang : lang})
+        ctx.bot.database.session.query(Server).\
+            filter(Server.discord_id == ctx.guild.id).\
+            update({Server.lang : lang})
 
         ctx.bot.database.session.commit()
 
