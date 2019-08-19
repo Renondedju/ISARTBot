@@ -34,3 +34,14 @@ class ClassConverter(commands.RoleConverter):
             return role
         except:
             return None
+
+class GameConverter(commands.RoleConverter):
+    async def convert(self, ctx, argument):
+        if (argument == ""):
+            raise commands.BadArgument("", "")
+
+        try:
+            role = await super().convert(ctx, argument.strip().title())
+            return role
+        except:
+            return None

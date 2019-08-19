@@ -34,6 +34,7 @@ class_delete_aborted=Aborted deletion.
 class_rename_error=This class already exists.
 class_rename_success=Class @{} successfully renamed to {} !
 class_invalid_argument=Invalid argument, please mention a valid class
+
 class_description=Class commands allowing easier creation, deletion or rename of them.
 class_create_help=Creates a class
 class_create_description=Creates a new class role with the given name.\n Also creates the associated delegate role.
@@ -41,6 +42,25 @@ class_delete_help=Deletes a class
 class_delete_description=Deletes a class role with the given name.\n Also deletes the associated delegate role.\n Giving either the name or the mention (@class) will work.
 class_rename_help=Renames a class
 class_rename_description=Renames a class role with the given name.\n Also renames the associated delegate role.\n Giving either the name or the mention (@class) will work.
+
+# Game extension
+
+game_create_success=Game {} successfully created !
+game_create_error_existing=Game {} already exists.
+game_create_error_invalid=Invalid game name.
+game_delete_success=Game @{} successfully deleted !
+game_invalid_argument=Invalid game name.
+game_delete_confirmation_title=Delete game?
+game_delete_confirmation_description=Are you sure you want to delete the game {} ?
+game_delete_aborted=Aborted deletion.
+
+game_description=[TODO]
+game_create_help=Creates a game
+game_create_description=[TODO]
+game_delete_help=Deletes a game
+game_delete_description=[TODO]
+game_rename_help=Renames a game
+game_rename_description=[TODO]
 
 # Diffusion extension
 

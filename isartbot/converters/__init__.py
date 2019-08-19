@@ -23,6 +23,6 @@
 # SOFTWARE.
 
 from .upper_clean      import upper_clean
-from .class_converter  import ClassConverter
+from .role_converter   import *
 from .member_converter import MemberConverter
 from .diffusion        import DiffusionConverter

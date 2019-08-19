@@ -43,6 +43,10 @@ class_delete_description=Supprime une classe avec le nom donné.\n Supprime éga
 class_rename_help=Renomme une classe
 class_rename_description=Renomme une classe avec le nom donné.\n Renomme également le rôle délégué associé.\n Donner le nom ou le tag fonctionnera.
 
+# Game extension
+
+
+
 # Diffusion extension
 
 diffusion_description=Longue description de la commande diffusion
