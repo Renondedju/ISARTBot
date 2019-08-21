@@ -33,7 +33,7 @@ import logging.config
 from isartbot.exceptions import UnauthorizedCommand
 from isartbot.help       import HelpCommand
 from isartbot.lang       import Lang
-from isartbot.database   import ServerPreferences
+from isartbot.database   import Server
 from isartbot.checks     import log_command, trigger_typing, block_dms
 from isartbot.database   import Database
 
@@ -144,7 +144,7 @@ class Bot(commands.Bot):
     def register_guild(self, ctx):
         """ Registers the guild into the database, this method is automatically called the first time a command is trigerred in a new guild """
 
-        new_server_preferences = ServerPreferences(discord_id=ctx.guild.id)
+        new_server_preferences = Server(discord_id=ctx.guild.id)
 
         self.database.session.add(new_server_preferences)
         self.database.session.commit()
@@ -157,8 +157,8 @@ class Bot(commands.Bot):
         """ An event that is called when a command is found and is about to be invoked. """
 
         # Fetching the guild language and injects it into the context
-        lang = self.database.session.query(ServerPreferences.lang).\
-            filter(ServerPreferences.discord_id == ctx.guild.id).first()
+        lang = self.database.session.query(Server.lang).\
+            filter(Server.discord_id == ctx.guild.id).first()
 
         # Checking if the guild is already registered in the database
         if (lang == None):

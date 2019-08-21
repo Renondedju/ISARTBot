@@ -27,9 +27,11 @@ import asyncio
 import re
 import io
 
-from discord.ext     import commands
-from isartbot.checks import is_moderator
-from discord.abc     import Messageable
+from discord.ext         import commands
+from discord.abc         import Messageable
+from isartbot.helper     import Helper
+from isartbot.checks     import is_moderator
+from isartbot.converters import MemberConverter
 
 class ModerationExt(commands.Cog):
     """Helps with moderation"""
@@ -125,51 +127,66 @@ class ModerationExt(commands.Cog):
 
         self.bot.logger.warning((await ctx.bot.get_translation(ctx, 'success_ban')).format(member.name, ctx.author.name, reason))
 
-#    @commands.command(help="mod_as_help", description="mod_as_description", name='as')
-#    @commands.check(is_moderator)
-#    async def _as(self, ctx, member : discord.Member, *, command_str : str):
-#
-#        prefix = self.bot.clean_prefix
-#        regex  = r"{0}(\w*)\s.*".format(prefix)
-#        matches = re.search(regex, command_str)
-#
-#        embedFail = discord.Embed()
-#        embedFail.title = "Failed"
-#        embedFail.colour = discord.Color.red()
-#
-#        if not matches:
-#            embedFail.description = 'There is no command to invoke.'
-#            await ctx.send(embed=embed)
-#            return
-#
-#        command = self.bot.get_command(matches.group(1))
-#        if (not await command.can_run(ctx)):
-#            embedFail.description = "The checks for this command failed, "
-#                                    "maybe you don't have the required rights ?"
-#            await ctx.send(embed=embed)
-#            return
-#
-#        for word in re.compile('\w+').findall(command_str.replace(prefix + matches.group(1), '')):
-#
-#            # if type of 'command' is a discord command, then everything is ready to be executed
-#            if type(command) == discord.ext.commands.core.Command:
-#                break
-#
-#            command = command.get_command(word)
-#            if command is None:
-#                break
-#            if (not await command.can_run(ctx)):
-#                await self.bot.send_fail(ctx,
-#                                "The checks for this subcommand failed, "
-#                                "maybe you don't have the required rights?")
-#                return
-#
-#        msg: discord.Message = await ctx.send(command_str)
-#        msg.author           = member
-#        await self.bot.process_commands(msg)
-#
-#        return
-#
+    @mod.command(help="mod_as_help", description="mod_as_description",
+                 name = "as")
+    @commands.check(is_moderator)
+    async def _as(self, ctx, member : MemberConverter, command_str : str):
+        
+        if (member is None):
+            await Helper.send_error(ctx, ctx.channel, 'mod_as_error')
+            return
+
+        """prefix  = self.bot.clean_prefix
+        regex   = r"{0}(\w*)\s.*".format(prefix)
+        matches = re.search(regex, command_str)
+
+        if (not matches):
+            await Helper.send_error(ctx, ctx.channel, 'mod_as_invalid_command')
+            return"""
+
+        await Helper.send_success(ctx, ctx.channel, 'mod_as_success')
+
+        """prefix = self.bot.clean_prefix
+        regex  = r"{0}(\w*)\s.*".format(prefix)
+        matches = re.search(regex, command_str)
+
+        embedFail = discord.Embed()
+        embedFail.title = "Failed"
+        embedFail.colour = discord.Color.red()
+
+        if not matches:
+            embedFail.description = 'There is no command to invoke.'
+            await ctx.send(embed=embed)
+            return
+
+        command = self.bot.get_command(matches.group(1))
+        if (not await command.can_run(ctx)):
+            embedFail.description = "The checks for this command failed, "
+                                    "maybe you don't have the required rights ?"
+            await ctx.send(embed=embed)
+            return
+
+        for word in re.compile('\w+').findall(command_str.replace(prefix + matches.group(1), '')):
+
+            # if type of 'command' is a discord command, then everything is ready to be executed
+            if type(command) == discord.ext.commands.core.Command:
+                break
+
+            command = command.get_command(word)
+            if command is None:
+                break
+            if (not await command.can_run(ctx)):
+                await self.bot.send_fail(ctx,
+                                "The checks for this subcommand failed, "
+                                "maybe you don't have the required rights?")
+                return
+
+        msg: discord.Message = await ctx.send(command_str)
+        msg.author           = member
+        await self.bot.process_commands(msg)
+
+        return"""
+
 #    @commands.command(pass_context=True, hidden=True, name='for',
 #        usage="!for <Users and/or Roles> <'add' or 'remove'> <Roles>")
 #    @commands.check(is_admin)
