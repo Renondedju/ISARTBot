@@ -38,29 +38,22 @@ class GameExt (commands.Cog):
 
         self.bot = bot
 
-    @commands.group(pass_context=True, help="game_help", 
-                    description="game_description", name = "game")
+    @commands.group(pass_context=True, help="game_help", description="game_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
-    async def _game(self, ctx):
-
+    async def game(self, ctx):
         pass
     
-    @_game.command(help="game_create_help", description="game_create_description")
+    @game.command(help="game_create_help", description="game_create_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
-    async def create(self, ctx, name: str.title):
+    async def create(self, ctx, name, discord_name = ""):
         """Create a game"""
 
-        user_check = await MemberConverter().convert(ctx, name)
         role_check = await GameConverter().convert(ctx, name)
 
         if (role_check is not None):
-            await Helper.send_error(ctx, ctx.channel, 'game_create_error_existing', format_content= (role_check.mention,))
-            return
-
-        if (user_check is not None):
-            await Helper.send_error(ctx, ctx.channel, 'game_create_error_invalid', format_content= (user_check.mention,))
+            await Helper.send_error(ctx, ctx.channel, 'game_create_error_existing', format_content=(role_check.mention,))
             return
 
         role_color = ctx.bot.settings.get("game", "role_color")
@@ -70,9 +63,9 @@ class GameExt (commands.Cog):
             color       = discord.Color(int(role_color, 16)),
             mentionable = True)
 
-        await Helper.send_success(ctx, ctx.channel, 'game_create_success', format_content= (game.mention,))
+        await Helper.send_success(ctx, ctx.channel, 'game_create_success', format_content=(game.mention,))
 
-    @_game.command(help="game_delete_help", description="game_delete_description")
+    @game.command(help="game_delete_help", description="game_delete_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
     async def delete(self, ctx, name: GameConverter):
