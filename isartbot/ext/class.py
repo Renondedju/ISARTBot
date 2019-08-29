@@ -108,9 +108,9 @@ class ClassExt (commands.Cog):
 
         _, delegate = self.get_class(ctx, name.name)
 
-        Helper.ask_confirmation(ctx, ctx.channel, "class_delete_confirmation_title", 
+        await Helper.ask_confirmation(ctx, ctx.channel, "class_delete_confirmation_title", 
             initial_content="class_delete_confirmation_description", initial_format=(name.mention,),
-            success_content="class_delete_success"                 , success_format=(name.name.mention,),
+            success_content="class_delete_success"                 , success_format=(name.mention,),
             failure_content="class_delete_aborted")
 
         await name.delete()
