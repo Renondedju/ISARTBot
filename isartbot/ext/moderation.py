@@ -26,9 +26,9 @@ import discord
 import asyncio
 import re
 import io
-import itertools
 
 from typing              import Union
+from itertools           import groupby
 from discord.ext         import commands
 from discord.abc         import Messageable
 from isartbot.helper     import Helper
@@ -63,7 +63,6 @@ class ModerationExt(commands.Cog):
     @commands.check(is_moderator)
     async def mod(self, ctx):
         pass
-
 
     #Prune command
     @mod.command(help="mod_prune_help", description="mod_prune_description")
@@ -129,22 +128,13 @@ class ModerationExt(commands.Cog):
 
         self.bot.logger.warning((await ctx.bot.get_translation(ctx, 'success_ban')).format(member.name, ctx.author.name, reason))
 
-    @mod.command(help="mod_as_help", description="mod_as_description",
-                 name = "as")
+    @mod.command(help="mod_as_help", description="mod_as_description", name = "as")
     @commands.check(is_moderator)
-    async def _as(self, ctx, member : MemberConverter, command_str : str):
+    async def _as(self, ctx, member : MemberConverter, *command_str : str):
         
         if (member is None):
             await Helper.send_error(ctx, ctx.channel, 'mod_as_error')
             return
-
-        """prefix  = self.bot.clean_prefix
-        regex   = r"{0}(\w*)\s.*".format(prefix)
-        matches = re.search(regex, command_str)
-
-        if (not matches):
-            await Helper.send_error(ctx, ctx.channel, 'mod_as_invalid_command')
-            return"""
 
         await Helper.send_success(ctx, ctx.channel, 'mod_as_success')
 
@@ -189,12 +179,13 @@ class ModerationExt(commands.Cog):
 
         return"""
 
-    @commands.command(help="mod_for_help", description="mod_for_description",
-                      pass_context=True, hidden=True, name='for')
+    @mod.command(help="mod_for_help", description="mod_for_description", name='for')
     @commands.check(is_moderator)
+    @commands.bot_has_permissions(manage_roles=True)
     async def _for(self, ctx, *args : Union[discord.Member, discord.Role, str]):
         """Removes or adds roles to members of the guild"""
-        selectors, action, roles = [list(items) for _, items in itertools.groupby(args, key=lambda x: isinstance(x, str))]
+
+        selectors, action, roles = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
 
         if len(action) != 1:
             await Helper.send_error(ctx, ctx.channel, 'mod_for_error')
@@ -208,6 +199,7 @@ class ModerationExt(commands.Cog):
 
         selected_members = set()
 
+        # Adding members to the set
         for selection in selectors:
             if isinstance(selection, discord.Member):
                 selected_members.add(selection)
@@ -216,22 +208,26 @@ class ModerationExt(commands.Cog):
             for member in selection.members:
                 selected_members.add(member)
 
-        async def add():
-            for member in selected_members:
-                for role in roles:
-                    await member.add_roles(role)
+        # Creating add and remove strategies
+        strategies = {'add' : self.for_add, 'remove' : self.for_remove}
 
-        async def remove():
-            for member in selected_members:
-                for role in roles:
-                    await member.remove_roles(role)
-
-        strategies = {'add' : add, 'remove' : remove}
-
-        await strategies[action]()
+        await strategies[action](selected_members, roles)
 
         await Helper.send_success(ctx, ctx.channel, 'mod_for_success', 
             format_content=(action, ' '.join([role.mention for role in roles]), ' '.join([selector.mention for selector in selectors])))
+
+    # For strategies
+    async def for_add(self, selected_members, roles):
+        """ Add strategy, adds every roles passed to every of the selected members """
+        for member in selected_members:
+            for role in roles:
+                await member.add_roles(role)
+
+    async def for_remove(self, selected_members, roles):
+        """ Remove strategy, removes every roles passed of every of the selected members """
+        for member in selected_members:
+            for role in roles:
+                await member.remove_roles(role)
 
 def setup(bot):
     bot.add_cog(ModerationExt(bot))
