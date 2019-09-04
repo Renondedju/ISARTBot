@@ -46,7 +46,7 @@ class_rename_description=Renames a class role with the given name.\n Also rename
 # Game extension
 
 game_create_success=Game {} successfully created !
-game_create_error_existing=Game {} already exists.
+game_create_error_existing=Game "{}" already exists.
 game_create_error_invalid=Invalid game name.
 game_delete_success=Game @{} successfully deleted !
 game_invalid_argument=Invalid game name.

@@ -30,7 +30,7 @@ class GameConverter(commands.Converter):
 
     async def convert(self, ctx, game_name):
         game = ctx.bot.database.session.query(Game).\
-            filter(Game.discord_name == game_name.lower(),
+            filter(Game.display_name == game_name.lower(),
                    Game.server_id    == ctx.guild.id).\
             first()
 

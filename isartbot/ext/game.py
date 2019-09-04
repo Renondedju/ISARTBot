@@ -50,18 +50,22 @@ class GameExt (commands.Cog):
     async def create(self, ctx, name, discord_name = ""):
         """Create a game"""
 
-        role_check = await GameConverter().convert(ctx, name)
+        game_check = await GameConverter().convert(ctx, name)
 
-        if (role_check is not None):
-            await Helper.send_error(ctx, ctx.channel, 'game_create_error_existing', format_content=(role_check.mention,))
+        if (game_check is not None):
+            await Helper.send_error(ctx, ctx.channel, 'game_create_error_existing', format_content=(game_check.display_name,))
             return
 
         role_color = ctx.bot.settings.get("game", "role_color")
-
         game = await ctx.guild.create_role(
             name        = name,
             color       = discord.Color(int(role_color, 16)),
             mentionable = True)
+
+        new_game = Game(discord_role_id = game.id, display_name = game.name.lower(), discord_name = discord_name, server_id = ctx.guild.id)
+
+        self.bot.database.session.add(new_game)
+        self.bot.database.session.commit()
 
         await Helper.send_success(ctx, ctx.channel, 'game_create_success', format_content=(game.mention,))
 
@@ -74,16 +78,21 @@ class GameExt (commands.Cog):
         if (name is None):
             await Helper.send_error(ctx, ctx.channel, 'game_invalid_argument')
             return
+            
+        game = await commands.RoleConverter().convert(ctx, name.display_name.title())
 
         confirmation = await Helper.ask_confirmation(ctx, ctx.channel, 'game_delete_confirmation_title',
-            initial_content = "game_delete_confirmation_description" , initial_format = (name.mention,),
-            success_content = "game_delete_success"                  , success_format = (name.name,),
+            initial_content = "game_delete_confirmation_description" , initial_format = (game.mention,),
+            success_content = "game_delete_success"                  , success_format = (name.display_name.title(),),
             failure_content = "game_delete_aborted")
 
         if (not confirmation):
             return
 
-        await name.delete()
+        self.bot.database.session.delete(name)
+        self.bot.database.session.commit()
+
+        await game.delete()
 
 def setup(bot):
     bot.add_cog(GameExt(bot))
