@@ -25,10 +25,11 @@
 import discord
 import asyncio
 
+from math                import ceil
 from discord.ext         import commands
 from isartbot.helper     import Helper
 from isartbot.checks     import is_moderator
-from isartbot.database   import Game
+from isartbot.database   import Game, Server
 from isartbot.converters import GameConverter
 from isartbot.converters import MemberConverter
 
@@ -36,7 +37,89 @@ class GameExt (commands.Cog):
 
     def __init__(self, bot):
 
-        self.bot = bot
+        # Starting the game assignation task
+        self.bot  = bot
+        self.task = bot.loop.create_task(self.run_game_task())
+
+    def cog_unload(self):
+        """Called when the game module is unloaded for any reason"""
+
+        self.task.cancel()
+
+    async def run_game_task(self):
+        """Error handler for the game scan task"""
+        
+        try:
+            await self.game_task()
+        except asyncio.CancelledError: # This error is thrown when the extension is unloaded
+            pass
+        except Exception as e:
+            await self.bot.on_error(e)
+
+    async def game_task(self):
+        """Scan for players and auto assigns game roles if possible"""
+
+        scan_delay = int(self.bot.settings.get("game", "scan_delay"))
+        
+        # Main scan loop
+        while (scan_delay != -1):
+
+            # Fetching all required data from the database
+            database_games = list(self.bot.database.session.query(Game).all())
+            server_ids     = set([item.server_id for item in database_games])
+
+            # Looping over every server that requires a scan
+            for server_id in server_ids:
+                guild = discord.utils.get(self.bot.guilds, id=server_id)
+                
+                # We just got removed from a server while scanning, skipping it.
+                # The next scan will be fine since all data related with this server
+                # has already been removed from the database
+                if (guild == None):
+                    continue
+
+                # Fetching server verified role (if any)
+                server        = self.bot.database.session.query(Server).filter(Server.discord_id == guild.id).first()
+                verified_role = discord.utils.get(guild.roles, id = (server.verified_role_id if server != None else 0))
+                server_games  = [game for game in database_games if game.server_id == server_id]
+
+                # Looping over each members
+                for member in guild.members:
+
+                    # Checking for a verified role, this way unauthorized people don't get assigned roles
+                    if (verified_role != None):
+                        if (verified_role not in member.roles):
+                            continue
+                    
+                    game_role = self.get_game_role_from_activity(member.activity, server_games, guild)
+                    if (game_role == None or game_role in member.roles):
+                        continue
+                    
+                    try:
+                        await member.add_roles(game_role, reason="Automatic game scan")
+                        self.bot.logger.info(f"Added the game {game_role.name} to {member} in guild named {guild.name}")
+                    except discord.Forbidden: # If discord doesn't let us modify roles, then breaking to the next server
+                        break
+                    except:
+                        pass
+
+            # Waiting for the next scan
+            await asyncio.sleep(scan_delay)
+
+    def get_game_role_from_activity(self, activity: discord.Activity, server_games, guild: discord.Guild):
+        """Returns a game role from an activity"""
+
+        if not isinstance(activity, (discord.Game, discord.Activity)):
+            return None
+
+        game_name = activity.name.lower()
+
+        # Looping over every available games to see if something is matching
+        for game in server_games:
+            if game_name == game.discord_name:
+                return discord.utils.get(guild.roles, id=game.discord_role_id)
+        
+        return None
 
     @commands.group(pass_context=True, help="game_help", description="game_description")
     @commands.check(is_moderator)
@@ -47,8 +130,11 @@ class GameExt (commands.Cog):
     @game.command(help="game_create_help", description="game_create_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
-    async def create(self, ctx, name, discord_name = ""):
+    async def create(self, ctx, name, *, discord_name = ""):
         """Create a game"""
+
+        if (discord_name == ""):
+            discord_name = name
 
         game_check = await GameConverter().convert(ctx, name)
 
@@ -59,10 +145,10 @@ class GameExt (commands.Cog):
         role_color = ctx.bot.settings.get("game", "role_color")
         game = await ctx.guild.create_role(
             name        = name,
-            color       = discord.Color(int(role_color, 16)),
+            color       = await commands.ColourConverter().convert(ctx, role_color),
             mentionable = True)
 
-        new_game = Game(discord_role_id = game.id, display_name = game.name.lower(), discord_name = discord_name, server_id = ctx.guild.id)
+        new_game = Game(discord_role_id = game.id, display_name = name, discord_name = discord_name.lower(), server_id = ctx.guild.id)
 
         self.bot.database.session.add(new_game)
         self.bot.database.session.commit()
@@ -72,27 +158,57 @@ class GameExt (commands.Cog):
     @game.command(help="game_delete_help", description="game_delete_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
-    async def delete(self, ctx, name: GameConverter):
+    async def delete(self, ctx, game: GameConverter):
         """Deletes a game"""
 
-        if (name is None):
+        if (game is None):
             await Helper.send_error(ctx, ctx.channel, 'game_invalid_argument')
             return
             
-        game = await commands.RoleConverter().convert(ctx, name.display_name.title())
+        game_role = discord.utils.get(ctx.guild.roles, id=game.discord_role_id)
 
         confirmation = await Helper.ask_confirmation(ctx, ctx.channel, 'game_delete_confirmation_title',
-            initial_content = "game_delete_confirmation_description" , initial_format = (game.mention,),
-            success_content = "game_delete_success"                  , success_format = (name.display_name.title(),),
+            initial_content = "game_delete_confirmation_description" , initial_format = (game_role.mention,),
+            success_content = "game_delete_success"                  , success_format = (game.display_name.title(),),
             failure_content = "game_delete_aborted")
 
         if (not confirmation):
             return
 
-        self.bot.database.session.delete(name)
+        self.bot.database.session.delete(game)
         self.bot.database.session.commit()
 
-        await game.delete()
+        await game_role.delete()
+
+    @game.command(help="game_list_help", description="game_list_description")
+    async def list(self, ctx, page: int = 1):
+        """Lists the available games of the server"""
+
+        # Fetching and computing all initial required data
+        database_games = list(self.bot.database.session.query(Game).all())
+        server_games   = [game for game in database_games if game.server_id == ctx.guild.id]
+        max_lines      = int(self.bot.settings.get("game", "list_max_lines"))
+        total_pages    = ceil(len(server_games) / max_lines)
+
+        # Clamping the current page
+        page = min(max(1, page), total_pages)
+
+        # Filling the embed content
+        lines = []
+        for index in range(max_lines * (page - 1), max_lines * page):
+            try:
+                lines.append(f"• {server_games[index].display_name}")
+            except IndexError:
+                break
+
+        embed = discord.Embed()
+        embed.description = '\n'.join(lines)
+        embed.title       = "Game list"
+        embed.color       = discord.Color.green()
+        embed.set_footer(text = f"Page {page} out of {total_pages}")
+
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(GameExt(bot))

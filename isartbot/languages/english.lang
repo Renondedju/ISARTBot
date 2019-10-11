@@ -61,6 +61,8 @@ game_delete_help=Deletes a game
 game_delete_description=[TODO]
 game_rename_help=Renames a game
 game_rename_description=[TODO]
+game_list_help=Lists all the available games
+game_list_description=[TODO]
 
 # Diffusion extension
 

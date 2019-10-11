@@ -31,8 +31,9 @@ class Server(TableBase):
 
     __tablename__ = 'servers'
 
-    id                   = Column('id'          , Integer, primary_key = True, unique = True)
-    lang                 = Column('lang'        , Text   , default     = "en")
-    discord_id           = Column('discord_id'  , Integer, unique      = True)
-    starboard_channel_id = Column('starboard_id', Integer, default     = 0)
+    id                   = Column('id'              , Integer, primary_key = True, unique = True)
+    lang                 = Column('lang'            , Text   , default     = "en")
+    discord_id           = Column('discord_id'      , Integer, unique      = True)
+    starboard_channel_id = Column('starboard_id'    , Integer, default     = 0)
+    verified_role_id     = Column('verified_role_id', Integer, default     = 0)
     games                = relationship('Game', cascade='all,delete')
