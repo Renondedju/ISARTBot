@@ -141,15 +141,15 @@ class Bot(commands.Bot):
 
         return self.langs[ctx.guild.description].get_key(key)
 
-    def register_guild(self, ctx):
+    def register_guild(self, guild: discord.Guild):
         """ Registers the guild into the database, this method is automatically called the first time a command is trigerred in a new guild """
 
-        new_server_preferences = Server(discord_id=ctx.guild.id)
+        new_server_preferences = Server(discord_id=guild.id)
 
         self.database.session.add(new_server_preferences)
         self.database.session.commit()
 
-        self.logger.warning(f"Registered new discord server to database : '{ctx.guild.name}' id = {ctx.guild.id}")
+        self.logger.warning(f"Registered new discord server to database : '{guild.name}' id = {guild.id}")
 
         return new_server_preferences
 
@@ -162,7 +162,7 @@ class Bot(commands.Bot):
 
         # Checking if the guild is already registered in the database
         if (lang == None):
-            lang = (self.register_guild(ctx)).lang
+            lang = (self.register_guild(ctx.guild)).lang
         else:
             lang = lang[0]
 
@@ -179,6 +179,32 @@ class Bot(commands.Bot):
         """
 
         self.logger.info(f"Logged in as {self.user.name}#{self.user.discriminator} - {self.user.id}")
+
+    async def on_connect(self):
+        """Executed when the bot connects to discord"""
+        self.logger.info("Discord connection established")
+
+    async def on_disconnect(self):
+        """Executed when the bot connects to discord"""
+        self.logger.info("Discord connection terminated")
+
+    async def on_guild_join(self, guild: discord.Guild):
+        """Called when a Guild is either created by the Client or when the Client joins a guild"""
+        self.logger.warning(f"Joined guild : {guild.name}")
+        self.register_guild(guild)
+
+    async def on_guild_remove(self, guild: discord.Guild):
+        """Called when a Guild is removed from the Client"""
+        self.logger.warning(f"Left guild : {guild.name}")
+
+        # Server should always be valid
+        server = self.database.session.query(Server).filter(Server.discord_id == guild.id).first()
+
+        if (server != None):
+            self.database.session.delete(server)
+            self.database.session.commit()
+        else:
+            self.logger.warning(f"No database entry found for the guild named {guild.name} (id = {guild.id})")
 
     async def on_command_error(self, ctx, error):
         """ Handles command errors """

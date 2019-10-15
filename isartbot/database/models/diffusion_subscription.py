@@ -35,5 +35,6 @@ class DiffusionSubscription(TableBase):
     discord_server_id  = Column('server_id'  , Integer, nullable=False)
     discord_channel_id = Column('channel_id' , Integer, nullable=False)
     tag                = Column('discord_tag', Text   , default = "")
+
     diffusion_id       = Column(Integer, ForeignKey('diffusions.id'))
-    diffusion          = relationship('Diffusion', backref = backref('subscriptions', cascade='all,delete'))
+    diffusion          = relationship('Diffusion', backref=backref('subscriptions', cascade='all,delete,delete-orphan'))

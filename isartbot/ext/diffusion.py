@@ -105,7 +105,7 @@ class DiffusionExt(commands.Cog):
             return await self.diffusion_already_exists_error(ctx, diffusion_name)
 
         # Otherwise, creating a new diffusion
-        new_diffusion = Diffusion(name = diffusion_name)
+        new_diffusion = Diffusion(name = diffusion_name, server_id = ctx.guild.id)
 
         self.bot.database.session.add(new_diffusion)
         self.bot.database.session.commit()

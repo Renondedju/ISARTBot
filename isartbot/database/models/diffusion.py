@@ -22,15 +22,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-from sqlalchemy     import Column, Integer, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
 from isartbot.database import TableBase
 
 class Diffusion(TableBase):
+    
     __tablename__ = 'diffusions'
 
     id            = Column('id'   , Integer, primary_key=True , unique=True)
     name          = Column('name' , Text   , nullable   =False, unique=True)
-    operators     = relationship('DiffusionOperator'    , cascade='all,delete')
-    subscriptions = relationship('DiffusionSubscription', cascade='all,delete')
+    operators     = relationship('DiffusionOperator'    , cascade='all,delete,delete-orphan')
+    subscriptions = relationship('DiffusionSubscription', cascade='all,delete,delete-orphan')
+
+    server_id     = Column(Integer, ForeignKey('servers.id'))
+    server        = relationship('Server', backref=backref('diffusions', cascade='all,delete,delete-orphan'))

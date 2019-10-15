@@ -35,5 +35,6 @@ class Game(TableBase):
     discord_role_id = Column('discord_role_id', Integer, nullable    = False)
     display_name    = Column('display_name'   , Text   , nullable    = False)
     discord_name    = Column('discord_name'   , Text   , nullable    = False)
-    server_id       = Column(Integer, ForeignKey('servers.id'))
-    server          = relationship('Server', backref = backref('games', cascade='all,delete'))
+
+    server_id = Column(Integer, ForeignKey('servers.id'))
+    server    = relationship('Server', backref=backref('games', cascade='all,delete,delete-orphan'))

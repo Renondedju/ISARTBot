@@ -36,4 +36,6 @@ class Server(TableBase):
     discord_id           = Column('discord_id'      , Integer, unique      = True)
     starboard_channel_id = Column('starboard_id'    , Integer, default     = 0)
     verified_role_id     = Column('verified_role_id', Integer, default     = 0)
-    games                = relationship('Game', cascade='all,delete')
+    
+    games                = relationship('Game'     , cascade='all,delete,delete-orphan')
+    diffusions           = relationship('Diffusion', cascade='all,delete,delete-orphan')
