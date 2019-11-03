@@ -85,7 +85,9 @@ class Bot(commands.Bot):
 
         self.before_invoke(self.fetch_guild_language)
 
-        self.run(self.settings.get('common', 'token'))
+        token = configparser.ConfigParser()
+        token.read(abspath('./token.ini'), encoding='utf-8')
+        self.run(token.get('DEFAULT', 'token'))
 
     async def load_extensions(self):
         """ Loads all the cogs of the bot defined into the settings.ini file """

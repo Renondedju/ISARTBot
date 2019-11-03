@@ -23,8 +23,7 @@ wheels/
 *.egg
 MANIFEST
 
-settings.json
-settings.ini
+token.ini
 database.db
 
 # PyInstaller
