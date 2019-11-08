@@ -41,14 +41,9 @@ class ClassExt (commands.Cog):
         self.bot = bot
 
     def get_class(self, ctx, class_name: upper_clean):
-        """ Checks if a class exists or not """
+        """Returns the class role if existing"""
 
-        prefix = ctx.bot.settings.get("class", "delegate_role_prefix")
-
-        role          = discord.utils.get(ctx.guild.roles, name=class_name)
-        delegate_role = discord.utils.get(ctx.guild.roles, name=f'{prefix} {class_name}')
-
-        return role, delegate_role
+        return discord.utils.get(ctx.guild.roles, name=class_name)
 
     @commands.group(pass_context=True, help="class_help", description="class_description", name="class")
     @commands.check(is_moderator)
@@ -74,24 +69,17 @@ class ClassExt (commands.Cog):
             await Helper.send_error(ctx, ctx.channel, "class_create_name_error", (user_check.mention,))
             return
 
-        role, delegate = self.get_class(ctx, name)
+        role = self.get_class(ctx, name)
 
-        if (role is not None or delegate is not None):
+        if (role is not None):
             await Helper.send_error(ctx, ctx.channel, "class_create_error", (role.mention,))
             return
 
-        role_color     = ctx.bot.settings.get("class", "role_color")
-        delegate_color = ctx.bot.settings.get("class", "delegate_role_color")
-        prefix         = ctx.bot.settings.get("class", "delegate_role_prefix")
+        role_color = ctx.bot.settings.get("class", "role_color")
 
         role = await ctx.guild.create_role(
             name        = name,
             color       = discord.Color(int(role_color, 16)),
-            mentionable = True)
-
-        delegate = await ctx.guild.create_role(
-            name        = f'{prefix} {name}',
-            color       = discord.Color(int(delegate_color, 16)),
             mentionable = True)
 
         await Helper.send_success(ctx, ctx.channel, "class_create_success", (role.mention,))
@@ -106,17 +94,12 @@ class ClassExt (commands.Cog):
             await Helper.send_error(ctx, ctx.channel, "class_invalid_argument")
             return
 
-        _, delegate = self.get_class(ctx, name.name)
-
         await Helper.ask_confirmation(ctx, ctx.channel, "class_delete_confirmation_title", 
             initial_content="class_delete_confirmation_description", initial_format=(name.mention,),
             success_content="class_delete_success"                 , success_format=(name.mention,),
             failure_content="class_delete_aborted")
 
         await name.delete()
-
-        if (delegate is not None):
-            await delegate.delete()
 
         return
 
@@ -137,19 +120,15 @@ class ClassExt (commands.Cog):
             await Helper.send_error(ctx, ctx.channel, "class_rename_error")
             return
 
-        _, old_delegate        = self.get_class(ctx, old_name.name)
-        new_role, new_delegate = self.get_class(ctx, new_name)
+        new_role = self.get_class(ctx, new_name)
 
-        if (new_role     is not None) or (new_delegate is not None) or (old_delegate is None):
+        if (new_role is not None):
             await Helper.send_error(ctx, ctx.channel, "class_rename_error")
             return
 
-        prefix = ctx.bot.settings.get("class", "delegate_role_prefix")
-        name   = old_name.name
+        name = old_name.name
 
-        await old_name    .edit(name=new_name)
-        await old_delegate.edit(name=f'{prefix} {new_name}')
-
+        await old_name.edit(name=new_name)
         await Helper.send_success(ctx, ctx.channel, "class_rename_success", (name, old_name.mention,))
 
 def setup(bot):
