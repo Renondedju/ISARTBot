@@ -148,7 +148,13 @@ class GameExt (commands.Cog):
             color       = await commands.ColourConverter().convert(ctx, role_color),
             mentionable = True)
 
-        new_game = Game(discord_role_id = game.id, display_name = name, discord_name = discord_name.lower(), server_id = ctx.guild.id)
+        server = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
+
+        new_game = Game(
+            discord_role_id = game.id,
+            display_name    = name,
+            discord_name    = discord_name.lower(),
+            server          = server)
 
         self.bot.database.session.add(new_game)
         self.bot.database.session.commit()

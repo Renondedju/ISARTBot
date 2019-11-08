@@ -184,19 +184,23 @@ class Bot(commands.Bot):
 
     async def on_connect(self):
         """Executed when the bot connects to discord"""
+
         self.logger.info("Discord connection established")
 
     async def on_disconnect(self):
         """Executed when the bot connects to discord"""
+
         self.logger.info("Discord connection terminated")
 
     async def on_guild_join(self, guild: discord.Guild):
         """Called when a Guild is either created by the Client or when the Client joins a guild"""
+
         self.logger.warning(f"Joined guild : {guild.name}")
         self.register_guild(guild)
 
     async def on_guild_remove(self, guild: discord.Guild):
         """Called when a Guild is removed from the Client"""
+        
         self.logger.warning(f"Left guild : {guild.name}")
 
         # Server should always be valid

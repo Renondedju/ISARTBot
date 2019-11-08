@@ -35,6 +35,3 @@ class Diffusion(TableBase):
     name          = Column('name' , Text   , nullable   =False, unique=True)
     operators     = relationship('DiffusionOperator'    , cascade='all,delete,delete-orphan')
     subscriptions = relationship('DiffusionSubscription', cascade='all,delete,delete-orphan')
-
-    server_id     = Column(Integer, ForeignKey('servers.id'))
-    server        = relationship('Server', backref=backref('diffusions', cascade='all,delete,delete-orphan'))

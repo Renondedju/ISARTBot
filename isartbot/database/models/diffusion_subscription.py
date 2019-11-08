@@ -32,9 +32,11 @@ class DiffusionSubscription(TableBase):
     __tablename__ = 'diffusion_subscriptions'
 
     id                 = Column('id'         , Integer, primary_key=True, unique=True)
-    discord_server_id  = Column('server_id'  , Integer, nullable=False)
-    discord_channel_id = Column('channel_id' , Integer, nullable=False)
     tag                = Column('discord_tag', Text   , default = "")
+    discord_channel_id = Column('channel_id' , Integer, nullable=False)
 
     diffusion_id       = Column(Integer, ForeignKey('diffusions.id'))
-    diffusion          = relationship('Diffusion', backref=backref('subscriptions', cascade='all,delete,delete-orphan'))
+    server_id          = Column(Integer, ForeignKey('servers.id'   ))
+
+    diffusion          = relationship('Diffusion', backref=backref('subscriptions' , cascade='all,delete,delete-orphan'))
+    server             = relationship('Server'   , backref=backref('diffusion_subs', cascade='all,delete,delete-orphan'))

@@ -28,7 +28,7 @@ from discord.ext import commands
 
 from isartbot.helper     import Helper
 from isartbot.checks     import is_super_admin, is_moderator
-from isartbot.database   import Diffusion, DiffusionOperator, DiffusionSubscription
+from isartbot.database   import Diffusion, DiffusionOperator, DiffusionSubscription, Server
 from isartbot.converters import DiffusionConverter
 
 class DiffusionExt(commands.Cog):
@@ -41,22 +41,6 @@ class DiffusionExt(commands.Cog):
         self.bot = bot
 
     # Events
-
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-
-        # Removing any left over subscriptions
-        subs = self.bot.database.session.query(DiffusionSubscription).\
-            filter(DiffusionSubscription.discord_server_id == guild.id).\
-            all()
-
-        if (len(subs) > 0):
-            self.bot.logger.warning(f"Clearing diffusion subscription from deleted guild: {subs}")
-
-            for sub in subs:
-                self.bot.database.session.delete(sub)
-
-            self.bot.database.session.commit()
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
@@ -105,7 +89,7 @@ class DiffusionExt(commands.Cog):
             return await self.diffusion_already_exists_error(ctx, diffusion_name)
 
         # Otherwise, creating a new diffusion
-        new_diffusion = Diffusion(name = diffusion_name, server_id = ctx.guild.id)
+        new_diffusion = Diffusion(name = diffusion_name)
 
         self.bot.database.session.add(new_diffusion)
         self.bot.database.session.commit()
@@ -126,6 +110,7 @@ class DiffusionExt(commands.Cog):
             initial_content = "diffusion_delete_content", initial_format = (diffusion.name,),
             success_content = "diffusion_deleted"       , success_format = (diffusion.name,),
             failure_content = "diffusion_delete_aborted")
+
         if (not result):
             return
 
@@ -148,6 +133,7 @@ class DiffusionExt(commands.Cog):
     @operator.command(help="diffusion_operator_add_help", description="diffusion_operator_add_description")
     async def add(self, ctx, diffusion: DiffusionConverter, new_operator: discord.Member):
         """ Adds a new diffusion operator to the selected diffusion """
+
         # Checking if the diffusion exists
         if (diffusion == None):
             return await self.diffusion_does_not_exists_error(ctx)
@@ -270,7 +256,8 @@ class DiffusionExt(commands.Cog):
         await confirmation_message.edit(embed=embed)
         self.bot.logger.warning(f"Diffusion of {diffusion.name} is done. {error_count} error(s) occurred.")
 
-    @subscription.command(aliases = ["sub", "add", "create"], help="diffusion_subscription_subscribe_help", 
+    @subscription.command(aliases = ["sub", "add", "create"], 
+        help       ="diffusion_subscription_subscribe_help", 
         description="diffusion_subscription_subscribe_description")
     async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: discord.Role = None):
         """ Subscribes to a diffusion """
@@ -301,8 +288,11 @@ class DiffusionExt(commands.Cog):
             else:
                 mention = diffusion_tag.mention
 
+        # Fetching server²
+        server = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
+
         new_subscription = DiffusionSubscription(
-                discord_server_id  = ctx.guild.id,
+                server             = server,
                 discord_channel_id = channel.id,
                 tag                = mention,
                 diffusion          = diffusion
@@ -313,7 +303,8 @@ class DiffusionExt(commands.Cog):
 
         await Helper.send_success(ctx, ctx.channel, "diffusion_subscribe_success")
 
-    @subscription.command(aliases = ["unsub", "remove", "delete"], help="diffusion_subscription_unsubscribe_help",
+    @subscription.command(aliases = ["unsub", "remove", "delete"], 
+        help       ="diffusion_subscription_unsubscribe_help",
         description="diffusion_subscription_unsubscribe_description")
     async def unsubscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel):
         """ Unsubscribes off a diffusion """
@@ -335,7 +326,9 @@ class DiffusionExt(commands.Cog):
 
         await Helper.send_success(ctx, ctx.channel, "diffusion_unsubscribe_success")
 
-    @subscription.command(name = "list", help="diffusion_subscription_list_help", description="diffusion_subscription_list_description")
+    @subscription.command(name = "list",
+        help       ="diffusion_subscription_list_help",
+        description="diffusion_subscription_list_description")
     async def subscription_list(self, ctx, channel: discord.TextChannel = None):
         """ Lists all the subscriptions in a channel or server """
         
@@ -360,26 +353,32 @@ class DiffusionExt(commands.Cog):
 
     async def diffusion_does_not_exists_error(self, ctx):
         """ Diffusion does not exists error """
+
         await Helper.send_error(ctx, ctx.channel, "diffusion_doesnt_exists", format_content = (ctx.prefix,))
 
     async def diffusion_already_exists_error(self, ctx, diffusion_name: str):
         """ Diffusion already exists error """
+
         await Helper.send_error(ctx, ctx.channel, "diffusion_already_exists", format_content = (diffusion_name,))
 
     async def member_is_already_operator(self, ctx, operator: discord.Member, diffusion_name: str):
         """ Member is already an operator error """
+
         await Helper.send_error(ctx, ctx.channel, "diffusion_already_operator", format_content = (operator.mention, diffusion_name))
 
     async def member_not_operator(self, ctx, member: discord.Member, diffusion_name: str):
         """ Member isn't an operator error """
+
         await Helper.send_error(ctx, ctx.channel, "diffusion_not_operator", format_content = (member.mention, diffusion_name))
 
     async def subscription_already_exists(self, ctx):
         """ Subscription already exists error """
+
         await Helper.send_error(ctx, ctx.channel, "diffusion_subscription_already_exists", format_content = (ctx.prefix,))
 
     async def no_such_subscription_error(self, ctx):
         """ No such subscription error """
+
         await Helper.send_error(ctx, ctx.channel, "diffusion_no_such_subscription", format_content = (ctx.prefix,))
 
 
