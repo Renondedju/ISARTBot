@@ -29,7 +29,7 @@ import discord
 class Helper():
 
     @staticmethod
-    async def send_success(ctx, channel: discord.TextChannel, content: str, format_content: tuple = ()):
+    async def send_success(ctx, channel: discord.TextChannel, content: str, format_content: tuple = (), **kwargs):
         """ Sends a success message to the targetted discord text channel """
 
         translations = await ctx.bot.get_translations(ctx, ["success_title", content])
@@ -38,10 +38,11 @@ class Helper():
             description = translations[content].format(*format_content),
             color       = discord.Color.green()
         )
-        await channel.send(embed=embed)
+        
+        return await channel.send(embed=embed, **kwargs)
 
     @staticmethod
-    async def send_error(ctx, channel: discord.TextChannel, content: str, format_content: tuple = ()):
+    async def send_error(ctx, channel: discord.TextChannel, content: str, format_content: tuple = (), **kwargs):
         """ Sends an error message to the targetted discord text channel """
         
         translations = await ctx.bot.get_translations(ctx, ["failure_title", content])
@@ -51,7 +52,7 @@ class Helper():
             color       = discord.Color.red()
         )
 
-        await channel.send(embed=embed)
+        return await channel.send(embed=embed, **kwargs)
 
     @staticmethod
     async def ask_confirmation(ctx, channel: discord.TextChannel,

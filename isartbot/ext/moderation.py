@@ -30,7 +30,6 @@ import io
 from typing              import Union
 from itertools           import groupby
 from discord.ext         import commands
-from discord.abc         import Messageable
 from isartbot.helper     import Helper
 from isartbot.checks     import is_moderator
 from isartbot.converters import MemberConverter
@@ -39,15 +38,13 @@ class ModerationExt(commands.Cog):
     """Helps with moderation"""
 
     def __init__(self, bot):
-
-        #Private
         self.bot = bot
 
     async def error_embed(self, ctx, description: str, *args):
         """Create an error embed"""
 
         return discord.Embed(
-            title       = await ctx.bot.get_translation(ctx, "failure_title"),
+            title       =  await ctx.bot.get_translation(ctx, "failure_title"),
             description = (await ctx.bot.get_translation(ctx, description)).format(*args),
             color       = discord.Color.red())
 
@@ -55,7 +52,7 @@ class ModerationExt(commands.Cog):
         """Create a success embed"""
 
         return discord.Embed(
-            title       = await ctx.bot.get_translation(ctx, 'success_title'),
+            title       =  await ctx.bot.get_translation(ctx, 'success_title'),
             description = (await ctx.bot.get_translation(ctx, description)).format(*args),
             color       = discord.Color.green())
 
@@ -64,69 +61,62 @@ class ModerationExt(commands.Cog):
     async def mod(self, ctx):
         pass
 
-    #Prune command
     @mod.command(help="mod_prune_help", description="mod_prune_description")
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
     @commands.has_permissions    (manage_messages=True, read_message_history=True)
     async def prune(self, ctx, number: int, member: discord.Member = None):
         """Deletes a certain amount of the latest messages in this text channel"""
 
-        embed = discord.Embed()
         messages = []
         if (member is None):
-            embed = await self.success_embed(ctx, 'success_prune_message', number)
             messages = await ctx.channel.history(limit=number + 1).flatten()
+
         else:
             async for message in ctx.channel.history(limit=number + 1):
                 if (message.author == member):
                      messages.append(message)
             messages.append(ctx.message)
-            embed = await self.success_embed(ctx, 'success_prune_member', number, member.mention)
 
         await ctx.channel.delete_messages(set(messages))
-            
-        await ctx.send(embed=embed, delete_after=5.0)
+        await Helper.send_success(ctx, ctx.channel, "success_prune", format_content=(len(messages),), delete_after=5.0)
 
-    #Kick command
     @mod.command(help="mod_kick_help", description="mod_kick_description")
     @commands.bot_has_permissions(kick_members=True)
-    @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member, *, reason="Because"):
+    @commands.has_permissions    (kick_members=True)
+    async def kick(self, ctx, member: discord.Member, *, reason="No reason"):
         """Kicks a member"""
 
-        #await member.kick(reason=reason)
+        await member.kick(reason=reason)
 
         file = discord.File("isartbot/media/kick.gif", filename="kick.gif")
         embed = await self.success_embed(ctx, 'success_kick', member.mention, ctx.author.mention, reason)
         embed.set_image(url="attachment://kick.gif")
 
-        self.bot.logger.warning((await ctx.bot.get_translation(ctx, 'success_kick')).format(member.name, ctx.author.name, reason))
-
+        self.bot.logger.warning(f"{member.name} has been kicked by {ctx.author.name} for '{reason}'")
         await ctx.send(file=file, embed=embed)
 
-    #Ban command
-    @mod.command(aliases=["banhammer", "derive_autoritaire"], help="mod_ban_help", description="mod_ban_description")
+    @mod.command(aliases=["banhammer", "derive_autoritaire", "begone"], help="mod_ban_help", description="mod_ban_description")
     @commands.bot_has_permissions(ban_members=True)
-    @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member, *, reason="Nothing special"):
+    @commands.has_permissions    (ban_members=True)
+    async def ban(self, ctx, member: discord.Member, *, reason="No reason"):
         """Bans a member"""
 
         await member.ban(reason=reason, delete_message_days=0)
 
-        fileHammer = discord.File("isartbot/media/banhammer.gif", filename="banhammer.gif")
-        fileSalty = discord.File("isartbot/media/saltyban.gif", filename="saltyban.gif")
+        file_hammer = discord.File("isartbot/media/banhammer.gif", filename="banhammer.gif")
+        file_salty  = discord.File("isartbot/media/saltyban.gif" , filename="saltyban.gif" )
         
         embed = await self.success_embed(ctx, 'success_ban', member.mention, ctx.author.mention, reason)
         embed.set_image(url="attachment://banhammer.gif")
 
         if (ctx.invoked_with == 'derive_autoritaire'):
             embed.set_image(url="attachment://saltyban.gif")
-            await ctx.send(file=fileSalty, embed=embed)
+            await ctx.send(file=file_salty, embed=embed)
         else:
             embed.set_image(url="attachment://banhammer.gif")
-            await ctx.send(file=fileHammer, embed=embed)
+            await ctx.send(file=file_hammer, embed=embed)
 
-        self.bot.logger.warning((await ctx.bot.get_translation(ctx, 'success_ban')).format(member.name, ctx.author.name, reason))
+        self.bot.logger.warning(f"{member.name} has been banned by {ctx.author.name} for '{reason}'")
 
     @mod.command(help="mod_as_help", description="mod_as_description", name = "as")
     @commands.check(is_moderator)
