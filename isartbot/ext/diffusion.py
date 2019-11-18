@@ -356,7 +356,7 @@ class DiffusionExt(commands.Cog):
     async def diffusion_does_not_exists_error(self, ctx):
         """ Diffusion does not exists error """
 
-        await Helper.send_error(ctx, ctx.channel, "diffusion_doesnt_exists", format_content = (ctx.prefix,))
+        await Helper.send_error(ctx, ctx.channel, "diffusion_doesnt_exist", format_content = (ctx.prefix,))
 
     async def diffusion_already_exists_error(self, ctx, diffusion_name: str):
         """ Diffusion already exists error """
