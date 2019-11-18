@@ -56,10 +56,11 @@ class ModerationExt(commands.Cog):
             description = (await ctx.bot.get_translation(ctx, description)).format(*args),
             color       = discord.Color.green())
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, invoke_without_command=True,
+        help="mod_help", description="mod_description")
     @commands.check(is_moderator)
     async def mod(self, ctx):
-        pass
+        await ctx.send_help(ctx.command)
 
     @mod.command(help="mod_prune_help", description="mod_prune_description")
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
