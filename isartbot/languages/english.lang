@@ -54,6 +54,7 @@ game_delete_confirmation_title=Delete game?
 game_delete_confirmation_description=Are you sure you want to delete the game {} ?
 game_delete_aborted=Aborted deletion.
 
+game_help=TODO
 game_description=[TODO]
 game_create_help=Creates a game
 game_create_description=[TODO]

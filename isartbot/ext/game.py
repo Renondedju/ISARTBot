@@ -125,7 +125,7 @@ class GameExt (commands.Cog):
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
     async def game(self, ctx):
-        pass
+        await ctx.send_help(ctx.command)
     
     @game.command(help="game_create_help", description="game_create_description")
     @commands.check(is_moderator)
