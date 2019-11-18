@@ -177,6 +177,17 @@ success_starboard_unset=The starboard has successfully been disabled for this se
 
 # Test extension
 
+test_help=TODO
+test_description=TODO
+test_error_help=TODO
+test_error_description=TODO
+test_delay_help=TODO
+test_delay_description=TODO
+test_denied_help=TODO
+test_denied_description=TODO
+test_groups_help=TODO
+test_groups_description=TODO
+
 denied_failure=Something went wrong !
 test_wait=The process has been paused 2 seconds for testing
 user_has_no_groups=has no special bot privileges

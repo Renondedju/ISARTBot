@@ -30,29 +30,29 @@ from isartbot.checks import super_admin, developper, is_developper, denied
 
 class TestExt(commands.Cog):
 
-    @commands.group(pass_context=True, invoke_without_command=True, hidden=True)
+    @commands.group(pass_context=True, invoke_without_command=True, hidden=True,
+        help="test_help", description="test_description")
     @commands.check(is_developper)
     async def test(self, ctx):
         """ Creates a command group"""
-
         if ctx.invoked_subcommand is None:
             await ctx.send(await ctx.bot.get_translation(ctx, 'test'))
 
-    @test.command()
+    @test.command(help="test_error_help", description="test_error_description")
     async def error(self, ctx):
         raise ValueError("Test of unhandled exception")
 
-    @test.command()
+    @test.command(help="test_delay_help", description="test_delay_description")
     async def delay(self, ctx):
         await asyncio.sleep(2)
         await ctx.send(await ctx.bot.get_translation(ctx, 'test_wait'))
 
-    @test.command()
+    @test.command(help="test_denied_help", description="test_denied_description")
     @commands.check(denied)
     async def denied(self, ctx):
         await ctx.send(await ctx.bot.get_translation(ctx, 'denied_failure'))
 
-    @test.command()
+    @test.command(help="test_groups_help", description="test_groups_description")
     async def groups(self, ctx, user: discord.Member = None):
 
         if user is None : user = ctx.author
