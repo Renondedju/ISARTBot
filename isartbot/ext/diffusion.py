@@ -37,7 +37,6 @@ class DiffusionExt(commands.Cog):
     __slots__ = ("bot")
 
     def __init__(self, bot):
-
         self.bot = bot
 
     # Events
@@ -60,22 +59,25 @@ class DiffusionExt(commands.Cog):
 
     # Groups
 
-    @commands.group(pass_context=True, help="diffusion_help", description="diffusion_description")
+    @commands.group(pass_context=True, invoke_without_command=True,
+        help="diffusion_help", description="diffusion_description")
     async def diffusion(self, ctx):
         """ Diffusion command group """
-        pass
+        await ctx.send_help(ctx.command)
 
-    @diffusion.group(aliases = ["op"], pass_context=True, help="diffusion_operator_help", description="diffusion_operator_description")
+    @diffusion.group(aliases = ["op"], pass_context=True, invoke_without_command=True,
+        help="diffusion_operator_help", description="diffusion_operator_description")
     @commands.check(is_super_admin)
     async def operator(self, ctx):
         """ Diffusion operator command group """
-        pass
+        await ctx.send_help(ctx.command)
 
-    @diffusion.group(aliases = ["sub"], pass_context=True, help="diffusion_subscription_help", description="diffusion_subscription_description")
+    @diffusion.group(aliases = ["sub"], pass_context=True, invoke_without_command=True,
+        help="diffusion_subscription_help", description="diffusion_subscription_description")
     @commands.check(is_moderator)
     async def subscription(self, ctx):
         """ Diffusion subscription command group """
-        pass
+        await ctx.send_help(ctx.command)
 
     # Commands
 
