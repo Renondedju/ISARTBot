@@ -47,13 +47,14 @@ class StarboardExt(commands.Cog):
 
     # Commands
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, invoke_without_command=True,
+        help="starboard_help", description="starboard_description")
     @commands.bot_has_permissions(send_messages=True)
     @commands.check(is_moderator)
     async def starboard(self, ctx):
-        pass
+        await ctx.send_help(ctx.command)
 
-    @starboard.command()
+    @starboard.command(help="starboard_set_help", description="starboard_set_description")
     async def set(self, ctx, channel: discord.TextChannel):
         """ Sets the current starboard channel, if none was set before, this command also enables the starboard """
 
@@ -80,7 +81,7 @@ class StarboardExt(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @starboard.command()
+    @starboard.command(help="starboard_disable_help", description="starboard_disable_description")
     async def disable(self, ctx):
         """ Disables the starboard for the current server, use "!starboard set <channel name>" to re enable it """
 

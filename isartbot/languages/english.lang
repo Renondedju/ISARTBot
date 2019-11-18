@@ -165,6 +165,13 @@ mod_for_error=Action should be 'add' or 'remove'!
 
 # Starboard extension
 
+starboard_help=TODO
+starboard_description=TODO
+starboard_set_help=TODO
+starboard_set_description=TODO
+starboard_disable_help=TODO
+starboard_disable_description=TODO
+
 success_starboard_set=The starboard has successfully been configured on the following text channel
 success_starboard_unset=The starboard has successfully been disabled for this server
 
