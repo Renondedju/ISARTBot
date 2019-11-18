@@ -112,6 +112,15 @@ diffusion_subscribe_description=TODO
 
 # Ext extension
 
+ext_help=TODO
+ext_description=TODO
+ext_load_help=TODO
+ext_load_description=TODO
+ext_unload_help=TODO
+ext_unload_description=TODO
+ext_reload_help=TODO
+ext_reload_description=TODO
+
 ext_load_failure_desc=Failed to load extension. Check logs for more information.
 ext_load_success_desc=Extension loaded !
 ext_unload_failure_desc=Failed to unload extension. Check logs for more information.

@@ -26,97 +26,74 @@ import asyncio
 import discord
 import logging
 
-from discord.ext import commands
 
-#TODO Add checks
+from discord.ext     import commands
+from isartbot.helper import Helper
+from isartbot.checks import is_super_admin, is_developper
+
 class ExtExt(commands.Cog):
 
-    @commands.group(pass_context=True, hidden=True, invoke_without_command=True)
-    #@commands.check(is_dev)
+    @commands.group(pass_context=True, hidden=True, invoke_without_command=True,
+        help="ext_help", description="ext_description")
+    @commands.check(is_super_admin)
     async def ext(self, ctx):
-        
-        if ctx.invoked_subcommand is None:
-            await ctx.send(await ctx.bot.get_translation(ctx, 'invalid_command_usage'))
+        await ctx.send_help(ctx.command)
 
     def get_ext_name(self, ext : str) -> str:
 
         ext = ext.replace('.py', '')
         return "isartbot.ext." + ext
 
-    @ext.command(name="load")
+    @ext.command(name="load", help="ext_load_help", description="ext_load_description")
     async def _load(self, ctx, *, ext : str):
         """Loads an extension"""
 
         ext = self.get_ext_name(ext)
         ctx.bot.logger.info(f"Loading extension named: {ext}")
         
-        embed = discord.Embed()
-
         try:
             ctx.bot.load_extension(ext)
 
         except Exception as e:
-            embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
-            embed.description = await ctx.bot.get_translation(ctx, 'ext_load_failure_desc')
-            embed.colour      = discord.Color.red()
-            await ctx.bot.on_error(ctx, e)
+            await Helper.send_error(ctx, ctx.channel, "ext_load_failure_desc")
+            await ctx.bot.on_error (ctx, e)
 
         else:
-            embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
-            embed.description = await ctx.bot.get_translation(ctx, 'ext_load_success_desc')
-            embed.colour      = discord.Color.green()
+            await Helper.send_success(ctx, ctx.channel, "ext_load_success_desc")
 
-        await ctx.send(embed=embed)
-
-    @ext.command(name="unload")
+    @ext.command(name="unload", help="ext_unload_help", description="ext_unload_description")
     async def _unload(self, ctx, *, ext : str):
         """Unloads an extension"""
 
         ext = self.get_ext_name(ext)
         ctx.bot.logger.info(f"Unloading extension named: {ext}")
         
-        embed = discord.Embed()
-
         try:
             ctx.bot.unload_extension(ext)
             
         except Exception as e:
-            embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
-            embed.description = await ctx.bot.get_translation(ctx, 'ext_unload_failure_desc')
-            embed.colour      = discord.Color.red()
+            await Helper.send_error(ctx, ctx.channel, "ext_unload_failure_desc")
             await ctx.bot.on_error(ctx, e)
 
         else:
-            embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
-            embed.description = await ctx.bot.get_translation(ctx, 'ext_unload_success_desc')
-            embed.colour      = discord.Color.green()
+            await Helper.send_success(ctx, ctx.channel, "ext_unload_success_desc")
 
-        await ctx.send(embed=embed)
-
-    @ext.command(name='reload')
+    @ext.command(name='reload', help="ext_reload_help", description="ext_reload_description")
     async def _reload(self, ctx, *, ext : str):
         """Reloads an extension"""
 
         ext = self.get_ext_name(ext)
         ctx.bot.logger.info(f"Reloading extension named: {ext}")
 
-        embed = discord.Embed()        
-
         try:
             ctx.bot.reload_extension(ext)
             
         except Exception as e:
-            embed.title       = await ctx.bot.get_translation(ctx, 'failure_title')
-            embed.description = await ctx.bot.get_translation(ctx, 'ext_reload_failure_desc')
-            embed.colour      = discord.Color.red()
+            await Helper.send_error(ctx, ctx.channel, "ext_reload_failure_desc")
             await ctx.bot.on_error(ctx, e)
 
         else:
-            embed.title       = await ctx.bot.get_translation(ctx, 'success_title')
-            embed.description = await ctx.bot.get_translation(ctx, 'ext_reload_success_desc')
-            embed.colour      = discord.Color.green()
-
-        await ctx.send(embed=embed)
+            await Helper.send_success(ctx, ctx.channel, "ext_reload_success_desc")
 
 def setup(bot):
     bot.add_cog(ExtExt())
