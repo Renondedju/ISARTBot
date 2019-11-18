@@ -63,6 +63,8 @@ game_rename_help=Renames a game
 game_rename_description=[TODO]
 game_list_help=Lists all the available games
 game_list_description=[TODO]
+game_list_title=Game list
+game_list_footer=Page {} out of {}
 
 # Diffusion extension
 
@@ -152,3 +154,25 @@ test_wait=The process has been paused 2 seconds for testing
 user_has_no_groups=has no special bot privileges
 user_has_groups=has the following bot privileges
 test=Everything seems to be working fine !
+
+# Iam extension
+
+iam_help=TODO
+iam_description=TODO
+iamn_help=TODO
+iamn_description=TODO
+sar_create_help=TODO
+sar_create_description=TODO
+sar_delete_help=TODO
+sar_delete_description=TODO
+sar_role_already_exists_error=TODO
+sar_invalid_role_error=TODO
+sar_role_created=TODO
+sar_role_deleted=TODO
+sar_non_existant_role=TODO
+sar_list_title=Self assignable roles list
+sar_list_footer=Page {} out of {}
+iam_success=You now have the role {} !
+iam_failure=Failed to add the role {}. I maybe don't have enough permissions !
+iamn_success=You don't have the {} role anymore
+iamn_failure=Failed to remove you the role {}. I maybe don't have enough permissions !

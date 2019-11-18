@@ -209,9 +209,9 @@ class GameExt (commands.Cog):
 
         embed = discord.Embed()
         embed.description = '\n'.join(lines)
-        embed.title       = "Game list"
+        embed.title       = await ctx.bot.get_translation(ctx, 'game_list_title')
         embed.color       = discord.Color.green()
-        embed.set_footer(text = f"Page {page} out of {total_pages}")
+        embed.set_footer(text = await ctx.bot.get_translation(ctx, 'game_list_footer').format(page, total_pages))
 
         await ctx.send(embed=embed)
 

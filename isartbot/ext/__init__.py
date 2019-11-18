@@ -28,3 +28,4 @@ from .lang      import *
 from .starboard import *
 from .diffusion import *
 from .game      import *
+from .iam       import *

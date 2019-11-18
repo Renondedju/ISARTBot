@@ -22,21 +22,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-from sqlalchemy     import Column, Integer, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy     import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
 from isartbot.database import TableBase
 
-class Server(TableBase):
+class SelfAssignableRole(TableBase):
 
-    __tablename__ = 'servers'
+    __tablename__ = 'self_assignable_roles'
 
-    id                   = Column('id'              , Integer, primary_key = True, unique = True)
-    lang                 = Column('lang'            , Text   , default     = "en")
-    discord_id           = Column('discord_id'      , Integer, unique      = True)
-    starboard_channel_id = Column('starboard_id'    , Integer, default     = 0)
-    verified_role_id     = Column('verified_role_id', Integer, default     = 0)
-    
-    games                 = relationship('Game'                 , cascade='all,delete,delete-orphan')
-    diffusion_subs        = relationship('DiffusionSubscription', cascade='all,delete,delete-orphan')
-    self_assignable_roles = relationship('SelfAssignableRole'   , cascade='all,delete,delete-orphan')
+    id         = Column('id'        , Integer, primary_key = True, unique = True)
+    discord_id = Column('discord_id', Integer, nullable    = False)
+
+    server_id = Column(Integer, ForeignKey('servers.id'))
+    server    = relationship('Server', backref=backref('self_assignable_roles', cascade='all,delete,delete-orphan'))    

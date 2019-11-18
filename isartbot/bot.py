@@ -30,15 +30,14 @@ import traceback
 import configparser
 import logging.config
 
-from isartbot.exceptions import UnauthorizedCommand
-from isartbot.help       import HelpCommand
-from isartbot.lang       import Lang
-from isartbot.database   import Server
-from isartbot.checks     import log_command, trigger_typing, block_dms
-from isartbot.database   import Database
+from isartbot.lang         import Lang
+from isartbot.checks       import log_command, trigger_typing, block_dms
+from isartbot.database     import Server, Database
+from isartbot.exceptions   import UnauthorizedCommand
+from isartbot.help_command import HelpCommand
 
-from discord.ext import commands
 from os.path     import abspath
+from discord.ext import commands
 
 
 class Bot(commands.Bot):

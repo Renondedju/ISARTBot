@@ -22,10 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-__slots__ = ("Server", "DiffusionOperator", "Diffusion", "DiffusionSubscription", "Game")
+__slots__ = ("Server", "DiffusionOperator", "Diffusion", "DiffusionSubscription", "SelfAssignableRole", "Game")
 
 from .game                   import Game
 from .server                 import Server
 from .diffusion              import Diffusion
 from .diffusion_operator     import DiffusionOperator
+from .self_assignable_role   import SelfAssignableRole
 from .diffusion_subscription import DiffusionSubscription
