@@ -37,7 +37,6 @@ from isartbot.helper      import Helper
 class ClassExt (commands.Cog):
 
     def __init__(self, bot):
-
         self.bot = bot
 
     def get_class(self, ctx, class_name: upper_clean):
@@ -45,12 +44,13 @@ class ClassExt (commands.Cog):
 
         return discord.utils.get(ctx.guild.roles, name=class_name)
 
-    @commands.group(pass_context=True, help="class_help", description="class_description", name="class")
+    @commands.group(pass_context=True, invoke_without_command=True, 
+        help="class_help", description="class_description", name="class")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
     async def _class(self, ctx):
         """Class modification command"""
-        pass
+        await ctx.send_help(ctx.command)
 
     @_class.command(help="class_create_help", description="class_create_description")
     @commands.check(is_moderator)
