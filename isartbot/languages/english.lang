@@ -174,11 +174,12 @@ sar_create_help=TODO
 sar_create_description=TODO
 sar_delete_help=TODO
 sar_delete_description=TODO
-sar_role_already_exists_error=TODO
-sar_invalid_role_error=TODO
-sar_role_created=TODO
-sar_role_deleted=TODO
-sar_non_existant_role=TODO
+
+sar_role_already_exists_error={} is already a self assignable role
+sar_invalid_role_error={} is not a valid role
+sar_role_created={} is now a self assignable role
+sar_role_deleted={} is no longer a self assignable role 
+sar_non_existant_role={} isn't a self assignable role
 sar_list_title=Self assignable roles list
 sar_list_footer=Page {} out of {}
 iam_success=You now have the role {} !

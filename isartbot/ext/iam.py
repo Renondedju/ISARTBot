@@ -38,6 +38,20 @@ class IamExt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role):
+        """ Database role maintainance """
+
+        server        = self.bot.database.session.query(Server).filter(Server.discord_id == role.guild.id).first()
+        database_role = self.bot.database.session.query(SelfAssignableRole).\
+            filter(SelfAssignableRole.discord_id == role.id, SelfAssignableRole.server == server).first()
+        
+        if (database_role == None):
+            return
+
+        self.bot.database.session.delete(database_role)
+        self.bot.database.session.commit()
+
     @commands.command(pass_context=True, help="iam_help", description="iam_description")
     @commands.bot_has_permissions(send_messages=True, manage_roles=True)
     async def iam(self, ctx, role: discord.Role):
@@ -77,10 +91,10 @@ class IamExt(commands.Cog):
         except:
             await Helper.send_error(ctx, ctx.channel, 'iamn_failure', format_content=(role.mention,))
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, invoke_without_command=True)
     async def sar(self, ctx):
         """ Sar command group (sar stands for Self Assignable Role) """
-        pass
+        await ctx.send_help(ctx.command)
 
     @sar.command(aliases=["add"], help="sar_create_help", description="sar_create_description")
     @commands.check(is_admin)
@@ -89,7 +103,7 @@ class IamExt(commands.Cog):
 
         # Looking for invalid roles
         if (role == ctx.guild.default_role):
-            await Helper.send_error(ctx, ctx.channel, 'sar_invalid_role_error')
+            await Helper.send_error(ctx, ctx.channel, 'sar_invalid_role_error', format_content=(role.mention,))
             return
 
         # Looking for duplicates
@@ -98,7 +112,7 @@ class IamExt(commands.Cog):
             filter(SelfAssignableRole.discord_id == role.id, SelfAssignableRole.server == server).first()
 
         if (database_role != None):
-            await Helper.send_error(ctx, ctx.channel, 'sar_role_already_exists_error')
+            await Helper.send_error(ctx, ctx.channel, 'sar_role_already_exists_error', format_content=(role.mention,))
             return
 
         # Creating the new role
