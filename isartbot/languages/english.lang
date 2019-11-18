@@ -120,6 +120,16 @@ ext_reload_success_desc=Extension reloaded !
 
 # Lang extension
 
+lang_help=TODO
+lang_description=TODO
+lang_reload_help=TODO
+lang_reload_description=TODO
+lang_list_help=TODO
+lang_list_description=TODO
+lang_set_help=TODO
+lang_set_description=TODO
+lang_key_help=TODO
+lang_key_description=TODO
 lang_reload_success=Reloaded every languages !
 lang_list_title=Available languages
 lang_list_footer=Use !lang set <language> to change the current language

@@ -22,6 +22,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-__slots__ = ("UnauthorizedCommand")
-
 from isartbot.exceptions.unauthorized_command import UnauthorizedCommand

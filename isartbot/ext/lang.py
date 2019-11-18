@@ -32,13 +32,12 @@ from isartbot.checks   import is_moderator, is_super_admin, is_developper
 
 class LangExt(commands.Cog):
 
-    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.group(pass_context=True, invoke_without_command=True,
+        help="lang_help", description="lang_description")
     async def lang(self, ctx):
+        await ctx.send_help(ctx.command)
 
-        if ctx.invoked_subcommand is None:
-            await ctx.send(await ctx.bot.get_translation(ctx, 'invalid_command_usage'))
-
-    @lang.command()
+    @lang.command(help="lang_reload_help", description="lang_reload_description")
     @commands.check(is_super_admin)
     async def reload(self, ctx):
         """ Reloads all the langs from the files """
@@ -53,7 +52,7 @@ class LangExt(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @lang.command()
+    @lang.command(help="lang_list_help", description="lang_list_description")
     async def list(self, ctx):
         """ Lists all the available languages for this server """
 
@@ -65,7 +64,7 @@ class LangExt(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @lang.command()
+    @lang.command(help="lang_set_help", description="lang_set_description")
     @commands.check(is_moderator)
     async def set(self, ctx, lang: str):
         """ Sets a language for the current server """
@@ -85,7 +84,7 @@ class LangExt(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @lang.command()
+    @lang.command(help="lang_key_help", description="lang_key_description")
     @commands.check(is_developper)
     async def key(self, ctx, lang: str, key: str):
         """ Returns the content of a language key """
