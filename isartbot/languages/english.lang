@@ -131,8 +131,8 @@ diffusion_subscribe_success=Successfully subscribed to this diffusion!
 diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
 
 # Unsubscribe
-diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
-diffusion_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>: Channel to unsubscribe from
+diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel
+diffusion_subscription_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>: Channel to unsubscribe from
 diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
 diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
 
@@ -262,7 +262,7 @@ user_has_groups=has the following bot privileges.
 test=Everything seems to be working fine!
 
 
-## Iam extension
+## SAR extension
 
 sar_help=Manages role attribution
 sar_description=Allows for easy attribution of roles, marking them as self-assignable.
@@ -281,17 +281,40 @@ sar_delete_description=Removes a self-assignable role, preventing users from ass
 sar_role_deleted={} is no longer a self assignable role.
 
 # List
+sar_list_help=Lists all the self-assignable roles
+sar_list_description=Shows the list of all the self-assignable roles.\n[page]: Page to be listed
 sar_list_title=Self assignable roles list
 sar_list_footer=Page {} out of {}
 
 # Iam
 iam_help=Assigns a role to yourself
-iam_description=Assigns a role to yourself.<role>: Name of the role you want assigned to you.
+iam_description=Assigns a role to yourself.<role>: Name of the role you want assigned to you
 iam_success=You now have the role {}!
 iam_failure=Failed to add the role {}. I may not have enough permissions.
 
 # Iamn
 iamn_help=Removes a role from yourself
-iamn_description=Removes a role from yourself.<role>: Name of the role you want unassigned from you.
+iamn_description=Removes a role from yourself.<role>: Name of the role you want unassigned from you
 iamn_success=You don't have the {} role anymore.
 iamn_failure=Failed to remove the role {}. I may not have enough permissions.
+
+
+## Test
+
+test_help=Helps testing the bot
+test_description=Provides commands to test the features and limits of the bot.
+
+test_commands_help_help=Runs help on every command
+test_commands_help_description=Runs the command "help" on every command.
+
+test_groups_help=Displays bot privileges of a user
+test_groups_description=Displays bot privileges of a user.\n[member]: Member to display the privileges of
+
+test_error_help=Raises an unexpected exception
+test_error_description=Raises an unexpected exception.
+
+test_delay_help=Waits for 2 seconds
+test_delay_description=Waits for 2 seconds.
+
+test_denied_help=Should never show
+test_denied_description=Should never execute.
