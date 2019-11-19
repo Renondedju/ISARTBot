@@ -37,11 +37,11 @@ class_rename_success=La classe @{0} a bien été renommée en {1} !
 class_invalid_argument=Argument invalide, merci d'indiquer une classe valide.
 class_description=Commandes de classe facilitant leur création, suppression et renommage.
 class_create_help=Crée une classe
-class_create_description=Crée une classe avec le nom donné.\nCrée également le rôle délégué associé.
+class_create_description=Crée une classe avec le nom donné.
 class_delete_help=Supprime une classe
-class_delete_description=Supprime une classe avec le nom donné.\n Supprime également le rôle délégué associé.\n Donner le nom ou le tag fonctionnera.
+class_delete_description=Supprime une classe avec le nom donné.\nDonner le nom ou le tag fonctionnera.
 class_rename_help=Renomme une classe
-class_rename_description=Renomme une classe avec le nom donné.\n Renomme également le rôle délégué associé.\n Donner le nom ou le tag fonctionnera.
+class_rename_description=Renomme une classe avec le nom donné.\nDonner le nom ou le tag fonctionnera.
 
 # Game extension
 

@@ -22,6 +22,9 @@ developper_status=developer
 admin_status=administrator
 denied_status=god
 
+command_not_found=This command does not exist.
+no_subcommand=This command has no subcommand.
+no_subcommand_named=This subcommand does not exist.
 
 ## Class extension
 
@@ -31,7 +34,7 @@ class_invalid_argument=Invalid argument, please mention a valid class.
 
 # Create
 class_create_help=Creates a class
-class_create_description=Creates a new class role.\n<name>: Name of the new class role.
+class_create_description=Creates a new class role.\n<name>: Name of the new class role
 class_create_success=Class {0} successfully created!
 class_create_error=Class {0} already exists.
 class_create_name_error=Invalid class name.
@@ -83,17 +86,15 @@ game_list_title=Games list
 game_list_footer=Page {} out of {}
 
 
-## Diffusion extension
+### Diffusion extension
 
 diffusion_help=Manages diffusion
 diffusion_description=Helps managing diffusion channels, subscriptions and operators
-
 diffusion_doesnt_exist=This diffusion doesn't exist.\nPlease use ``{}diffusion list`` to get a list of all the existing diffusions.
-diffusion_list_title=Available diffusions
 
 # Diffuse
 diffusion_diffuse_help=Diffuses a message
-diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion_name>: Name of the diffusion channel\n<message> : Id of the message to diffuse
+diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion>: Name of the diffusion channel\n<message> : Id of the message to diffuse
 diffusion_diffuse_confirmation_title=Diffusion
 diffusion_diffuse_confirmation=You are about to diffuse a message to {} subscriptions, are you sure?\nOnce this process started, there is no way to cancel it!
 diffusion_diffuse_confirmation_start=Diffuse your message to the "{}" channel.\n{} out of {} subscriptions have been notified so far.\nPlease wait, this process can take a while.
@@ -107,54 +108,69 @@ diffusion_created=The diffusion named "{}" has successfully been created.
 diffusion_already_exists=This diffusion already exists! Please choose a unique diffusion name.
 
 # Delete
-diffusion_delete_help=Deletes a diffusion channel.
-diffusion_delete_description=Deletes a diffusion channel, <diffusion_name> being the name of the diffusion channel to delete.
+diffusion_delete_help=Deletes a diffusion channel
+diffusion_delete_description=Deletes a diffusion channel.\n<diffusion>: Name of the diffusion channel to delete
 diffusion_delete_title=Delete a diffusion?
 diffusion_delete_aborted=Aborted deletion.
 diffusion_delete_content=Are you sure to want to delete the diffusion named "{}".\nThis will also delete all subscriptions to this diffusion.
 diffusion_deleted=The diffusion named "{}" has successfully been deleted.
 
-# Subscription
+# List
+diffusion_list_help=Lists all the diffusions
+diffusion_list_description=Shows the list of all the available diffusions.
+diffusion_list_title=Available diffusions
+
+## Subscription
 diffusion_subscription_help=Helps (un)subscribing to and from diffusion channels
 diffusion_subscription_description=Helps subscribing and unsubscribing to and from diffusion channels.
 
+# Subscribe
 diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
 diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>:Channel to subscribe to\n[diffusion_tag]:Role to mention with every message
-
 diffusion_subscribe_success=Successfully subscribed to this diffusion!
 diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
 
+# Unsubscribe
+diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
+diffusion_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>: Channel to unsubscribe from
+diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
+diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
+
+# List
+diffusion_subscription_list_help=Lists all the subscriptions to a channel
+diffusion_subscription_list_description=Lists all the subscriptions to a channel.[channel]: Name of the channel to list the subscriptions of
 diffusion_subscription_list_empty=This server does not have any subscription!
 diffusion_subscription_list_title=Subscription list for this server
 
-# Unsubscription
-diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
-diffusion_unsubscribe_description=Unsubscribes from a diffusion channel.
-
-diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
-
-diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
-
-# Operator
-diffusion_operator_help=Operator subcommands
+## Operator
+diffusion_operator_help=Helps adding and removing operators
 diffusion_operator_description=Helps adding and removing operators to or from a diffusion.
 
+# Add
+diffusion_operator_add_help=Adds an operator to a diffusion
+diffusion_operator_add_description=Adds an operator to a diffusion.\n<diffusion>: Name of the diffusion\n<new_operator>: Name or tag of the operator to add
 diffusion_operator_added={} is now an operator of the diffusion named "{}".
 diffusion_already_operator={} is already an operator of the diffusion named "{}".
 
+# Remove
+diffusion_operator_remove_help=Removes an operator from a diffusion
+diffusion_operator_remove_description=Removes an operator from a diffusion.\n<diffusion>: Name of the diffusion\n<old_operator>: Name or tag of the operator to remove
 diffusion_operator_remove_title=Remove operator?
 diffusion_operator_remove_content=Do you really want to remove {} from the "{}" diffusion operators?
 diffusion_operator_removed={} is no more an operator of the diffusion named "{}".
 diffusion_operator_remove_content_failure=Operation aborted.
 diffusion_not_operator={} isn't an operator of the diffusion named "{}".
 
+# List
+diffusion_operator_list_help=Lists all the operators of a diffusion
+diffusion_operator_list_description=Shows the list of all the operators of a diffusion.\n<diffusion>: Diffusion to list the operators of
 diffusion_operator_list_title=Operators of "{}" diffusion.
 diffusion_operator_list_no_operator=There is no operators for this diffusion.
 
 
 ## Ext extension
 
-ext_help=Manages extensions
+ext_help=Manages (un/re)loading of extensions
 ext_description=Allows for easy loading, unloading and reloading of the bot's extensions.
 
 # Load
@@ -220,7 +236,7 @@ success_kick={0} was kicked by {1} for reason: {2}.
 
 # Ban
 mod_ban_help=Bans a member
-mod_ban_description=Bans a member.\n<member>: Name of the member\n[reason]: Reason of the ban.
+mod_ban_description=Bans a member.\n<member>: Name of the member\n[reason]: Reason of the ban
 success_ban={0} was banned by {1} for reason: {2}.
 
 mod_as_help=
