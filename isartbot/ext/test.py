@@ -52,6 +52,12 @@ class TestExt(commands.Cog):
     async def denied(self, ctx):
         await ctx.send(await ctx.bot.get_translation(ctx, 'denied_failure'))
 
+    @test.command(help="test_commands_help_help", description="test_commands_help_description")
+    async def commands_help(self, ctx):
+
+        for command in self.extract_commands(ctx.bot.commands):
+            await ctx.send_help(command)
+
     @test.command(help="test_groups_help", description="test_groups_description")
     async def groups(self, ctx, user: discord.Member = None):
 
@@ -65,6 +71,15 @@ class TestExt(commands.Cog):
             await ctx.send(f"{user.mention} {await ctx.bot.get_translation(ctx, 'user_has_no_groups')}")
         else:
             await ctx.send(f"{user.mention} {await ctx.bot.get_translation(ctx, 'user_has_groups')}: {groups}")
+
+    def extract_commands(self, group):
+        commands = []
+        for command in group:
+            commands.append(command)
+            if (isinstance(command, discord.ext.commands.core.Group)):
+                commands = commands + self.extract_commands(command.commands)
+
+        return commands
 
 def setup(bot):
     bot.add_cog(TestExt())
