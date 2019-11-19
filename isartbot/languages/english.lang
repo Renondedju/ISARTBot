@@ -86,7 +86,7 @@ game_list_footer=Page {} out of {}
 ## Diffusion extension
 
 diffusion_help=Manages diffusion
-diffusion_description=Diffusion command long description
+diffusion_description=Helps managing diffusion channels, subscriptions and operators
 
 diffusion_doesnt_exist=This diffusion doesn't exist.\nPlease use ``{}diffusion list`` to get a list of all the existing diffusions.
 diffusion_list_title=Available diffusions
@@ -115,18 +115,21 @@ diffusion_delete_content=Are you sure to want to delete the diffusion named "{}"
 diffusion_deleted=The diffusion named "{}" has successfully been deleted.
 
 # Subscription
-diffusion_subscribe_help=Subscribes to a diffusion channel
-diffusion_subscribe_description=TODO
+diffusion_subscription_help=Helps (un)subscribing to and from diffusion channels
+diffusion_subscription_description=Helps subscribing and unsubscribing to and from diffusion channels.
+
+diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
+diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>:Channel to subscribe to\n[diffusion_tag]:Role to mention with every message
 
 diffusion_subscribe_success=Successfully subscribed to this diffusion!
 diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
 
-diffusion_subscription_list_empty=This server does not have any subscriptions!
+diffusion_subscription_list_empty=This server does not have any subscription!
 diffusion_subscription_list_title=Subscription list for this server
 
 # Unsubscription
 diffusion_unsubscribe_help=Unsubscribes from a diffusion channel
-diffusion_unsubscribe_description=TODO
+diffusion_unsubscribe_description=Unsubscribes from a diffusion channel.
 
 diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
 
@@ -134,17 +137,19 @@ diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUs
 
 # Operator
 diffusion_operator_help=Operator subcommands
-diffusion_operator_description=TODO
-diffusion_operator_list_no_operator=There is no operators for this diffusion.
-diffusion_operator_remove_content=Do you really want to remove {} from the "{}" diffusion operators?
-diffusion_operator_remove_content_failure=Operation aborted.
-diffusion_operator_remove_title=Remove operator?
+diffusion_operator_description=Helps adding and removing operators to or from a diffusion.
 
-diffusion_already_operator={} is already an operator of the diffusion named "{}".
-diffusion_operator_list_title=Operators of "{}" diffusion.
-diffusion_not_operator={} isn't an operator of the diffusion named "{}".
 diffusion_operator_added={} is now an operator of the diffusion named "{}".
+diffusion_already_operator={} is already an operator of the diffusion named "{}".
+
+diffusion_operator_remove_title=Remove operator?
+diffusion_operator_remove_content=Do you really want to remove {} from the "{}" diffusion operators?
 diffusion_operator_removed={} is no more an operator of the diffusion named "{}".
+diffusion_operator_remove_content_failure=Operation aborted.
+diffusion_not_operator={} isn't an operator of the diffusion named "{}".
+
+diffusion_operator_list_title=Operators of "{}" diffusion.
+diffusion_operator_list_no_operator=There is no operators for this diffusion.
 
 
 ## Ext extension
@@ -177,28 +182,31 @@ lang_help=Manages languages
 lang_description=Allows for easy switching of language for the bot.
 
 # Reload
-lang_reload_help=TODO
-lang_reload_description=TODO
-lang_reload_success=Reloaded every language!
+lang_reload_help=Reloads all languages
+lang_reload_description=Reloads all the languages that are currently loaded.
+lang_reload_success=All languages were successfully reloaded!
 
 # List
-lang_list_help=TODO
-lang_list_description=TODO
+lang_list_help=Lists all languages
+lang_list_description=Shows the list of all the available languages of this bot.
 lang_list_title=Available languages
 lang_list_footer=Use !lang set <language> to change the current language.
 
-lang_set_help=TODO
-lang_set_description=TODO
-lang_key_help=TODO
-lang_key_description=TODO
-
-lang_not_available=This language does not exist, please use ``!lang list`` to have the full list of available languages.
+# Set
+lang_set_help=Sets the language
+lang_set_description=Sets the language that is used by this bot.
 lang_set=Language successfully set!
+lang_not_available=This language does not exist, please use ``!lang list`` to have the full list of available languages.
+
+# Key
+lang_key_help=Retrieves a localization value from a key
+lang_key_description=Retrieves the value corresponding to this localization key.\n<lang>: Target language\n<key>: Key to retrieve the value from
+
 
 ## Moderation extension
 
 mod_help=Manages moderation
-mod_description=
+mod_description=Helps moderating the server.
 
 # Prune
 mod_prune_help=Deletes a desired amount of messages
@@ -207,12 +215,12 @@ success_prune=Last {0} message(s) have been removed.
 
 # Kick
 mod_kick_help=Kicks a member
-mod_kick_description=You guessed it. Kicks a member.\n<member>: Name of the member\n[reason]: Reason of the kick
+mod_kick_description=Kicks a member.\n<member>: Name of the member\n[reason]: Reason of the kick
 success_kick={0} was kicked by {1} for reason: {2}.
 
 # Ban
 mod_ban_help=Bans a member
-mod_ban_description=A definitive kick: bans a member.\n<member>: Name of the member\n[reason]: Reason of the ban.
+mod_ban_description=Bans a member.\n<member>: Name of the member\n[reason]: Reason of the ban.
 success_ban={0} was banned by {1} for reason: {2}.
 
 mod_as_help=
@@ -247,13 +255,13 @@ sar_invalid_role_error={} is not a valid role.
 
 # Create
 sar_create_help=Makes a role self-assignable
-sar_create_description=TODO
+sar_create_description=Marks a role as self-assignable, allowing users to assign it to themselves.
 sar_role_created={} is now a self assignable role.
 sar_role_already_exists_error={} is already a self assignable role.
 
 # Delete
 sar_delete_help=Makes a role non-self-assignable
-sar_delete_description=TODO
+sar_delete_description=Removes a self-assignable role, preventing users from assigning it to themselves.
 sar_role_deleted={} is no longer a self assignable role.
 
 # List
@@ -262,12 +270,12 @@ sar_list_footer=Page {} out of {}
 
 # Iam
 iam_help=Assigns a role to yourself
-iam_description=TODO
+iam_description=Assigns a role to yourself.<role>: Name of the role you want assigned to you.
 iam_success=You now have the role {}!
 iam_failure=Failed to add the role {}. I may not have enough permissions.
 
 # Iamn
 iamn_help=Removes a role from yourself
-iamn_description=TODO
+iamn_description=Removes a role from yourself.<role>: Name of the role you want unassigned from you.
 iamn_success=You don't have the {} role anymore.
-iamn_failure=Failed to remove you the role {}. I may not have enough permissions.
+iamn_failure=Failed to remove the role {}. I may not have enough permissions.
