@@ -25,13 +25,15 @@
 from discord.ext import commands
 
 from isartbot.database.models import Game
+from isartbot.database.models import Server
 
 class GameConverter(commands.Converter):
 
     async def convert(self, ctx, game_name):
-        game = ctx.bot.database.session.query(Game).\
-            filter(Game.display_name == game_name.lower(),
-                   Game.server_id    == ctx.guild.id).\
+
+        server = ctx.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first() 
+        game   = ctx.bot.database.session.query(Game).\
+            filter(Game.display_name.ilike(game_name), Game.server == server).\
             first()
 
-        return game if game != None else None
+        return game

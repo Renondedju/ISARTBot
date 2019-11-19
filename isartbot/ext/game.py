@@ -29,7 +29,7 @@ from math                import ceil
 from discord.ext         import commands
 from isartbot.helper     import Helper
 from isartbot.checks     import is_moderator
-from isartbot.database   import Game, Server
+from isartbot.database   import Game, Server, SelfAssignableRole
 from isartbot.converters import GameConverter
 from isartbot.converters import MemberConverter
 
@@ -121,7 +121,8 @@ class GameExt (commands.Cog):
         
         return None
 
-    @commands.group(pass_context=True, help="game_help", description="game_description")
+    @commands.group(invoke_without_command=True, pass_context=True,
+        help="game_help", description="game_description")
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles = True)
     async def game(self, ctx):
@@ -154,9 +155,13 @@ class GameExt (commands.Cog):
             discord_role_id = game.id,
             display_name    = name,
             discord_name    = discord_name.lower(),
-            server          = server)
+            server          = server
+        )
+
+        sar = SelfAssignableRole(discord_id = game.id, server = server)
 
         self.bot.database.session.add(new_game)
+        self.bot.database.session.add(sar)
         self.bot.database.session.commit()
 
         await Helper.send_success(ctx, ctx.channel, 'game_create_success', format_content=(game.mention,))
@@ -192,7 +197,7 @@ class GameExt (commands.Cog):
 
         # Fetching and computing all initial required data
         database_games = list(self.bot.database.session.query(Game).all())
-        server_games   = [game for game in database_games if game.server_id == ctx.guild.id]
+        server_games   = [game for game in database_games if game.server.discord_id == ctx.guild.id]
         max_lines      = int(self.bot.settings.get("game", "list_max_lines"))
         total_pages    = ceil(len(server_games) / max_lines)
 
@@ -211,10 +216,23 @@ class GameExt (commands.Cog):
         embed.description = '\n'.join(lines)
         embed.title       = await ctx.bot.get_translation(ctx, 'game_list_title')
         embed.color       = discord.Color.green()
-        embed.set_footer(text = await ctx.bot.get_translation(ctx, 'game_list_footer').format(page, total_pages))
+        embed.set_footer(text = (await ctx.bot.get_translation(ctx, 'game_list_footer')).format(page, total_pages))
 
         await ctx.send(embed=embed)
 
+    # Events
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role):
+        """ Database role maintainance """
+
+        server = self.bot.database.session.query(Server).filter(Server.discord_id == role.guild.id).first()
+        game   = self.bot.database.session.query(Game).filter(Game.discord_role_id == role.id, Game.server == server).first()
+        
+        if (game == None):
+            return
+
+        self.bot.database.session.delete(game)
+        self.bot.database.session.commit()
 
 def setup(bot):
     bot.add_cog(GameExt(bot))
