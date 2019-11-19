@@ -94,7 +94,7 @@ diffusion_doesnt_exist=This diffusion doesn't exist.\nPlease use ``{}diffusion l
 
 # Diffuse
 diffusion_diffuse_help=Diffuses a message
-diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion>: Name of the diffusion channel\n<message> : Id of the message to diffuse
+diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion>: Name of the diffusion channel\n<message>: Id of the message to diffuse
 diffusion_diffuse_confirmation_title=Diffusion
 diffusion_diffuse_confirmation=You are about to diffuse a message to {} subscriptions, are you sure?\nOnce this process started, there is no way to cancel it!
 diffusion_diffuse_confirmation_start=Diffuse your message to the "{}" channel.\n{} out of {} subscriptions have been notified so far.\nPlease wait, this process can take a while.
@@ -126,19 +126,19 @@ diffusion_subscription_description=Helps subscribing and unsubscribing to and fr
 
 # Subscribe
 diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
-diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>:Channel to subscribe to\n[diffusion_tag]:Role to mention with every message
+diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to subscribe to\n[diffusion_tag]: Role to mention with every message
 diffusion_subscribe_success=Successfully subscribed to this diffusion!
 diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
 
 # Unsubscribe
 diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel
-diffusion_subscription_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>:Name of the diffusion\n<channel>: Channel to unsubscribe from
+diffusion_subscription_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to unsubscribe from
 diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
 diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
 
 # List
 diffusion_subscription_list_help=Lists all the subscriptions to a channel
-diffusion_subscription_list_description=Lists all the subscriptions to a channel.[channel]: Name of the channel to list the subscriptions of
+diffusion_subscription_list_description=Lists all the subscriptions to a channel.\n[channel]: Name of the channel to list the subscriptions of
 diffusion_subscription_list_empty=This server does not have any subscription!
 diffusion_subscription_list_title=Subscription list for this server
 
@@ -288,13 +288,13 @@ sar_list_footer=Page {} out of {}
 
 # Iam
 iam_help=Assigns a role to yourself
-iam_description=Assigns a role to yourself.<role>: Name of the role you want assigned to you
+iam_description=Assigns a role to yourself.\n<role>: Name of the role you want assigned to you
 iam_success=You now have the role {}!
 iam_failure=Failed to add the role {}. I may not have enough permissions.
 
 # Iamn
 iamn_help=Removes a role from yourself
-iamn_description=Removes a role from yourself.<role>: Name of the role you want unassigned from you
+iamn_description=Removes a role from yourself.\n<role>: Name of the role you want unassigned from you
 iamn_success=You don't have the {} role anymore.
 iamn_failure=Failed to remove the role {}. I may not have enough permissions.
 
