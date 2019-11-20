@@ -28,7 +28,7 @@ import discord
 from math              import ceil
 from discord.ext       import commands
 from isartbot.helper   import Helper
-from isartbot.checks   import is_admin
+from isartbot.checks   import is_admin, is_verified
 from isartbot.database import SelfAssignableRole, Server
 
 class IamExt(commands.Cog):
@@ -54,6 +54,7 @@ class IamExt(commands.Cog):
 
     @commands.command(pass_context=True, help="iam_help", description="iam_description")
     @commands.bot_has_permissions(send_messages=True, manage_roles=True)
+    @commands.check(is_verified)
     async def iam(self, ctx, role: discord.Role):
         """ Adds a role to a user if possible """
 
@@ -74,6 +75,7 @@ class IamExt(commands.Cog):
 
     @commands.command(pass_context=True, help="iamn_help", description="iamn_description")
     @commands.bot_has_permissions(send_messages=True, manage_roles=True)
+    @commands.check(is_verified)
     async def iamn(self, ctx, role: discord.Role):
         """ Removes a role from the user """
         
