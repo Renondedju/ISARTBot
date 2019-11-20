@@ -61,6 +61,18 @@ game_help=Manages games roles
 game_description=Allows for easy creation, deletion and renaming of game roles.
 game_invalid_argument=Invalid game name.
 
+# Add
+game_add_help=Adds a game role to a user
+game_add_description=Adds a game role to a user.\n<game> Name of the game to add
+game_add_success=Role added! Have fun playing {}
+game_add_failure=Failed to add you the role, I may don't have enough rights.
+
+# Remove
+game_remove_help=Removes a game role from a user
+game_remove_description=Removes a game role from a user.\n<game> Name of the game to remove
+game_remove_success=Successfully removed you the role {} !
+game_remove_failure=Failed to remove you the role, I may don't have enough rights.
+
 # Create
 game_create_help=Creates a game
 game_create_description=Adds a role corresponding to the game <name>. If you want your role to have a different name than which that Discord uses, precise it using the [discord_name] argument.
