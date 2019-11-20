@@ -22,8 +22,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import re
 import emoji
 import discord
+import asyncio
 
 from discord.ext import commands
 
@@ -33,11 +35,12 @@ from isartbot.database import Server
 class StarboardExt(commands.Cog):
     """ Starboard related commands and tasks """
 
-    __slots__ = ("bot", "stars", "minimum_stars")
+    __slots__ = ("bot", "stars", "minimum_stars", "locks")
 
     def __init__(self, bot, *args, **kwargs):
 
-        self.bot = bot
+        self.bot   = bot
+        self.locks = {}
 
         self.minimum_stars = int(self.bot.settings.get("starboard", "minimum_stars"))
 
@@ -46,7 +49,6 @@ class StarboardExt(commands.Cog):
         self.stars = dict(sorted(self.stars.items()))
 
     # Commands
-
     @commands.group(pass_context=True, invoke_without_command=True,
         help="starboard_help", description="starboard_description")
     @commands.bot_has_permissions(send_messages=True)
@@ -101,27 +103,6 @@ class StarboardExt(commands.Cog):
         await ctx.send(embed=embed)
 
     # Methods
-
-    async def is_starboard_message(self, message: discord.Message) -> bool:
-        """ Checks if the message is a starboard message """
-
-        if message is None:
-            return False
-
-        # If the message is in a starboard channel
-        # And if the author is the bot
-        # and if the message has embeds
-        if (message.author.id  == self.bot.user.id and
-            message.channel.id == await self.get_server_starboard_channel_id(message.guild) and
-            len(message.embeds) > 0):
-
-            # If the author url of the first embed of the message
-            # starts with 'https://discordapp.com/channels/', then it's
-            # a starboard message
-            return str(message.embeds[0].author.url).startswith('https://discordapp.com/channels/')
-
-        return False
-
     def get_emoji_message(self, message: discord.Message, star_count : int):
         """ Returns the starboarded version of a message """
 
@@ -167,7 +148,38 @@ class StarboardExt(commands.Cog):
 
         return emoji
 
-    async def get_server_starboard_channel_id(self, server: discord.Guild) -> int:
+    def is_control_emoji(self, reaction_emoji) -> bool:
+        """ Checks if the passed emoji is the control emoji """
+
+        # Retreiving the emoji code ex.: ":star:"
+        if isinstance(reaction_emoji, str):
+            reaction_emoji = emoji.demojize(reaction_emoji)
+        else:
+            reaction_emoji = reaction_emoji.name
+
+        return reaction_emoji == self.bot.settings.get('starboard', 'control_emoji')
+
+    async def is_starboard_message(self, message: discord.Message) -> bool:
+        """ Checks if the message is a starboard message """
+
+        if message is None:
+            return False
+
+        # If the message is in a starboard channel
+        # And if the author is the bot
+        # and if the message has embeds
+        if (    message.author.id   ==       self.bot.user.id
+            and message.channel.id  == await self.get_starboard_channel_id(message.guild)
+            and len(message.embeds) >  0):
+
+            # If the author url of the first embed of the message
+            # starts with 'https://discordapp.com/channels/', then it's
+            # a starboard message
+            return str(message.embeds[0].author.url).startswith('https://discordapp.com/channels/')
+
+        return False
+
+    async def get_starboard_channel_id(self, server: discord.Guild) -> int:
         """ Returns the setuped starboard channel id for a given server """
 
         servers = self.bot.database.session.query(Server).\
@@ -182,52 +194,179 @@ class StarboardExt(commands.Cog):
 
         server = servers[0]
 
-        return server.starboard_id
+        return server.starboard_channel_id
 
-    async def get_server_starboard_channel(self, server: discord.Guild) -> discord.TextChannel:
+    async def get_starboard_channel(self, server: discord.Guild) -> discord.TextChannel:
 
-        channel_id = await self.get_server_starboard_channel_id(server)
+        channel_id = await self.get_starboard_channel_id(server)
 
         if (channel_id != 0):
             return server.get_channel(channel_id)
 
         return None
 
+    async def get_original_message(self, starboard_message: discord.Message) -> discord.Message:
+        """ Gets the original message from a starboard message """
+
+        if starboard_message is None or len(starboard_message.embeds) == 0:
+            return None
+
+        author_url = starboard_message.embeds[0].author.url
+
+        r = r"https:\/\/discordapp\.com\/channels\/\d*\/(\d*)\/(\d*)"
+        match = re.search(r, author_url)
+
+        if not match:
+            return None
+
+        channel_id = match.group(1)
+        message_id = match.group(2)
+
+        channel = starboard_message.guild.get_channel(int(channel_id))
+        if channel is None:
+            return None
+
+        return await channel.fetch_message(message_id)
+
+    async def get_starboard_message(self, original_message: discord.Message) -> discord.Message:
+        """ Returns a starboard message from the original message if there is one corresponding
+            Returns none otherwise
+        """
+
+        if original_message is None:
+            return None
+
+        # Looking into the history of the starboard channel and looking for an
+        # embed message that has the same author url than the variable 'url'
+        async for history_message in (await self.get_starboard_channel(original_message.guild)).history(limit=20):
+            for embed in history_message.embeds:
+                if embed.author.url == original_message.jump_url:
+                    return history_message
+
+        return None
+
     async def is_reaction_eligible(self, reaction) -> bool:
         """ Checks if a reaction is eligible for the starboard """
 
-        # Retreiving the emoji code ex.: ":star:"
-        reaction_emoji = reaction.emoji
-        if isinstance(reaction_emoji, str):
-            reaction_emoji = emoji.demojize(reaction_emoji)
-        else:
-            reaction_emoji = reaction_emoji.name
-
-        if (reaction_emoji == self.bot.settings.get('starboard', 'control_emoji')):
-            if (await self.get_server_starboard_channel_id(reaction.message.guild) != 0):
+        if (self.is_control_emoji(reaction.emoji)):
+            if (await self.get_starboard_channel_id(reaction.message.guild) != 0):
                 return True
 
         return False
 
-    # Events
+    async def count_stars(self, original_message : discord.Message,
+                                starboard_message: discord.Message) -> int:
+        """ Counts how many stars there is on the message """
 
+        unique_users = set()
+
+        # Counts every star on the original message
+        for reaction in original_message.reactions:
+            if self.is_control_emoji(reaction.emoji):
+                unique_users = set(await reaction.users().flatten())
+                break
+
+        # If there is a starboard message
+        if starboard_message != None:
+            # adding the number of star reactions under the starboard message
+            for reaction in starboard_message.reactions:
+                if self.is_control_emoji(reaction.emoji):
+                    unique_users |= set(await reaction.users().flatten())
+                    break
+
+        return len(unique_users)
+
+    # Events
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        self.bot.logger.info(f"Added reaction: {reaction.emoji}, {user.name}, {await self.is_reaction_eligible(reaction)}")
 
-        if (await self.is_reaction_eligible(reaction)):
-            content, embed = self.get_emoji_message(reaction.message, 1)
-            channel = await self.get_server_starboard_channel(reaction.message.guild)
+        # No need to lock for a non starboard reaction
+        if (not (await self.is_reaction_eligible(reaction))):
+            return
 
-            await channel.send(content = content, embed = embed)
+        if (reaction.message.guild.id not in self.locks.keys()):
+            self.locks[reaction.message.guild.id] = asyncio.Lock()
+
+        async with self.locks[reaction.message.guild.id]:
+
+            starboard_message = None
+            original_message  = None
+
+            if (await self.is_starboard_message(reaction.message)):
+                starboard_message = reaction.message
+                original_message  = await self.get_original_message(reaction.message)
+            else:
+                starboard_message = await self.get_starboard_message(reaction.message)
+                original_message  = reaction.message
+
+            stars_count = await self.count_stars(original_message, starboard_message)
+            if (stars_count >= int(self.bot.settings.get('starboard', 'minimum_stars'))):
+
+                content, embed = self.get_emoji_message(original_message, stars_count)
+
+                if (starboard_message == None):
+                    await (await self.get_starboard_channel(reaction.message.guild)).send(content = content, embed = embed)
+                else:
+                    await starboard_message.edit(content = content, embed = embed)
 
     @commands.Cog.listener()
     async def on_reaction_remove(self, reaction, user):
-        self.bot.logger.info(f"Removed reaction: {reaction.emoji}, {user.name} {await self.is_reaction_eligible(reaction)}")
+
+        # No need to lock for a non starboard reaction
+        if (not (await self.is_reaction_eligible(reaction))):
+            return
+
+        if (reaction.message.guild.id not in self.locks.keys()):
+            self.locks[reaction.message.guild.id] = asyncio.Lock()
+
+        async with self.locks[reaction.message.guild.id]:
+
+            starboard_message = None
+            original_message  = None
+
+            if (await self.is_starboard_message(reaction.message)):
+                starboard_message = reaction.message
+                original_message  = await self.get_original_message(reaction.message)
+            else:
+                starboard_message = await self.get_starboard_message(reaction.message)
+                original_message  = reaction.message
+
+            stars_count = await self.count_stars(original_message, starboard_message)
+
+            if (stars_count < int(self.bot.settings.get('starboard', 'minimum_stars')) and starboard_message != None):
+                await starboard_message.delete()
+
+            elif (starboard_message != None):
+                content, embed = self.get_emoji_message(original_message, stars_count)
+                await starboard_message.edit(content = content, embed = embed)
 
     @commands.Cog.listener()
     async def on_reaction_clear(self, message, reactions):
-        self.bot.logger.info(f"Cleared reactions: {reactions}")
+        
+        update_starboard = False
+        if (await self.get_starboard_channel_id(message.guild) != 0):
+            for reaction in reactions:
+                if (self.is_control_emoji(reaction.emoji)):
+                    update_starboard = True
+                    break
+
+        if (not update_starboard):
+            return
+
+        if (message.guild.id not in self.locks.keys()):
+            self.locks[message.guild.id] = asyncio.Lock()
+
+        async with self.locks[message.guild.id]:
+            starboard_message = None
+
+            if (await self.is_starboard_message(message)):
+                starboard_message = reaction.message
+
+            else:
+                starboard_message = await self.get_starboard_message(message)
+
+            if (starboard_message != None):
+                await starboard_message.delete()
 
 def setup(bot):
     bot.add_cog(StarboardExt(bot))
