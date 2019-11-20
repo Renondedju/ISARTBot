@@ -22,12 +22,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.checks.denied         import denied
-from isartbot.checks.admin          import is_admin
-from isartbot.checks.verified       import is_verified
-from isartbot.checks.block_dms      import block_dms
-from isartbot.checks.moderator      import is_moderator
-from isartbot.checks.developper     import is_developper , developper
-from isartbot.checks.super_admin    import is_super_admin, super_admin
-from isartbot.checks.log_command    import log_command
-from isartbot.checks.trigger_typing import trigger_typing
+import discord
+import asyncio
+
+from isartbot.database          import Server
+from isartbot.exceptions        import VerificationRequired
+from isartbot.checks.developper import developper
+
+async def is_verified(ctx):
+
+    # Fetching server verified role (if any)
+    server        = ctx.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
+    verified_role = discord.utils.get(ctx.guild.roles, id = (server.verified_role_id if server != None else 0))
+
+    if ctx.bot.dev_mode and developper(ctx, ctx.author):
+        return True
+
+    if (verified_role != None and verified_role not in ctx.message.author.roles):
+        raise VerificationRequired(missing_role=verified_role.mention)
+
+    return True

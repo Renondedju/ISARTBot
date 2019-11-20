@@ -33,7 +33,7 @@ import logging.config
 from isartbot.lang         import Lang
 from isartbot.checks       import log_command, trigger_typing, block_dms
 from isartbot.database     import Server, Database
-from isartbot.exceptions   import UnauthorizedCommand
+from isartbot.exceptions   import UnauthorizedCommand, VerificationRequired
 from isartbot.help_command import HelpCommand
 
 from os.path     import abspath
@@ -218,6 +218,10 @@ class Bot(commands.Bot):
             await self.unauthorized_command_error(ctx, error)
             return
 
+        if isinstance(error, VerificationRequired):
+            await self.verification_required_error(ctx, error)
+            return
+
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, (commands.CommandNotFound, commands.CheckFailure)):
             return
@@ -276,10 +280,10 @@ class Bot(commands.Bot):
         if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
 
-        translations = await self.get_translations(ctx, ["error_title", "missing_perms_error"], force_fetch=True)
+        translations = await self.get_translations(ctx, ["failure_title", "missing_perms_error"], force_fetch=True)
 
         embed = discord.Embed(
-            title       = translations["error_title"],
+            title       = translations["failure_title"],
             description = translations["missing_perms_error"].format(error.missing_perms),
             color       = discord.Color.red()
         )
@@ -292,13 +296,28 @@ class Bot(commands.Bot):
         if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
 
-        translations = await self.get_translations(ctx, ["error_title", "bot_missing_perms_error"], force_fetch=True)
+        translations = await self.get_translations(ctx, ["failure_title", "bot_missing_perms_error"], force_fetch=True)
 
         embed = discord.Embed(
-            title       = translations["error_title"],
+            title       = translations["failure_title"],
             description = translations["bot_missing_perms_error"].format(error.missing_perms),
             color       = discord.Color.red()
         )
 
         await ctx.send(embed=embed)
 
+    async def verification_required_error(self, ctx, error):
+        """ Sends a verification required error """
+
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
+
+        translations = await self.get_translations(ctx, ["failure_title", "verified_role_required"], force_fetch=True)
+
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["verified_role_required"].format(error.missing_role),
+            color       = discord.Color.red()
+        )
+
+        await ctx.send(embed=embed)
