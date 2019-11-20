@@ -29,3 +29,4 @@ from .starboard import *
 from .diffusion import *
 from .game      import *
 from .iam       import *
+from .foodtruck import *
