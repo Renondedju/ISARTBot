@@ -87,3 +87,371 @@ test_wait=Le processus a été mis en pause 2 secondes pour le test
 user_has_no_groups=n'a aucun privilège particulier vis à vis du bot
 user_has_groups=a les privilèges de bot suivants
 denied_failure=Quelque chose ne marche pas comme il faut !
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+# French language file
+
+# Help
+
+help_opening_note=Utilisez `{0}{1} [commande]` pour plus d'info sur une commande.\nVous pouvez également utiliser `{0}{1} [catégorie]` pour plus d'informations une une catégorie.
+commands_heading=Commandes disponibles
+help_title=Aide
+
+# General
+
+failure_title=Erreur
+success_title=Succès
+confirmation_footer=Réagissez avec 👍 si vous voulez continuer
+
+missing_perms_error=Oops ! Il semblerais qu'il vous manque l'une des permissions suivantes pour exécuter cette commande : {0}
+missing_bot_perms_error=Oops ! Il semblerais qu'il manque au bot l'une des permissions suivantes pour exécuter cette commande
+unauthorized_command=Seuls les {0}s peuvent utiliser cette commande
+verified_role_required=Vous devez avoir le role {} pour etre capable d'executer cette commande!
+
+moderator_status=moderateur
+super_admin_status=super administrateur
+developper_status=developpeur
+admin_status=administrateur
+denied_status=dieu
+
+command_not_found=Cette commande n'existe pas.
+no_subcommand=Cette commande n'a pas de sous commande.
+no_subcommand_named=Cette sous commande n'existe pas.
+
+## Class extension
+
+class_help=Gère les rôles de classe.
+class_description=Permet de créer, supprimer et renommer facilement des rôles de classe.
+class_invalid_argument=Argument invalide, veuillez mentionner une classe valide.
+
+# Create
+class_create_help=Crée une classe
+class_create_description=Crée un nouveau rôle de classe.\n<name>: Nom du nouveau rôle de classe
+class_create_success=Classe {0} créé avec succès!
+class_create_error=Classe {0} existe déjà.
+class_create_name_error=Nom de classe invalide.
+
+# Delete
+class_delete_help=Supprime une classe
+class_delete_description=Supprime un rôle de classe.\n<name>: Nom ou balise du rôle de classe condamné.
+class_delete_success=Suppression de la classe nommée {0}...
+class_delete_confirmation_title=Supprimer la classe?
+class_delete_confirmation_description=Êtes-vous sûr de vouloir supprimer la classe {}?
+class_delete_aborted=Suppression annulée.
+
+# Rename
+class_rename_help=Renomme une classe
+class_rename_description=Renomme un rôle de classe.\n<old_name>: Nom actuel ou balise du rôle de classe\n<new_name>: Nouveau nom du rôle de classe
+class_rename_error=Cette classe existe déjà.
+class_rename_success=Classe @{} renommé avec succès en {}!
+
+
+## Game extension
+
+game_help=Gère les rôles de jeux.
+game_description=Permet de créer, supprimer et renommer facilement les rôles de jeu.
+game_invalid_argument=Nom de jeu invalide.
+
+# Add
+game_add_help=Ajoute un rôle de jeu à un utilisateur.
+game_add_description=Ajoute un rôle de jeu à un utilisateur.\n<game> Nom du jeu à ajouter
+game_add_success=Rôle ajouté! Enjoy {}
+game_add_failure=Échec de l'ajout de votre rôle, je n'ai peut-être pas assez de droits.
+
+# Remove
+game_remove_help=Supprime un rôle de jeu d'un utilisateur
+game_remove_description=Supprime un rôle de jeu d'un utilisateur.\n<game> Nom du jeu à supprimer
+game_remove_success=Vous avez supprimé le rôle avec succès {} !
+game_remove_failure=Échec de la suppression du rôle, je n'ai peut-être pas assez de droits.
+
+# Create
+game_create_help=Crée un jeu
+game_create_description=Ajoute un rôle correspondant au jeu <name>. Si vous souhaitez que votre rôle porte un nom différent de celui utilisé par Discord, précisez-le à l'aide de l'argument [discord_name].
+game_create_success=Jeu {} créé avec succès!
+game_create_error_existing=Le jeu "{}" existe déjà.
+game_create_error_invalid=Nom de jeu invalide.
+
+# Delete
+game_delete_help=Deletes a game
+game_delete_description=Deletes the role corresponding to this game.\n<name>: Name of the game
+game_delete_success=Game @{} successfully deleted!
+game_delete_confirmation_title=Delete game?
+game_delete_confirmation_description=Are you sure you want to delete the game {}?
+game_delete_aborted=Aborted deletion.
+
+# Rename
+game_rename_help=Renames a game
+game_rename_description=Renames a game role.\n<old_name>: Current name of the game role\n<new_name>: New name of the game role
+
+# List
+game_list_help=Lists all the available games
+game_list_description=Gives you the list of all the available games that have corresponding roles you can attribute yourself.
+game_list_title=Games list
+game_list_footer=Page {} out of {}
+
+
+### Diffusion extension
+
+diffusion_help=Manages diffusion
+diffusion_description=Helps managing diffusion channels, subscriptions and operators
+diffusion_doesnt_exist=This diffusion doesn't exist.\nPlease use ``{}diffusion list`` to get a list of all the existing diffusions.
+
+# Diffuse
+diffusion_diffuse_help=Diffuses a message
+diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion>: Name of the diffusion channel\n<message>: Id of the message to diffuse
+diffusion_diffuse_confirmation_title=Diffusion
+diffusion_diffuse_confirmation=You are about to diffuse a message to {} subscriptions, are you sure?\nOnce this process started, there is no way to cancel it!
+diffusion_diffuse_confirmation_start=Diffuse your message to the "{}" channel.\n{} out of {} subscriptions have been notified so far.\nPlease wait, this process can take a while.
+diffusion_diffuse_confirmation_abort=Diffusion cancelled.
+diffusion_diffuse_confirmation_done=Diffusion done!\n{} error(s) occurred.
+
+# Create
+diffusion_create_help=Creates a diffusion channel
+diffusion_create_description=Creates a diffusion channel.\n<diffusion_name>: Unique name of the diffusion channel
+diffusion_created=The diffusion named "{}" has successfully been created.
+diffusion_already_exists=This diffusion already exists! Please choose a unique diffusion name.
+
+# Delete
+diffusion_delete_help=Deletes a diffusion channel
+diffusion_delete_description=Deletes a diffusion channel.\n<diffusion>: Name of the diffusion channel to delete
+diffusion_delete_title=Delete a diffusion?
+diffusion_delete_aborted=Aborted deletion.
+diffusion_delete_content=Are you sure to want to delete the diffusion named "{}".\nThis will also delete all subscriptions to this diffusion.
+diffusion_deleted=The diffusion named "{}" has successfully been deleted.
+
+# List
+diffusion_list_help=Lists all the diffusions
+diffusion_list_description=Shows the list of all the available diffusions.
+diffusion_list_title=Available diffusions
+
+## Subscription
+diffusion_subscription_help=Helps (un)subscribing to and from diffusion channels
+diffusion_subscription_description=Helps subscribing and unsubscribing to and from diffusion channels.
+
+# Subscribe
+diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
+diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to subscribe to\n[diffusion_tag]: Role to mention with every message
+diffusion_subscribe_success=Successfully subscribed to this diffusion!
+diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
+
+# Unsubscribe
+diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel
+diffusion_subscription_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to unsubscribe from
+diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
+diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
+
+# List
+diffusion_subscription_list_help=Lists all the subscriptions to a channel
+diffusion_subscription_list_description=Lists all the subscriptions to a channel.\n[channel]: Name of the channel to list the subscriptions of
+diffusion_subscription_list_empty=This server does not have any subscription!
+diffusion_subscription_list_title=Subscription list for this server
+
+## Operator
+diffusion_operator_help=Helps adding and removing operators
+diffusion_operator_description=Helps adding and removing operators to or from a diffusion.
+
+# Add
+diffusion_operator_add_help=Adds an operator to a diffusion
+diffusion_operator_add_description=Adds an operator to a diffusion.\n<diffusion>: Name of the diffusion\n<new_operator>: Name or tag of the operator to add
+diffusion_operator_added={} is now an operator of the diffusion named "{}".
+diffusion_already_operator={} is already an operator of the diffusion named "{}".
+
+# Remove
+diffusion_operator_remove_help=Removes an operator from a diffusion
+diffusion_operator_remove_description=Removes an operator from a diffusion.\n<diffusion>: Name of the diffusion\n<old_operator>: Name or tag of the operator to remove
+diffusion_operator_remove_title=Remove operator?
+diffusion_operator_remove_content=Do you really want to remove {} from the "{}" diffusion operators?
+diffusion_operator_removed={} is no more an operator of the diffusion named "{}".
+diffusion_operator_remove_content_failure=Operation aborted.
+diffusion_not_operator={} isn't an operator of the diffusion named "{}".
+
+# List
+diffusion_operator_list_help=Lists all the operators of a diffusion
+diffusion_operator_list_description=Shows the list of all the operators of a diffusion.\n<diffusion>: Diffusion to list the operators of
+diffusion_operator_list_title=Operators of "{}" diffusion.
+diffusion_operator_list_no_operator=There is no operators for this diffusion.
+
+
+## Ext extension
+
+ext_help=Manages (un/re)loading of extensions
+ext_description=Allows for easy loading, unloading and reloading of the bot's extensions.
+
+# Load
+ext_load_help=Loads an extension
+ext_load_description=Loads the desired extension.\n<ext>: Name of the extension
+ext_load_success_desc=Extension loaded!
+ext_load_failure_desc=Failed to load extension. Check logs for more information.
+
+# Unload
+ext_unload_help=Unloads an extension
+ext_unload_description=Unloads the desired extension.\n<ext>: Name of the extension
+ext_unload_success_desc=Extension unloaded!
+ext_unload_failure_desc=Failed to unload extension. Check logs for more information.
+
+# Reload
+ext_reload_help=Reloads an extension
+ext_reload_description=Reloads the desired extension.\n<ext>: Name of the extension
+ext_reload_success_desc=Extension reloaded!
+ext_reload_failure_desc=Failed to reload extension. Check logs for more information.
+
+
+## Lang extension
+
+lang_help=Manages languages
+lang_description=Allows for easy switching of language for the bot.
+
+# Reload
+lang_reload_help=Reloads all languages
+lang_reload_description=Reloads all the languages that are currently loaded.
+lang_reload_success=All languages were successfully reloaded!
+
+# List
+lang_list_help=Lists all languages
+lang_list_description=Shows the list of all the available languages of this bot.
+lang_list_title=Available languages
+lang_list_footer=Use !lang set <language> to change the current language.
+
+# Set
+lang_set_help=Sets the language
+lang_set_description=Sets the language that is used by this bot.
+lang_set=Language successfully set!
+lang_not_available=This language does not exist, please use ``!lang list`` to have the full list of available languages.
+
+# Key
+lang_key_help=Retrieves a localization value from a key
+lang_key_description=Retrieves the value corresponding to this localization key.\n<lang>: Target language\n<key>: Key to retrieve the value from
+
+
+## Moderation extension
+
+mod_help=Manages moderation
+mod_description=Helps moderating the server.
+
+# Prune
+mod_prune_help=Deletes a desired amount of messages
+mod_prune_description=Deletes the latest messages in this text channel.\n<number>: Amount of the latest messages to delete\n[member]: Name of the member to restrict the message deletion to. (From the <number> messages, only those from [member] will be deleted)
+success_prune=Last {0} message(s) have been removed.
+
+# Kick
+mod_kick_help=Kicks a member
+mod_kick_description=Kicks a member.\n<member>: Name of the member\n[reason]: Reason of the kick
+success_kick={0} was kicked by {1} for reason: {2}.
+
+# Ban
+mod_ban_help=Bans a member
+mod_ban_description=Bans a member.\n<member>: Name of the member\n[reason]: Reason of the ban
+success_ban={0} was banned by {1} for reason: {2}.
+
+mod_as_help=
+mod_as_description=
+mod_for_help=
+mod_for_description=
+mod_for_success=Used the \'{}\' strategy with the roles {} on {}'.
+mod_for_error=Action should be 'add' or 'remove'!
+
+
+## Starboard extension
+
+success_starboard_set=The starboard has successfully been configured on the following text channel.
+success_starboard_unset=The starboard has successfully been disabled for this server.
+
+
+## Test extension
+
+denied_failure=Something went wrong!
+test_wait=The process has been paused 2 seconds for testing.
+user_has_no_groups=has no special bot privileges.
+user_has_groups=has the following bot privileges.
+test=Everything seems to be working fine!
+
+
+## SAR extension
+
+sar_help=Manages role attribution
+sar_description=Allows for easy attribution of roles, marking them as self-assignable.
+sar_non_existant_role={} isn't a self assignable role.
+sar_invalid_role_error={} is not a valid role.
+
+# Create
+sar_create_help=Makes a role self-assignable
+sar_create_description=Marks a role as self-assignable, allowing users to assign it to themselves.
+sar_role_created={} is now a self assignable role.
+sar_role_already_exists_error={} is already a self assignable role.
+
+# Delete
+sar_delete_help=Makes a role non-self-assignable
+sar_delete_description=Removes a self-assignable role, preventing users from assigning it to themselves.
+sar_role_deleted={} is no longer a self assignable role.
+
+# List
+sar_list_help=Lists all the self-assignable roles
+sar_list_description=Shows the list of all the self-assignable roles.\n[page]: Page to be listed
+sar_list_title=Self assignable roles list
+sar_list_footer=Page {} out of {}
+
+# Iam
+iam_help=Assigns a role to yourself
+iam_description=Assigns a role to yourself.\n<role>: Name of the role you want assigned to you
+iam_success=You now have the role {}!
+iam_failure=Failed to add the role {}. I may not have enough permissions.
+
+# Iamn
+iamn_help=Removes a role from yourself
+iamn_description=Removes a role from yourself.\n<role>: Name of the role you want unassigned from you
+iamn_success=You don't have the {} role anymore.
+iamn_failure=Failed to remove the role {}. I may not have enough permissions.
+
+
+## Test
+
+test_help=Helps testing the bot
+test_description=Provides commands to test the features and limits of the bot.
+
+test_commands_help_help=Runs help on every command
+test_commands_help_description=Runs the command "help" on every command.
+
+test_groups_help=Displays bot privileges of a user
+test_groups_description=Displays bot privileges of a user.\n[member]: Member to display the privileges of
+
+test_error_help=Raises an unexpected exception
+test_error_description=Raises an unexpected exception.
+
+test_delay_help=Waits for 2 seconds
+test_delay_description=Waits for 2 seconds.
+
+test_denied_help=Should never show
+test_denied_description=Should never execute.
+
+## Foodtruck
+
+foodtruck_help=Prints a list of upcoming foodtrucks
+foodtruck_description=Prints the list of every upcoming foodtrucks
+foodtruck_list_title=Upcoming foodtrucks:
+foodtruck_list_format={delimiters}{date} - [{foodtruck}]({website}) ({specialty}) {delimiters}
+foodtruck_list_empty=Such empty ¯\_(ツ)_/¯
+
+# Upload
+
+foodtruck_upload_help=Uploads a new foodtruck database
+foodtruck_upload_description=Uploads a new foodtruck database. The database must be a `.csv` file containing the following columns: `foodtruck, date, specialty, website`.
+foodtruck_upload_attachment_error=The command needs to be called with (only) one attachment.
+foodtruck_upload_succeeded=New foodtruck database upload succeeded ! 
+foodtruck_upload_failed=Foodtruck database upload failed, please try again later or contact an administrator for more details.
