@@ -189,44 +189,44 @@ game_create_error_existing=Le jeu "{}" existe déjà.
 game_create_error_invalid=Nom de jeu invalide.
 
 # Delete
-game_delete_help=Deletes a game
-game_delete_description=Deletes the role corresponding to this game.\n<name>: Name of the game
-game_delete_success=Game @{} successfully deleted!
-game_delete_confirmation_title=Delete game?
-game_delete_confirmation_description=Are you sure you want to delete the game {}?
-game_delete_aborted=Aborted deletion.
+game_delete_help=Supprime un jeu.
+game_delete_description=Supprime le rôle correspondant à ce jeu.\n<name>: Nom du jeu
+game_delete_success=Jeu @{} supprimé avec succès !
+game_delete_confirmation_title=Supprimer le jeu?
+game_delete_confirmation_description=Voulez-vous vraiment supprimer le jeu {}?
+game_delete_aborted=Suppression abandonnée.
 
 # Rename
-game_rename_help=Renames a game
-game_rename_description=Renames a game role.\n<old_name>: Current name of the game role\n<new_name>: New name of the game role
+game_rename_help=Renomme un jeu
+game_rename_description=Renomme un rôle de jeu.\n<old_name>: Nom actuel du rôle de jeu\n<new_name>: Nouveau nom du rôle de jeu
 
 # List
-game_list_help=Lists all the available games
-game_list_description=Gives you the list of all the available games that have corresponding roles you can attribute yourself.
-game_list_title=Games list
-game_list_footer=Page {} out of {}
+game_list_help=Liste tous les jeux disponibles
+game_list_description=Vous donne la liste de tous les jeux disponibles qui ont des rôles correspondants que vous pouvez vous attribuer.
+game_list_title=Liste des jeux
+game_list_footer=Page {} sur {}
 
 
 ### Diffusion extension
 
-diffusion_help=Manages diffusion
-diffusion_description=Helps managing diffusion channels, subscriptions and operators
-diffusion_doesnt_exist=This diffusion doesn't exist.\nPlease use ``{}diffusion list`` to get a list of all the existing diffusions.
+diffusion_help=Gère la diffusion
+diffusion_description=Aide à la gestion des canaux de diffusion, des abonnements et des opérateurs
+diffusion_doesnt_exist=Cette diffusion n'existe pas.\nVeuillez utiliser ``{}diffusion list`` pour obtenir une liste de toutes les diffusions existantes.
 
 # Diffuse
-diffusion_diffuse_help=Diffuses a message
-diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion>: Name of the diffusion channel\n<message>: Id of the message to diffuse
+diffusion_diffuse_help=Diffuse un message
+diffusion_diffuse_description=Diffuse un message vers un canal de diffusion.\n<diffusion>: Nom du canal de diffusion \n<message>: Id du message à diffuser
 diffusion_diffuse_confirmation_title=Diffusion
-diffusion_diffuse_confirmation=You are about to diffuse a message to {} subscriptions, are you sure?\nOnce this process started, there is no way to cancel it!
-diffusion_diffuse_confirmation_start=Diffuse your message to the "{}" channel.\n{} out of {} subscriptions have been notified so far.\nPlease wait, this process can take a while.
-diffusion_diffuse_confirmation_abort=Diffusion cancelled.
-diffusion_diffuse_confirmation_done=Diffusion done!\n{} error(s) occurred.
+diffusion_diffuse_confirmation=Vous êtes sur le point de diffuser un message à {} abonnements, êtes-vous sûr?\nUne fois ce processus commencé, il n'y a aucun moyen de l'annuler!
+diffusion_diffuse_confirmation_start=Diffusez votre message au "{}" channel.\n{} sur {} abonnements ont été notifiés jusqu'à présent. \nVeuillez patienter, ce processus peut prendre un certain temps.
+diffusion_diffuse_confirmation_abort=Diffusion annulée.
+diffusion_diffuse_confirmation_done=Diffusion terminée!\n{} erreur(s) produites.
 
 # Create
-diffusion_create_help=Creates a diffusion channel
-diffusion_create_description=Creates a diffusion channel.\n<diffusion_name>: Unique name of the diffusion channel
-diffusion_created=The diffusion named "{}" has successfully been created.
-diffusion_already_exists=This diffusion already exists! Please choose a unique diffusion name.
+diffusion_create_help=Crée un canal de diffusion
+diffusion_create_description=Crée un canal de diffusion.\n<diffusion_name>: Nom unique du canal de diffusion 
+diffusion_created= La diffusion nommée "{}" a été créé avec succès.
+diffusion_already_exists=Cette diffusion existe déjà! Veuillez choisir un nom de diffusion unique.
 
 # Delete
 diffusion_delete_help=Deletes a diffusion channel
