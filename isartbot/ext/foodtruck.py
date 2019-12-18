@@ -90,7 +90,7 @@ class FoodtruckExt(commands.Cog):
     def get_foodtrucks(self, target_date):
 
         foodtrucks = list()
-        with open(self.db_path, newline='') as csv_file:
+        with open(self.db_path, newline='', encoding="utf-8") as csv_file:
             for truck in csv.DictReader(csv_file):
                 delta = (self.parse_truck_date(truck) - target_date).days
                 
