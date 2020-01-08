@@ -87,24 +87,6 @@ test_wait=Le processus a été mis en pause 2 secondes pour le test
 user_has_no_groups=n'a aucun privilège particulier vis à vis du bot
 user_has_groups=a les privilèges de bot suivants
 denied_failure=Quelque chose ne marche pas comme il faut !
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
 
 # French language file
 
@@ -229,229 +211,230 @@ diffusion_created= La diffusion nommée "{}" a été créé avec succès.
 diffusion_already_exists=Cette diffusion existe déjà! Veuillez choisir un nom de diffusion unique.
 
 # Delete
-diffusion_delete_help=Deletes a diffusion channel
-diffusion_delete_description=Deletes a diffusion channel.\n<diffusion>: Name of the diffusion channel to delete
-diffusion_delete_title=Delete a diffusion?
-diffusion_delete_aborted=Aborted deletion.
-diffusion_delete_content=Are you sure to want to delete the diffusion named "{}".\nThis will also delete all subscriptions to this diffusion.
-diffusion_deleted=The diffusion named "{}" has successfully been deleted.
+diffusion_delete_help=Supprime un canal de diffusion
+diffusion_delete_description=Supprime un canal de diffusion. \n<diffusion>: Nom du canal de diffusion à supprimer
+diffusion_delete_title=Supprimer une diffusion?
+diffusion_delete_aborted=Suppression abandonnée.
+diffusion_delete_content=Voulez-vous vraiment supprimer la diffusion nommée "{}".\n Cela supprimera également tous les abonnements à cette diffusion.
+diffusion_deleted=La diffusion nommée "{}" a été supprimé avec succès.
 
 # List
-diffusion_list_help=Lists all the diffusions
-diffusion_list_description=Shows the list of all the available diffusions.
-diffusion_list_title=Available diffusions
+diffusion_list_help=Liste toutes les diffusions
+diffusion_list_description=Affiche la liste de toutes les diffusions disponibles.
+diffusion_list_title=Diffusions disponibles
+
 
 ## Subscription
-diffusion_subscription_help=Helps (un)subscribing to and from diffusion channels
-diffusion_subscription_description=Helps subscribing and unsubscribing to and from diffusion channels.
+diffusion_subscription_help=Aide à s'abonner ou désabonner aux canaux de diffusion
+diffusion_subscription_description=Aide à l'abonnement et au désabonnement vers et depuis les canaux de diffusion.
 
 # Subscribe
-diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
-diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to subscribe to\n[diffusion_tag]: Role to mention with every message
-diffusion_subscribe_success=Successfully subscribed to this diffusion!
-diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
+diffusion_subscription_subscribe_help=S'abonne à un canal de diffusion
+diffusion_subscription_subscribe_description=S'abonne à un canal de diffusion.\n<diffusion>: Nom de la diffusion\n<channel>: Canal auquel vous abonner\n[diffusion_tag]: Rôle à mentionner avec chaque message
+diffusion_subscribe_success=Souscrit avec succès à cette diffusion!
+diffusion_subscription_already_exists=Cet abonnement existe déjà.\n Utilisez ``{}diffusion unsubscribe`` se désinscrire de cette diffusion.
 
 # Unsubscribe
-diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel
-diffusion_subscription_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to unsubscribe from
-diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
-diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
+diffusion_subscription_unsubscribe_help=Se désabonner d'un canal de diffusion
+diffusion_subscription_unsubscribe_description=Se désabonner d'un canal de diffusion.\n<diffusion>: Nom de la diffusion\n<channel>: Canal à désabonner
+diffusion_unsubscribe_success=Désabonnement réussi de cette diffusion!
+diffusion_no_such_subscription=Il n'y a pas d'abonnement pour se désinscrire.\nUse ``{}diffusion subscribe`` s'abonner d'abord à une diffusion.
 
 # List
-diffusion_subscription_list_help=Lists all the subscriptions to a channel
-diffusion_subscription_list_description=Lists all the subscriptions to a channel.\n[channel]: Name of the channel to list the subscriptions of
-diffusion_subscription_list_empty=This server does not have any subscription!
-diffusion_subscription_list_title=Subscription list for this server
+diffusion_subscription_list_help=Répertorie tous les abonnements à une chaîne
+diffusion_subscription_list_description=Répertorie tous les abonnements à une chaîne.\n[channel]: Nom de la chaîne pour lister les abonnements
+diffusion_subscription_list_empty=Ce serveur n'a pas d'abonnement!
+diffusion_subscription_list_title=Liste d'abonnement pour ce serveur
 
 ## Operator
-diffusion_operator_help=Helps adding and removing operators
-diffusion_operator_description=Helps adding and removing operators to or from a diffusion.
+diffusion_operator_help=Aide à ajouter et à supprimer des opérateurs
+diffusion_operator_description=Aide à ajouter et à supprimer des opérateurs vers ou depuis une diffusion.
 
 # Add
-diffusion_operator_add_help=Adds an operator to a diffusion
-diffusion_operator_add_description=Adds an operator to a diffusion.\n<diffusion>: Name of the diffusion\n<new_operator>: Name or tag of the operator to add
-diffusion_operator_added={} is now an operator of the diffusion named "{}".
-diffusion_already_operator={} is already an operator of the diffusion named "{}".
+diffusion_operator_add_help=Ajoute un opérateur à une diffusion
+diffusion_operator_add_description=Ajoute un opérateur à une diffusion.\n<diffusion>: Nom de la diffusion\n<new_operator>: Nom ou tag de l'opérateur à ajouter
+diffusion_operator_added={} est désormais un opérateur de la diffusion nommé "{}".
+diffusion_already_operator={} est déjà un opérateur de la diffusion nommé "{}".
 
 # Remove
-diffusion_operator_remove_help=Removes an operator from a diffusion
-diffusion_operator_remove_description=Removes an operator from a diffusion.\n<diffusion>: Name of the diffusion\n<old_operator>: Name or tag of the operator to remove
-diffusion_operator_remove_title=Remove operator?
-diffusion_operator_remove_content=Do you really want to remove {} from the "{}" diffusion operators?
-diffusion_operator_removed={} is no more an operator of the diffusion named "{}".
-diffusion_operator_remove_content_failure=Operation aborted.
-diffusion_not_operator={} isn't an operator of the diffusion named "{}".
+diffusion_operator_remove_help=Supprime un opérateur d'une diffusion
+diffusion_operator_remove_description=Supprime un opérateur d'une diffusion.\n<diffusion>: Nom de la diffusion\n<old_operator>: Nom ou tag de l'opérateur à enlever
+diffusion_operator_remove_title=Supprimer l'opérateur?
+diffusion_operator_remove_content=Voulez-vous vraiment supprimer {} de "{}" opérateurs de diffusion?
+diffusion_operator_removed={} n'est plus un opérateur de la diffusion nommé "{}".
+diffusion_operator_remove_content_failure=Opération annulée.
+diffusion_not_operator={} n'est pas un opérateur de la diffusion nommé "{}".
 
 # List
-diffusion_operator_list_help=Lists all the operators of a diffusion
-diffusion_operator_list_description=Shows the list of all the operators of a diffusion.\n<diffusion>: Diffusion to list the operators of
-diffusion_operator_list_title=Operators of "{}" diffusion.
-diffusion_operator_list_no_operator=There is no operators for this diffusion.
+diffusion_operator_list_help=Liste tous les opérateurs d'une diffusion
+diffusion_operator_list_description=Affiche la liste de tous les opérateurs d'une diffusion.\n<diffusion>: Diffusion pour lister les opérateurs de
+diffusion_operator_list_title=Les opérateurs de "{}" diffusion.
+diffusion_operator_list_no_operator=Il n'y a pas d'opérateurs pour cette diffusion.
 
 
 ## Ext extension
 
-ext_help=Manages (un/re)loading of extensions
-ext_description=Allows for easy loading, unloading and reloading of the bot's extensions.
+ext_help=Gère (re)chargement des extensions
+ext_description=Permet de charger, décharger et recharger facilement les extensions du bot.
 
 # Load
-ext_load_help=Loads an extension
-ext_load_description=Loads the desired extension.\n<ext>: Name of the extension
-ext_load_success_desc=Extension loaded!
-ext_load_failure_desc=Failed to load extension. Check logs for more information.
+ext_load_help=Charge une extension
+ext_load_description=Charge l'extension souhaitée.\n<ext>: Nom de l'extension
+ext_load_success_desc= Extension chargée!
+ext_load_failure_desc=Impossible de charger l'extension. Consultez les journaux pour plus d'informations.
 
 # Unload
-ext_unload_help=Unloads an extension
-ext_unload_description=Unloads the desired extension.\n<ext>: Name of the extension
-ext_unload_success_desc=Extension unloaded!
-ext_unload_failure_desc=Failed to unload extension. Check logs for more information.
+ext_unload_help=Décharge une extension
+ext_unload_description=Décharge l'extension souhaitée.\n<ext>: Nom de l'extension
+ext_unload_success_desc=Extension déchargée!
+ext_unload_failure_desc=Impossible de décharger l'extension. Consultez les journaux pour plus d'informations.
 
 # Reload
-ext_reload_help=Reloads an extension
-ext_reload_description=Reloads the desired extension.\n<ext>: Name of the extension
-ext_reload_success_desc=Extension reloaded!
-ext_reload_failure_desc=Failed to reload extension. Check logs for more information.
+ext_reload_help=recharge une extension
+ext_reload_description=Recharge l'extension souhaitée.\n<ext>: Nom de l'extension
+ext_reload_success_desc=Extension rechargée!
+ext_reload_failure_desc=Impossible de rechargée l'etension. Consultez les journaux pour plus d'informations.
 
 
 ## Lang extension
 
-lang_help=Manages languages
-lang_description=Allows for easy switching of language for the bot.
+lang_help=Gère les langues
+lang_description=Permet de changer facilement de langue pour le bot.
 
 # Reload
-lang_reload_help=Reloads all languages
-lang_reload_description=Reloads all the languages that are currently loaded.
-lang_reload_success=All languages were successfully reloaded!
+lang_reload_help=Recharge toutes les langues
+lang_reload_description=Recharge toutes les langues actuellement chargées.
+lang_reload_success=Toutes les langues ont été rechargées avec succès!
 
 # List
-lang_list_help=Lists all languages
-lang_list_description=Shows the list of all the available languages of this bot.
-lang_list_title=Available languages
-lang_list_footer=Use !lang set <language> to change the current language.
+lang_list_help=Répertorie toutes les langues
+lang_list_description=Affiche la liste de toutes les langues disponibles de ce bot.
+lang_list_title=Langues disponibles
+lang_list_footer=Utilisez !lang set <language> pour changer la langue actuelle.
 
 # Set
-lang_set_help=Sets the language
-lang_set_description=Sets the language that is used by this bot.
-lang_set=Language successfully set!
-lang_not_available=This language does not exist, please use ``!lang list`` to have the full list of available languages.
+lang_set_help=Définit la langue
+lang_set_description=Définit la langue utilisée par ce bot.
+lang_set=Langue définie avec succès!
+lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles.
 
 # Key
-lang_key_help=Retrieves a localization value from a key
-lang_key_description=Retrieves the value corresponding to this localization key.\n<lang>: Target language\n<key>: Key to retrieve the value from
+lang_key_help=Récupère une valeur de localisation à partir d'une clé
+lang_key_description=Récupère la valeur correspondant à cette clé de localisation.\n<lang>: Langue cible\n<key>: Clé pour récupérer la valeur de
 
 
 ## Moderation extension
 
-mod_help=Manages moderation
-mod_description=Helps moderating the server.
+mod_help=Gère la modération
+mod_description=Aide à modérer le serveur.
 
 # Prune
-mod_prune_help=Deletes a desired amount of messages
-mod_prune_description=Deletes the latest messages in this text channel.\n<number>: Amount of the latest messages to delete\n[member]: Name of the member to restrict the message deletion to. (From the <number> messages, only those from [member] will be deleted)
-success_prune=Last {0} message(s) have been removed.
+mod_prune_help=Supprime la quantité souhaitée de messages
+mod_prune_description=Supprime les derniers messages de cette chaîne de texte.\n<number>: Nombre des derniers messages à supprimer\n[member]: Nom du membre auquel limiter la suppression du message. (Du <number> messages, seuls ceux de [member] sera supprimé)
+success_prune=Les {0} derniers messages ont été supprimés.
 
 # Kick
-mod_kick_help=Kicks a member
-mod_kick_description=Kicks a member.\n<member>: Name of the member\n[reason]: Reason of the kick
-success_kick={0} was kicked by {1} for reason: {2}.
+mod_kick_help=Exclu un membre
+mod_kick_description=Exclu un membre.\n<member>: Nom du membre\n[reason]: Raison de l'exclusion
+success_kick={0} a été exclu par {1} car : {2}.
 
 # Ban
-mod_ban_help=Bans a member
-mod_ban_description=Bans a member.\n<member>: Name of the member\n[reason]: Reason of the ban
-success_ban={0} was banned by {1} for reason: {2}.
+mod_ban_help=Banni un membre
+mod_ban_description=Banni un membre.\n<member>: Nom du membre \n[reason]: Raison du bannissement
+success_ban={0} a été banni par {1} car : {2}.
 
 mod_as_help=
 mod_as_description=
 mod_for_help=
 mod_for_description=
-mod_for_success=Used the \'{}\' strategy with the roles {} on {}'.
-mod_for_error=Action should be 'add' or 'remove'!
+mod_for_success=Utilisez \'{}\' stratégie avec les rôles {} sur {}'.
+mod_for_error=Action devrait être 'add' ou 'remove'!
 
 
 ## Starboard extension
 
-success_starboard_set=The starboard has successfully been configured on the following text channel.
-success_starboard_unset=The starboard has successfully been disabled for this server.
+success_starboard_set=Le starboard a été configuré avec succès sur le canal de texte suivant.
+success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur.
 
 
 ## Test extension
 
-denied_failure=Something went wrong!
-test_wait=The process has been paused 2 seconds for testing.
-user_has_no_groups=has no special bot privileges.
-user_has_groups=has the following bot privileges.
-test=Everything seems to be working fine!
+denied_failure=Quelque chose a mal tourné!
+test_wait=Le processus a été interrompu 2 secondes pour les tests.
+user_has_no_groups=n'a pas de privilèges spéciaux de bot. 
+user_has_groups=a les privilèges de bot suivants.
+test=Tout semble bien fonctionner!
 
 
 ## SAR extension
 
-sar_help=Manages role attribution
-sar_description=Allows for easy attribution of roles, marking them as self-assignable.
-sar_non_existant_role={} isn't a self assignable role.
-sar_invalid_role_error={} is not a valid role.
+sar_help=Gère l'attribution des rôles
+sar_description=Permet une attribution facile des rôles, en les marquant comme auto-assignables.
+sar_non_existant_role={} n'est pas un rôle auto-assignable.
+sar_invalid_role_error={} n'est pas un rôle valide.
 
 # Create
-sar_create_help=Makes a role self-assignable
-sar_create_description=Marks a role as self-assignable, allowing users to assign it to themselves.
-sar_role_created={} is now a self assignable role.
-sar_role_already_exists_error={} is already a self assignable role.
+sar_create_help=Rend un rôle auto-assignable
+sar_create_description=Marque un rôle comme auto-assignable, permettant aux utilisateurs de l'attribuer à eux-mêmes.
+sar_role_created={} est désormais un rôle auto-assignable.
+sar_role_already_exists_error={} est déjà un rôle auto-assignable.
 
 # Delete
-sar_delete_help=Makes a role non-self-assignable
-sar_delete_description=Removes a self-assignable role, preventing users from assigning it to themselves.
-sar_role_deleted={} is no longer a self assignable role.
+sar_delete_help=Rend un rôle non auto-assignable
+sar_delete_description=Supprime un rôle auto-assignable, empêchant les utilisateurs de se l'attribuer à eux-mêmes.
+sar_role_deleted={} n'est plus un rôle auto-assignable.
 
 # List
-sar_list_help=Lists all the self-assignable roles
-sar_list_description=Shows the list of all the self-assignable roles.\n[page]: Page to be listed
-sar_list_title=Self assignable roles list
-sar_list_footer=Page {} out of {}
+sar_list_help=Répertorie tous les rôles auto-attribuables
+sar_list_description=Affiche la liste de tous les rôles auto-attribuables. \n [page]: page à répertorier
+sar_list_title=Liste des rôles auto-attribuables
+sar_list_footer=Page {} sur {}
 
 # Iam
-iam_help=Assigns a role to yourself
-iam_description=Assigns a role to yourself.\n<role>: Name of the role you want assigned to you
-iam_success=You now have the role {}!
-iam_failure=Failed to add the role {}. I may not have enough permissions.
+iam_help=Vous attribue un rôle
+iam_description=Vous attribue un rôle.\n<role>: Nom du rôle que vous souhaitez vous attribuer
+iam_success=Vous avez maintenant le rôle {}!
+iam_failure=Échec de l'ajout du rôle {}. Je n'ai peut-être pas assez d'autorisations.
 
 # Iamn
-iamn_help=Removes a role from yourself
-iamn_description=Removes a role from yourself.\n<role>: Name of the role you want unassigned from you
-iamn_success=You don't have the {} role anymore.
-iamn_failure=Failed to remove the role {}. I may not have enough permissions.
+iamn_help=Supprime un rôle de vous-même
+iamn_description=Supprime un rôle de vous-même.\n<role>: Nom du rôle que vous souhaitez ne pas vous attribuer
+iamn_success=Vous n'avez plus le rôle {}.
+iamn_failure=Impossible de supprimer le rôle {}. Je n'ai peut-être pas assez d'autorisations.
 
 
 ## Test
 
-test_help=Helps testing the bot
-test_description=Provides commands to test the features and limits of the bot.
+test_help=Aide à tester le bot
+test_description=Fournit des commandes pour tester les fonctionnalités et les limites du bot.
 
-test_commands_help_help=Runs help on every command
-test_commands_help_description=Runs the command "help" on every command.
+test_commands_help_help=Exécute l'aide sur chaque commande
+test_commands_help_description=Exécute la commande "help" sur chaque commande.
 
-test_groups_help=Displays bot privileges of a user
-test_groups_description=Displays bot privileges of a user.\n[member]: Member to display the privileges of
+test_groups_help=Affiche les privilèges des bots d'un utilisateur
+test_groups_description=Affiche les privilèges des bots d'un utilisateur.\n[member]: Membre pour afficher les privilèges de
 
-test_error_help=Raises an unexpected exception
-test_error_description=Raises an unexpected exception.
+test_error_help=Déclenche une exception inattendue
+test_error_description=Déclenche une exception inattendue.
 
-test_delay_help=Waits for 2 seconds
-test_delay_description=Waits for 2 seconds.
+test_delay_help=Attendez 2 secondes
+test_delay_description=Attendez 2 secondes.
 
-test_denied_help=Should never show
-test_denied_description=Should never execute.
+test_denied_help=Ne devrait jamais montrer
+test_denied_description=Ne devrait jamais s'exécuter.
 
 ## Foodtruck
 
-foodtruck_help=Prints a list of upcoming foodtrucks
-foodtruck_description=Prints the list of every upcoming foodtrucks
-foodtruck_list_title=Upcoming foodtrucks:
+foodtruck_help=Imprime une liste des foodtrucks à venir
+foodtruck_description=Imprime la liste de tous les foodtrucks à venir
+foodtruck_list_title=Foodtrucks à venir:
 foodtruck_list_format={delimiters}{date} - [{foodtruck}]({website}) ({specialty}) {delimiters}
-foodtruck_list_empty=Such empty ¯\_(ツ)_/¯
+foodtruck_list_empty=Tellement vide ¯\_(ツ)_/¯
 
 # Upload
 
-foodtruck_upload_help=Uploads a new foodtruck database
-foodtruck_upload_description=Uploads a new foodtruck database. The database must be a `.csv` file containing the following columns: `foodtruck, date, specialty, website`.
-foodtruck_upload_attachment_error=The command needs to be called with (only) one attachment.
-foodtruck_upload_succeeded=New foodtruck database upload succeeded ! 
-foodtruck_upload_failed=Foodtruck database upload failed, please try again later or contact an administrator for more details.
+foodtruck_upload_help=Télécharge une nouvelle base de données foodtruck
+foodtruck_upload_description=Télécharge une nouvelle base de données foodtruck. La base de données doit être un fichier `.csv` contenant les colonnes suivantes:` foodtruck, date, speciality, website`.
+foodtruck_upload_attachment_error=La commande doit être appelée avec (une seule) pièce jointe.
+foodtruck_upload_succeeded=Le nouveau téléchargement de la base de données foodtruck a réussi!
+foodtruck_upload_failed=Échec du téléchargement de la base de données Foodtruck. Veuillez réessayer plus tard ou contacter un administrateur pour plus de détails.
