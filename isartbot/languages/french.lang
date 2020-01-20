@@ -262,6 +262,12 @@ mod_for_error=Action devrait être 'add' ou 'remove' !
 
 ## Starboard extension
 
+starboard_description=Met en évidence automatiquement les posts upvoté dans un channel dédié.\nRéagissez à un message avec ⭐ et le bot ajoutera ou enlévera automatiquement ce message du starboard.
+starboard_set_description=Définit le channel du starboard.\nEnvisagez d'autoriser l'accès exclusif en écriture au bot sur ce channel.\n<channel>: Channel du starboard.
+starboard_disable_description=Désactive le starboard, utilisez la commande `starboard set` pour le réactiver.
+starboard_set_help=Définit le channel du starboard.
+starboard_disable_help=Désactive le starboard.
+
 success_starboard_set=Le starboard a été configuré avec succès sur le canal de texte suivant.
 success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur.
 
