@@ -125,7 +125,7 @@ diffusion_delete_help=Deletes a diffusion channel
 diffusion_delete_description=Deletes a diffusion channel.\n<diffusion>: Name of the diffusion channel to delete
 diffusion_delete_title=Delete a diffusion?
 diffusion_delete_aborted=Aborted deletion.
-diffusion_delete_content=Are you sure to want to delete the diffusion named "{}".\nThis will also delete all subscriptions to this diffusion.
+diffusion_delete_content=Are you sure to want to delete the diffusion named "{}"?\nThis will also delete all subscriptions to this diffusion.
 diffusion_deleted=The diffusion named "{}" has successfully been deleted.
 
 # List
@@ -134,7 +134,7 @@ diffusion_list_description=Shows the list of all the available diffusions.
 diffusion_list_title=Available diffusions
 
 ## Subscription
-diffusion_subscription_help=Helps (un)subscribing to and from diffusion channels
+diffusion_subscription_help=Helps managing subscriptions to diffusion channels
 diffusion_subscription_description=Helps subscribing and unsubscribing to and from diffusion channels.
 
 # Subscribe
@@ -156,7 +156,7 @@ diffusion_subscription_list_empty=This server does not have any subscription!
 diffusion_subscription_list_title=Subscription list for this server
 
 ## Operator
-diffusion_operator_help=Helps adding and removing operators
+diffusion_operator_help=Helps managing operators
 diffusion_operator_description=Helps adding and removing operators to or from a diffusion.
 
 # Add
