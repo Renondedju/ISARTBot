@@ -22,10 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+__slots__ = ("Server", "DiffusionOperator", "Diffusion", "DiffusionSubscription", "SelfAssignableRole", "Game")
 
-if __name__ == '__main__':
-
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+from .game                   import Game
+from .server                 import Server
+from .diffusion              import Diffusion
+from .diffusion_operator     import DiffusionOperator
+from .self_assignable_role   import SelfAssignableRole
+from .diffusion_subscription import DiffusionSubscription

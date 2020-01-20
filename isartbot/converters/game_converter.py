@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018-2020 Renondedju
+# Copyright (c) 2018 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from discord.ext import commands
 
-if __name__ == '__main__':
+from isartbot.database.models import Game
+from isartbot.database.models import Server
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class GameConverter(commands.Converter):
+
+    async def convert(self, ctx, game_name):
+
+        server = ctx.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first() 
+        game   = ctx.bot.database.session.query(Game).\
+            filter(Game.display_name.ilike(game_name), Game.server == server).\
+            first()
+
+        return game

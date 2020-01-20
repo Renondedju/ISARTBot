@@ -22,10 +22,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from sqlalchemy.ext.automap import automap_base
 
-if __name__ == '__main__':
+__slots__ = ("TableBase")
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+TableBase = automap_base()

@@ -22,10 +22,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+import discord
+import asyncio
 
-if __name__ == '__main__':
+from discord.ext       import commands
+from isartbot.database import Diffusion
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class DiffusionConverter(commands.Converter):
+    async def convert(self, ctx, diffusion_name):
+        diffusion = ctx.bot.database.session.query(Diffusion).filter(Diffusion.name == diffusion_name).first()
+        return diffusion if diffusion != None else None

@@ -22,10 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+async def log_command(ctx):
 
-if __name__ == '__main__':
+    author  = f"{ctx.author.name}#{ctx.author.discriminator}"
+    channel = f"{ctx.guild.name}/{ctx.channel.category.name}/{ctx.channel.name}" if not (ctx.guild is None) else "DM"
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+    ctx.bot.logger.info(f"{author} -> {channel} : {ctx.message.content}")
+
+    return True

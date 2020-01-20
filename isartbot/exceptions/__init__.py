@@ -22,10 +22,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
-
-if __name__ == '__main__':
-
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+from isartbot.exceptions.unauthorized_command  import UnauthorizedCommand
+from isartbot.exceptions.verification_required import VerificationRequired

@@ -22,10 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from discord.ext.commands import CheckFailure
 
-if __name__ == '__main__':
+class VerificationRequired(CheckFailure):
+    """ Exception raised when the user must be verified to run the command and isn't verified """
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+    __slots__ = ("missing_role")
+
+    def __init__(self, missing_role="", *args):
+
+        super().__init__("", *args)
+        self.missing_role = missing_role

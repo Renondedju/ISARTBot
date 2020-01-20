@@ -22,10 +22,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+import asyncio
 
-if __name__ == '__main__':
+from os.path import abspath
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class Lang():
+
+    def __init__ (self, file: str):
+        self.filename   = file
+        self.dictionary = self.load_language(file)
+
+    def get_key(self, key: str):
+        """ Return the value of the given key """
+
+        if (not self.has_key(key)):
+            return f"Key named \"{key}\" is missing in language file \"{self.filename}\""
+
+        return self.dictionary[key]
+
+    def has_key(self, key: str):
+        """ returns true if the targetted language has the specified key"""
+        return key in self.dictionary
+
+    def load_language(self, name: str):
+        """Create a dictionary (keyword, descrition/quote) from a language file"""
+        language = {}
+
+        with open(abspath(name), 'rt', encoding='utf-8') as file:
+
+            for line in file:
+
+                #Ignoring comments and empty lines
+                if line.startswith('#') or len(line) <= 2:
+                    continue
+
+                (key, val) = line.split('=')
+                language[key] = val.strip('\n\r').replace("\\n", '\n')
+
+        return language

@@ -22,10 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+async def trigger_typing(ctx):
 
-if __name__ == '__main__':
+    if (not (ctx.invoked_subcommand is None)):
+        await ctx.trigger_typing()
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+    return True

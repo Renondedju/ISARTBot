@@ -22,10 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from discord.ext.commands import CheckFailure
 
-if __name__ == '__main__':
+class UnauthorizedCommand(CheckFailure):
+    """ Exception raised when the user had not the required rights to execute the command """
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+    __slots__ = ("missing_status")
+
+    def __init__(self, missing_status="", *args):
+
+        super().__init__("", *args)
+        self.missing_status = missing_status

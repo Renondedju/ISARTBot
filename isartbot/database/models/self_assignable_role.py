@@ -19,13 +19,20 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-import os
-import isartbot
+from sqlalchemy     import Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
-if __name__ == '__main__':
+from isartbot.database import TableBase
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class SelfAssignableRole(TableBase):
+
+    __tablename__ = 'self_assignable_roles'
+
+    id         = Column('id'        , Integer, primary_key = True, unique = True)
+    discord_id = Column('discord_id', Integer, nullable    = False)
+
+    server_id = Column(Integer, ForeignKey('servers.id'))
+    server    = relationship('Server', backref=backref('self_assignable_roles', cascade='all,delete,delete-orphan'))    

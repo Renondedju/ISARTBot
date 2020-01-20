@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018-2020 Renondedju
+# Copyright (c) 2018 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from discord.ext import commands
 
-if __name__ == '__main__':
+class ClassConverter(commands.RoleConverter):
+    async def convert(self, ctx, argument):
+        if (argument == ""):
+            raise commands.BadArgument("", "")
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+        try:
+            role = await super().convert(ctx, argument.strip().upper())
+            return role
+        except:
+            return None

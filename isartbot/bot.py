@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018 Renondedju
+# Copyright (c) 2018-2020 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,215 +22,302 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import sys
 import discord
 import asyncio
+import logging
 import traceback
+import configparser
+import logging.config
 
-from .logs           import Logs
-from .settings       import Settings
-from .bot_decorators import is_dev
-from  os.path        import abspath
-from  discord.ext    import commands
+from isartbot.lang         import Lang
+from isartbot.checks       import log_command, trigger_typing, block_dms
+from isartbot.database     import Server, Database
+from isartbot.exceptions   import UnauthorizedCommand, VerificationRequired
+from isartbot.help_command import HelpCommand
 
-class Bot(discord.ext.commands.Bot):
+from os.path     import abspath
+from discord.ext import commands
+
+
+class Bot(commands.Bot):
     """ Main bot class """
+
+    __slots__ = ("settings", "extensions", "config_file", "database", "logger", "langs", "dev_mode")
 
     def __init__(self, *args, **kwargs):
         """ Inits and runs the bot """
 
-        super().__init__(command_prefix = "!", *args, **kwargs)
+        self.config_file = abspath('./settings.ini')
 
-        #Private
-        self.__settings     = Settings()
-        self.__commands     = self.__settings.get("bot", "commands")
-        self.logs           = Logs(self, enabled = self.__settings.get("logs"))
-        self.command_prefix = self.__settings.get("bot", "prefix")
+        # Setting up logging
+        logging.config.fileConfig(self.config_file)
+        self.logger = logging.getLogger('isartbot')
 
-        self.logs.print('Using settings file at {}'.format(abspath(self.__settings.path)))
-        self.logs.print('Initializing bot ...')
+        # Loading settings
+        self.logger.info('Settings file located at {}'.format(self.config_file))
+        self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
+        self.settings.read(self.config_file, encoding='utf-8')
 
-        self.add_check(self.globally_block_dms)
-        self.add_check(self.log_command)
-        self.add_check(self.check_enable)
-        self.add_check(self.trigger_typing)
+        super().__init__(command_prefix = discord.ext.commands.when_mentioned_or(self.settings.get('common', 'prefix')), *args, **kwargs)
 
-        self.loop.create_task(self.load_cog())
+        self.dev_mode   = self.settings.getboolean('debug', 'developement_mode')
+        self.extensions = self.settings['extensions']
 
-        self.run(self.__settings.get("bot", "token"))
+        # Loading database
+        database_name = f"sqlite:///{abspath(self.settings.get('common', 'database'))}"
+        self.logger.info(f"Connecting to database {database_name}")
+        self.database = Database(self.loop, database_name)
 
-        self.logs.close()
+        # Creating the help command
+        self.help_command = HelpCommand()
 
-    @property
-    def guild(self):
-        return self.get_guild(self.settings.get('bot', 'server_id'))
+        # Loading languages
+        self.langs          = {}
+        self.loop.create_task(self.load_languages())
+        self.loop.create_task(self.load_extensions())
 
-    async def load_cog(self):
-        """ Loads all the cogs of the bot defined into the settings.json file """
+        # Adding checks
+        self.add_check(block_dms      , call_once=True)
+        self.add_check(log_command    , call_once=True)
+        self.add_check(trigger_typing , call_once=True)
+
+        self.before_invoke(self.fetch_guild_language)
+
+        token = configparser.ConfigParser()
+        token.read(abspath('./token.ini'), encoding='utf-8')
+        self.run(token.get('DEFAULT', 'token'))
+
+    async def load_extensions(self):
+        """ Loads all the cogs of the bot defined into the settings.ini file """
 
         try:
-            await self.wait_for('ready', timeout=30)
+            await self.wait_for("ready", timeout=30)
+            self.logger.info("Loading extensions...")
         except asyncio.futures.TimeoutError:
-            self.logs.print("Wait for on_ready event timed out, loading the cogs anyway.")
+            self.logger.warning("Wait for on_ready event timed out, loading the extensions anyway...")
 
-        for name, enabled in self.__commands.items():
-            if (name != ""):
-                name = name.strip('_')
-
+        for (extension, _) in self.settings.items("extensions"):
+            if self.extensions.getboolean(extension):
                 try:
-                    text = str(enabled.get('enabled'))
-                    self.load_extension('isartbot.modules.' + name)
-                    self.logs.print    ('Loaded the module {} : enabled = {}'.format(name, text))
-
+                    self.load_extension(f"isartbot.ext.{extension}")
+                    self.logger.info   (f"Loaded extension named isartbot.ext.{extension}")
                 except Exception as e:
-                    await self.on_error(None, e)
-                    self.logs.print('Failed to load extension named modules.{0}'.format(name))
+                    self.logger.error(f"Failed to load extension named isartbot.ext.{extension}")
+                    await self.on_error(e)
+            else:
+                self.logger.info(f"Ignored extension named isartbot.ext.{extension}")
 
         return
 
-    @property
-    def settings(self):
-        return self.__settings
+    async def load_languages(self):
+        """ (re)Loads all the available languages files of the bot"""
 
-    async def send_success(self, ctx, message, title=""):
-        """ Send a successful message """
+        self.langs.clear()
 
-        embed = discord.Embed(
-            title       = title,
-            description = message,
-            colour      = discord.Color.green())
+        for (lang, file_name) in self.settings.items("languages"):
 
-        return await ctx.send(embed=embed)
+            try:
+                self.langs[lang] = Lang(file_name)
+                self.logger.info(f"Loaded language named {lang} from {file_name}")
+            except Exception as e:
+                self.logger.error(f"Failed to load a language")
+                await self.on_error(e)
 
-    async def send_fail(self, ctx, message, title=""):
-        """ Send a failed message """
+        return
 
-        embed = discord.Embed(
-            title       = title,
-            description = message,
-            colour      = discord.Color.red())
+    async def get_translations(self, ctx, keys: list, force_fetch: bool = False):
+        """ Returns a set of translations """
 
-        return await ctx.send(embed=embed)
+        if (force_fetch):
+            await self.fetch_guild_language(ctx)
 
-    #Events
+        return dict([(key, self.langs[ctx.guild.description].get_key(key)) for key in keys])
+
+    async def get_translation(self, ctx, key: str, force_fetch: bool = False):
+        """ Returns a translation """
+
+        if (force_fetch):
+            await self.fetch_guild_language(ctx)
+
+        return self.langs[ctx.guild.description].get_key(key)
+
+    def register_guild(self, guild: discord.Guild):
+        """ Registers the guild into the database, this method is automatically called the first time a command is trigerred in a new guild """
+
+        new_server_preferences = Server(discord_id=guild.id)
+
+        self.database.session.add(new_server_preferences)
+        self.database.session.commit()
+
+        self.logger.warning(f"Registered new discord server to database : '{guild.name}' id = {guild.id}")
+
+        return new_server_preferences
+
+    async def fetch_guild_language(self, ctx):
+        """ An event that is called when a command is found and is about to be invoked. """
+
+        # Fetching the guild language and injects it into the context
+        lang = self.database.session.query(Server.lang).\
+            filter(Server.discord_id == ctx.guild.id).first()
+
+        # Checking if the guild is already registered in the database
+        if (lang == None):
+            lang = (self.register_guild(ctx.guild)).lang
+        else:
+            lang = lang[0]
+
+        # We are gonna use the guild description to store the language of the guild
+        # since this is not used by discord anyways
+        ctx.guild.description = lang
+
+    # --- Events ---
+
     async def on_ready(self):
         """
             Executed when the bot is connected
             to discord and ready to operate
         """
 
-        self.logs.print('------------')
-        self.logs.print('Logged in as')
-        self.logs.print('Username : {0}#{1}'.format(self.user.name, self.user.discriminator))
-        self.logs.print('User ID  : {0}'    .format(self.user.id))
-        self.logs.print('------------')
+        self.logger.info(f"Logged in as {self.user.name}#{self.user.discriminator} - {self.user.id}")
 
-    async def on_error(self, ctx, error):
-        """ Sends errors reports if needed """
+    async def on_connect(self):
+        """Executed when the bot connects to discord"""
 
-        ignored = (commands.CommandNotFound,
-                   commands.UserInputError,
-                   commands.CheckFailure)
-        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
-        # If nothing is found. We keep the exception passed to on_command_error.
-        error = getattr(error, 'original', error)
+        self.logger.info("Discord connection established")
+
+    async def on_disconnect(self):
+        """Executed when the bot connects to discord"""
+
+        self.logger.info("Discord connection terminated")
+
+    async def on_guild_join(self, guild: discord.Guild):
+        """Called when a Guild is either created by the Client or when the Client joins a guild"""
+
+        self.logger.warning(f"Joined guild : {guild.name}")
+        self.register_guild(guild)
+
+    async def on_guild_remove(self, guild: discord.Guild):
+        """Called when a Guild is removed from the Client"""
+        
+        self.logger.warning(f"Left guild : {guild.name}")
+
+        # Server should always be valid
+        server = self.database.session.query(Server).filter(Server.discord_id == guild.id).first()
+
+        if (server != None):
+            self.database.session.delete(server)
+            self.database.session.commit()
+        else:
+            self.logger.warning(f"No database entry found for the guild named {guild.name} (id = {guild.id})")
+
+    async def on_command_error(self, ctx, error):
+        """ Handles command errors """
+
+        if isinstance(error, UnauthorizedCommand):
+            await self.unauthorized_command_error(ctx, error)
+            return
+
+        if isinstance(error, VerificationRequired):
+            await self.verification_required_error(ctx, error)
+            return
 
         # Anything in ignored will return and prevent anything happening.
-        if isinstance(error, ignored):
+        if isinstance(error, (commands.CommandNotFound, commands.CheckFailure)):
             return
 
-        if isinstance(error, commands.NoPrivateMessage):
-            try:
-                return await ctx.author.send("Hey no DMs!")
-            except:
-                return
+        if isinstance(error, commands.UserInputError):
+            await ctx.send_help(ctx.command)
+            return
+
+        if isinstance(error, commands.MissingPermissions):
+            await self.missing_permissions_error(ctx, error)
+            return
+
+        if isinstance(error, commands.BotMissingPermissions):
+            await self.bot_missing_permissions_error(ctx, error)
+            return
 
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        if ctx is not None:
-            self.logs.print('Ignoring exception in command {}:'.format(ctx.command))
-        else:
-            self.logs.print('Ctx is empty, this might be comming from the module loading function:')
+        self.logger.error(f"Ignoring exception in command \"{ctx.command}\":")
 
         for err in traceback.format_exception(type(error), error, error.__traceback__):
-            if (err[len(err) - 1] == '\n'):
-                err = err[:-1]
-            self.logs.print(err)
-
-        try:
-            errors = traceback.format_tb(error.__traceback__)
-            embed  = discord.Embed(description =
-                "Oops an unexpected error occurred !" +
-                "\nPlease [open an issue](https://github.com/BasileCombet/ISARTBot/issues)" +
-                " on github if this error is recurrent\n" +
-                "Make sure to include a screenshot of this message\n```\n" +
-                errors[len(errors) - 1] +
-                "\n```",
-                title = "Error")
-
-            embed.set_footer(text=self.logs.get_time)
-            embed.colour = discord.Colour.red()
-
-            await ctx.send(embed = embed)
-        except:
-            return
+            index = 0
+            for i, char in enumerate(err):
+                if (char == '\n'):
+                    self.logger.error(err[index:i])
+                    index = i + 1
 
         return
 
-    async def on_command_error(self, ctx, error):
-        """ Handles unhandled errors """
+    async def on_error(self, *args, **kwargs):
+        """ Sends errors reports """
 
-        # This prevents any commands with local handlers being handled here in on_command_error.
-        if hasattr(ctx.command, 'on_error'):
+        self.logger.critical("Unhandled exception occurred:")
+        for err in traceback.format_exc().split('\n'):
+            self.logger.critical(err)
+
+    async def unauthorized_command_error(self, ctx, error):
+        """ Sends a missing permission error """
+
+        self.logger.info(f"Access unauthorized, command has been denied.")
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
 
-        await self.on_error(ctx, error)
+        translations = await self.get_translations(ctx, ["failure_title", "unauthorized_command"], force_fetch=True)
 
-    ###Checks
-    async def trigger_typing(self, ctx):
-        """ Triggers typing """
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["unauthorized_command"].format(error.missing_status),
+            color       = discord.Color.red()
+            )
 
-        await ctx.trigger_typing()
+        await ctx.send(embed = embed)
 
-        return True
+    async def missing_permissions_error(self, ctx, error):
+        """ Sends a missing permission error """
 
-    async def globally_block_dms(self, ctx):
-        """
-            Checks if the messages provides from
-            a guild or a DM
-        """
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
 
-        result = not (ctx.guild is None)
+        translations = await self.get_translations(ctx, ["failure_title", "missing_perms_error"], force_fetch=True)
 
-        if result is False:
-            raise commands.NoPrivateMessage()
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["missing_perms_error"].format(error.missing_perms),
+            color       = discord.Color.red()
+        )
 
-        return result
+        await ctx.send(embed=embed)
 
-    async def check_enable(self, ctx):
-        """
-            Checks if the command is enabled or not
-        """
+    async def bot_missing_permissions_error(self, ctx, error):
+        """ Sends a missing permission error """
 
-        if is_dev(ctx):
-            return True
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
 
-        command = ctx.command.root_parent
-        if (command is None):
-            command = ctx.command
+        translations = await self.get_translations(ctx, ["failure_title", "bot_missing_perms_error"], force_fetch=True)
 
-        enabled = ctx.bot.settings.get("enabled", command=command.name)
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["bot_missing_perms_error"].format(error.missing_perms),
+            color       = discord.Color.red()
+        )
 
-        if (enabled == False):
-            await self.send_fail(ctx,
-                "Sorry, but this command is disabled for now !",
-                'Error')
+        await ctx.send(embed=embed)
 
-        return enabled
+    async def verification_required_error(self, ctx, error):
+        """ Sends a verification required error """
 
-    async def log_command(self, ctx):
-        """ Logs every command """
-        author  = '{0}#{1}'     .format(ctx.author.name, ctx.author.discriminator)
-        channel = '{1.name}/{0}'.format(ctx.channel.name, ctx.channel.category)
+        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
+            return
 
-        self.logs.print('{0} {1} : {2}'.format(author, channel, ctx.message.content))
+        translations = await self.get_translations(ctx, ["failure_title", "verified_role_required"], force_fetch=True)
 
-        return True
+        embed = discord.Embed(
+            title       = translations["failure_title"],
+            description = translations["verified_role_required"].format(error.missing_role),
+            color       = discord.Color.red()
+        )
+
+        await ctx.send(embed=embed)

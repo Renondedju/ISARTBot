@@ -22,10 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from isartbot.exceptions import UnauthorizedCommand
 
-if __name__ == '__main__':
-
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+async def denied(ctx):
+    raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "denied_status", force_fetch = True))

@@ -1,0 +1,355 @@
+# French language file
+
+# Help
+
+help_opening_note=Utilisez `{0}{1} [commande]` pour plus d'info sur une commande.\nVous pouvez également utiliser `{0}{1} [catégorie]` pour plus d'informations une une catégorie.
+commands_heading=Commandes disponibles
+help_title=Aide
+
+# General
+
+failure_title=Erreur
+success_title=Succès
+confirmation_footer=Réagissez avec 👍 si vous voulez continuer
+
+missing_perms_error=Oups ! Il semblerait qu'il vous manque l'une des permissions suivantes pour exécuter cette commande : {0}.
+missing_bot_perms_error=Oups ! Il semblerait qu'il manque au bot l'une des permissions suivantes pour exécuter cette commande.
+unauthorized_command=Seuls les {0}s peuvent utiliser cette commande.
+verified_role_required=Vous devez avoir le rôle {} pour être capable d'éxecuter cette commande !
+
+moderator_status=moderateur
+super_admin_status=super administrateur
+developper_status=developpeur
+admin_status=administrateur
+denied_status=dieu
+
+command_not_found=Cette commande n'existe pas.
+no_subcommand=Cette commande n'a pas de sous-commande.
+no_subcommand_named=Cette sous-commande n'existe pas.
+
+## Class extension
+
+class_help=Gère les rôles de classe.
+class_description=Permet de créer, supprimer et renommer facilement des rôles de classe.
+class_invalid_argument=Argument invalide, veuillez mentionner une classe valide.
+
+# Create
+class_create_help=Crée une classe
+class_create_description=Crée un nouveau rôle de classe.\n<name>: Nom du nouveau rôle de classe
+class_create_success=Classe {0} créé avec succès !
+class_create_error=Classe {0} existe déjà.
+class_create_name_error=Nom de classe invalide.
+
+# Delete
+class_delete_help=Supprime une classe
+class_delete_description=Supprime un rôle de classe.\n<name>: Nom ou balise du rôle de classe condamné.
+class_delete_success=Suppression de la classe nommée {0}...
+class_delete_confirmation_title=Supprimer la classe ?
+class_delete_confirmation_description=Êtes-vous sûr de vouloir supprimer la classe {} ?
+class_delete_aborted=Suppression annulée.
+
+# Rename
+class_rename_help=Renomme une classe
+class_rename_description=Renomme un rôle de classe.\n<old_name>: Nom actuel ou balise du rôle de classe\n<new_name>: Nouveau nom du rôle de classe
+class_rename_error=Cette classe existe déjà.
+class_rename_success=Classe @{} renommé avec succès en {} !
+
+
+## Game extension
+
+game_help=Gère les rôles de jeux.
+game_description=Permet de créer, supprimer et renommer facilement les rôles de jeu.
+game_invalid_argument=Nom de jeu invalide.
+
+# Add
+game_add_help=Ajoute un rôle de jeu à un utilisateur.
+game_add_description=Ajoute un rôle de jeu à un utilisateur.\n<game> Nom du jeu à ajouter
+game_add_success=Rôle ajouté ! Enjoy {}
+game_add_failure=Échec de l'ajout de votre rôle, je n'ai peut-être pas assez de droits.
+
+# Remove
+game_remove_help=Supprime un rôle de jeu d'un utilisateur
+game_remove_description=Supprime un rôle de jeu d'un utilisateur.\n<game> Nom du jeu à supprimer
+game_remove_success=Vous avez supprimé le rôle avec succès {} !
+game_remove_failure=Échec de la suppression du rôle, je n'ai peut-être pas assez de droits.
+
+# Create
+game_create_help=Crée un jeu
+game_create_description=Ajoute un rôle correspondant au jeu <name>. Si vous souhaitez que votre rôle porte un nom différent de celui utilisé par Discord, précisez-le à l'aide de l'argument [discord_name].
+game_create_success=Jeu {} créé avec succès !
+game_create_error_existing=Le jeu "{}" existe déjà.
+game_create_error_invalid=Nom de jeu invalide.
+
+# Delete
+game_delete_help=Supprime un jeu.
+game_delete_description=Supprime le rôle correspondant à ce jeu.\n<name>: Nom du jeu
+game_delete_success=Jeu @{} supprimé avec succès !
+game_delete_confirmation_title=Supprimer le jeu ?
+game_delete_confirmation_description=Voulez-vous vraiment supprimer le jeu {} ?
+game_delete_aborted=Suppression abandonnée.
+
+# Rename
+game_rename_help=Renomme un jeu
+game_rename_description=Renomme un rôle de jeu.\n<old_name>: Nom actuel du rôle de jeu\n<new_name>: Nouveau nom du rôle de jeu
+
+# List
+game_list_help=Liste tous les jeux disponibles
+game_list_description=Vous donne la liste de tous les jeux disponibles qui ont des rôles correspondants que vous pouvez vous attribuer.
+game_list_title=Liste des jeux
+game_list_footer=Page {} sur {}
+
+
+### Diffusion extension
+
+diffusion_help=Gère la diffusion
+diffusion_description=Aide à la gestion des canaux de diffusion, des abonnements et des opérateurs
+diffusion_doesnt_exist=Cette diffusion n'existe pas.\nVeuillez utiliser ``{}diffusion list`` pour obtenir une liste de toutes les diffusions existantes.
+
+# Diffuse
+diffusion_diffuse_help=Diffuse un message
+diffusion_diffuse_description=Diffuse un message vers un canal de diffusion.\n<diffusion>: Nom du canal de diffusion \n<message>: Id du message à diffuser
+diffusion_diffuse_confirmation_title=Diffusion
+diffusion_diffuse_confirmation=Vous êtes sur le point de diffuser un message à {} abonnements, êtes-vous sûr ?\nUne fois ce processus commencé, il n'y a aucun moyen de l'annuler !
+diffusion_diffuse_confirmation_start=Diffusez votre message au "{}" channel.\n{} sur {} abonnements ont été notifiés jusqu'à présent. \nVeuillez patienter, ce processus peut prendre un certain temps.
+diffusion_diffuse_confirmation_abort=Diffusion annulée.
+diffusion_diffuse_confirmation_done=Diffusion terminée !\n{} erreur(s) produites.
+
+# Create
+diffusion_create_help=Crée un canal de diffusion
+diffusion_create_description=Crée un canal de diffusion.\n<diffusion_name>: Nom unique du canal de diffusion 
+diffusion_created= La diffusion nommée "{}" a été créé avec succès.
+diffusion_already_exists=Cette diffusion existe déjà ! Veuillez choisir un nom de diffusion unique.
+
+# Delete
+diffusion_delete_help=Supprime un canal de diffusion
+diffusion_delete_description=Supprime un canal de diffusion. \n<diffusion>: Nom du canal de diffusion à supprimer
+diffusion_delete_title=Supprimer une diffusion ?
+diffusion_delete_aborted=Suppression abandonnée.
+diffusion_delete_content=Voulez-vous vraiment supprimer la diffusion nommée "{}" ?\n Cela supprimera également tous les abonnements à cette diffusion.
+diffusion_deleted=La diffusion nommée "{}" a été supprimée avec succès.
+
+# List
+diffusion_list_help=Liste toutes les diffusions
+diffusion_list_description=Affiche la liste de toutes les diffusions disponibles.
+diffusion_list_title=Diffusions disponibles
+
+## Subscription
+diffusion_subscription_help=Aide à gérer les souscriptions aux canaux de diffusion
+diffusion_subscription_description=Aide à l'abonnement et au désabonnement aux canaux de diffusion.
+
+# Subscribe
+diffusion_subscription_subscribe_help=S'abonne à un canal de diffusion
+diffusion_subscription_subscribe_description=S'abonne à un canal de diffusion.\n<diffusion>: Nom de la diffusion\n<channel>: Canal auquel vous abonner\n[diffusion_tag]: Rôle à mentionner avec chaque message
+diffusion_subscribe_success=Souscrit avec succès à cette diffusion !
+diffusion_subscription_already_exists=Cet abonnement existe déjà.\n Utilisez ``{}diffusion unsubscribe`` se désinscrire de cette diffusion.
+
+# Unsubscribe
+diffusion_subscription_unsubscribe_help=Se désabonner d'un canal de diffusion
+diffusion_subscription_unsubscribe_description=Se désabonner d'un canal de diffusion.\n<diffusion>: Nom de la diffusion\n<channel>: Canal à désabonner
+diffusion_unsubscribe_success=Désabonnement réussi de cette diffusion !
+diffusion_no_such_subscription=Il n'y a pas d'abonnement à désinscrire.\nUtilisez ``{}diffusion subscribe`` pour vous abonner à une diffusion.
+
+# List
+diffusion_subscription_list_help=Répertorie tous les abonnements à une chaîne
+diffusion_subscription_list_description=Répertorie tous les abonnements à une chaîne.\n[channel]: Nom de la chaîne pour lister les abonnements
+diffusion_subscription_list_empty=Ce serveur n'a pas d'abonnement !
+diffusion_subscription_list_title=Liste d'abonnements pour ce serveur
+
+## Operator
+diffusion_operator_help=Aide à gérer les opérateurs
+diffusion_operator_description=Aide à ajouter et à supprimer des opérateurs à une diffusion.
+
+# Add
+diffusion_operator_add_help=Ajoute un opérateur à une diffusion
+diffusion_operator_add_description=Ajoute un opérateur à une diffusion.\n<diffusion>: Nom de la diffusion\n<new_operator>: Nom ou tag de l'opérateur à ajouter
+diffusion_operator_added={} est désormais un opérateur de la diffusion nommé "{}".
+diffusion_already_operator={} est déjà un opérateur de la diffusion nommé "{}".
+
+# Remove
+diffusion_operator_remove_help=Supprime un opérateur d'une diffusion
+diffusion_operator_remove_description=Supprime un opérateur d'une diffusion.\n<diffusion>: Nom de la diffusion\n<old_operator>: Nom ou tag de l'opérateur à enlever
+diffusion_operator_remove_title=Supprimer l'opérateur ?
+diffusion_operator_remove_content=Voulez-vous vraiment supprimer {} de "{}" opérateurs de diffusion ?
+diffusion_operator_removed={} n'est plus un opérateur de la diffusion nommé "{}".
+diffusion_operator_remove_content_failure=Opération annulée.
+diffusion_not_operator={} n'est pas un opérateur de la diffusion nommé "{}".
+
+# List
+diffusion_operator_list_help=Liste tous les opérateurs d'une diffusion
+diffusion_operator_list_description=Affiche la liste de tous les opérateurs d'une diffusion.\n<diffusion>: Diffusion pour lister les opérateurs de
+diffusion_operator_list_title=Les opérateurs de "{}" diffusion.
+diffusion_operator_list_no_operator=Il n'y a pas d'opérateurs pour cette diffusion.
+
+
+## Ext extension
+
+ext_help=Gère (re)chargement des extensions
+ext_description=Permet de charger, décharger et recharger facilement les extensions du bot.
+
+# Load
+ext_load_help=Charge une extension
+ext_load_description=Charge l'extension souhaitée.\n<ext>: Nom de l'extension
+ext_load_success_desc= Extension chargée !
+ext_load_failure_desc=Impossible de charger l'extension. Consultez les journaux pour plus d'informations.
+
+# Unload
+ext_unload_help=Décharge une extension
+ext_unload_description=Décharge l'extension souhaitée.\n<ext>: Nom de l'extension
+ext_unload_success_desc=Extension déchargée !
+ext_unload_failure_desc=Impossible de décharger l'extension. Consultez les journaux pour plus d'informations.
+
+# Reload
+ext_reload_help=recharge une extension
+ext_reload_description=Recharge l'extension souhaitée.\n<ext>: Nom de l'extension
+ext_reload_success_desc=Extension rechargée !
+ext_reload_failure_desc=Impossible de rechargée l'etension. Consultez les journaux pour plus d'informations.
+
+
+## Lang extension
+
+lang_help=Gère les langues
+lang_description=Permet de changer facilement de langue pour le bot.
+
+# Reload
+lang_reload_help=Recharge toutes les langues
+lang_reload_description=Recharge toutes les langues actuellement chargées.
+lang_reload_success=Toutes les langues ont été rechargées avec succès !
+
+# List
+lang_list_help=Répertorie toutes les langues
+lang_list_description=Affiche la liste de toutes les langues disponibles de ce bot.
+lang_list_title=Langues disponibles
+lang_list_footer=Utilisez !lang set <language> pour changer la langue actuelle.
+
+# Set
+lang_set_help=Définit la langue
+lang_set_description=Définit la langue utilisée par ce bot.
+lang_set=Langue définie avec succès !
+lang_not_available=Cette langue n'existe pas, veuillez utiliser ``!lang list`` pour avoir la liste complète des langues disponibles.
+
+# Key
+lang_key_help=Récupère une valeur de localisation à partir d'une clé
+lang_key_description=Récupère la valeur correspondant à cette clé de localisation.\n<lang>: Langue cible\n<key>: Clé associée à la valeur
+
+
+## Moderation extension
+
+mod_help=Gère la modération
+mod_description=Aide à modérer le serveur.
+
+# Prune
+mod_prune_help=Supprime la quantité souhaitée de messages
+mod_prune_description=Supprime les derniers messages de cette chaîne de texte.\n<number>: Nombre des derniers messages à supprimer\n[member]: Nom du membre auquel limiter la suppression du message. (Des <number> messages, seuls ceux de [member] seront supprimé)
+success_prune=Les {0} derniers messages ont été supprimés.
+
+# Kick
+mod_kick_help=Exclut un membre
+mod_kick_description=Exclut un membre.\n<member>: Nom du membre\n[reason]: Raison de l'exclusion
+success_kick={0} a été exclu par {1} car : {2}.
+
+# Ban
+mod_ban_help=Bannit un membre
+mod_ban_description=Bannit un membre.\n<member>: Nom du membre \n[reason]: Raison du bannissement
+success_ban={0} a été banni par {1} car : {2}.
+
+mod_as_help=
+mod_as_description=
+mod_for_help=
+mod_for_description=
+mod_for_success=Utilisez \'{}\' stratégie avec les rôles {} sur {}'.
+mod_for_error=Action devrait être 'add' ou 'remove' !
+
+
+## Starboard extension
+
+starboard_description=Met en évidence automatiquement les posts upvoté dans un channel dédié.\nRéagissez à un message avec ⭐ et le bot ajoutera ou enlévera automatiquement ce message du starboard.
+starboard_set_description=Définit le channel du starboard.\nEnvisagez d'autoriser l'accès exclusif en écriture au bot sur ce channel.\n<channel>: Channel du starboard.
+starboard_disable_description=Désactive le starboard, utilisez la commande `starboard set` pour le réactiver.
+starboard_set_help=Définit le channel du starboard.
+starboard_disable_help=Désactive le starboard.
+
+success_starboard_set=Le starboard a été configuré avec succès sur le canal de texte suivant.
+success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur.
+
+
+## Test extension
+
+denied_failure=Quelque chose a mal tourné !
+test_wait=Le processus a été interrompu 2 secondes pour les tests.
+user_has_no_groups=n'a pas de privilèges spéciaux de bot. 
+user_has_groups=a les privilèges de bot suivants.
+test=Tout semble bien fonctionner !
+
+
+## SAR extension
+
+sar_help=Gère l'attribution des rôles
+sar_description=Permet une attribution facile des rôles, en les marquant comme auto-assignables.
+sar_non_existant_role={} n'est pas un rôle auto-assignable.
+sar_invalid_role_error={} n'est pas un rôle valide.
+
+# Create
+sar_create_help=Rend un rôle auto-assignable
+sar_create_description=Marque un rôle comme auto-assignable, permettant aux utilisateurs de l'attribuer à eux-mêmes.
+sar_role_created={} est désormais un rôle auto-assignable.
+sar_role_already_exists_error={} est déjà un rôle auto-assignable.
+
+# Delete
+sar_delete_help=Rend un rôle non auto-assignable
+sar_delete_description=Supprime un rôle auto-assignable, empêchant les utilisateurs de se l'attribuer à eux-mêmes.
+sar_role_deleted={} n'est plus un rôle auto-assignable.
+
+# List
+sar_list_help=Répertorie tous les rôles auto-attribuables
+sar_list_description=Affiche la liste de tous les rôles auto-attribuables. \n [page]: page à répertorier
+sar_list_title=Liste des rôles auto-attribuables
+sar_list_footer=Page {} sur {}
+
+# Iam
+iam_help=Vous attribue un rôle
+iam_description=Vous attribue un rôle.\n<role>: Nom du rôle que vous souhaitez vous attribuer
+iam_success=Vous avez maintenant le rôle {} !
+iam_failure=Échec de l'ajout du rôle {}. Je n'ai peut-être pas assez d'autorisations.
+
+# Iamn
+iamn_help=Supprime un rôle de vous-même
+iamn_description=Supprime un rôle de vous-même.\n<role>: Nom du rôle que vous souhaitez ne pas vous attribuer
+iamn_success=Vous n'avez plus le rôle {}.
+iamn_failure=Impossible de supprimer le rôle {}. Je n'ai peut-être pas assez d'autorisations.
+
+
+## Test
+
+test_help=Aide à tester le bot
+test_description=Fournit des commandes pour tester les fonctionnalités et les limites du bot.
+
+test_commands_help_help=Exécute l'aide sur chaque commande
+test_commands_help_description=Exécute la commande "help" sur chaque commande.
+
+test_groups_help=Affiche les privilèges des bots d'un utilisateur
+test_groups_description=Affiche les privilèges des bots d'un utilisateur.\n[member]: Membre dont afficher les privilèges
+
+test_error_help=Déclenche une exception inattendue
+test_error_description=Déclenche une exception inattendue.
+
+test_delay_help=Attendez 2 secondes
+test_delay_description=Attendez 2 secondes.
+
+test_denied_help=Ne devrait jamais montrer
+test_denied_description=Ne devrait jamais s'exécuter.
+
+## Foodtruck
+
+foodtruck_help=Imprime une liste des foodtrucks à venir
+foodtruck_description=Imprime la liste de tous les foodtrucks à venir
+foodtruck_list_title=Foodtrucks à venir :
+foodtruck_list_format={delimiters}{date} - [{foodtruck}]({website}) ({specialty}) {delimiters}
+foodtruck_list_empty=Tellement vide ¯\_(ツ)_/¯
+
+# Upload
+
+foodtruck_upload_help=Télécharge une nouvelle base de données foodtruck
+foodtruck_upload_description=Télécharge une nouvelle base de données foodtruck. La base de données doit être un fichier `.csv` contenant les colonnes suivantes:` foodtruck, date, speciality, website`.
+foodtruck_upload_attachment_error=La commande doit être appelée avec (une seule) pièce jointe.
+foodtruck_upload_succeeded=Le nouveau téléchargement de la base de données foodtruck a réussi !
+foodtruck_upload_failed=Échec du téléchargement de la base de données foodtruck. Veuillez réessayer plus tard ou contacter un administrateur pour plus de détails.

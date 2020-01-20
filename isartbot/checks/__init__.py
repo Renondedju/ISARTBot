@@ -22,10 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
-
-if __name__ == '__main__':
-
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+from isartbot.checks.denied         import denied
+from isartbot.checks.admin          import is_admin
+from isartbot.checks.verified       import is_verified
+from isartbot.checks.block_dms      import block_dms
+from isartbot.checks.moderator      import is_moderator
+from isartbot.checks.developper     import is_developper , developper
+from isartbot.checks.super_admin    import is_super_admin, super_admin
+from isartbot.checks.log_command    import log_command
+from isartbot.checks.trigger_typing import trigger_typing

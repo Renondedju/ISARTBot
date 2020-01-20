@@ -19,13 +19,24 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-import os
-import isartbot
+from sqlalchemy     import Column, Integer, Text
+from sqlalchemy.orm import relationship
 
-if __name__ == '__main__':
+from isartbot.database import TableBase
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class Server(TableBase):
+
+    __tablename__ = 'servers'
+
+    id                   = Column('id'              , Integer, primary_key = True, unique = True)
+    lang                 = Column('lang'            , Text   , default     = "en")
+    discord_id           = Column('discord_id'      , Integer, unique      = True)
+    starboard_channel_id = Column('starboard_id'    , Integer, default     = 0)
+    verified_role_id     = Column('verified_role_id', Integer, default     = 0)
+    
+    games                 = relationship('Game'                 , cascade='all,delete,delete-orphan')
+    diffusion_subs        = relationship('DiffusionSubscription', cascade='all,delete,delete-orphan')
+    self_assignable_roles = relationship('SelfAssignableRole'   , cascade='all,delete,delete-orphan')

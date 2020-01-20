@@ -22,10 +22,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from sqlalchemy.orm    import sessionmaker, scoped_session
+from sqlalchemy        import create_engine
 
-if __name__ == '__main__':
+from isartbot.database.table_base import TableBase
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class Database:
+
+    __slots__ = ("engine", "session", "loop", "session_factory")
+
+    def __init__(self, loop, database_name: str):
+
+        self.loop            = loop
+        self.engine          = create_engine (database_name)
+        self.session_factory = sessionmaker  (bind=self.engine)
+        self.session         = scoped_session(self.session_factory)
+
+        TableBase.prepare(self.engine)
+        TableBase.metadata.create_all(self.engine)
+
+    def __del__(self):
+        self.session.remove()

@@ -22,10 +22,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from isartbot.exceptions import UnauthorizedCommand
 
-if __name__ == '__main__':
+async def is_developper(ctx):
+    value = developper(ctx, ctx.author)
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+    if (not value):
+        raise UnauthorizedCommand(missing_status = await ctx.bot.get_translation(ctx, "developper_status", force_fetch = True))
+
+    return True
+
+# Manual check
+def developper(ctx, user):
+    return str(user.id) in ctx.bot.settings.get('debug', 'developer_ids')

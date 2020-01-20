@@ -22,10 +22,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+from discord.ext.commands import NoPrivateMessage
 
-if __name__ == '__main__':
+async def block_dms(ctx):
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+    result = not (ctx.guild is None)
+
+    if result is False:
+        raise NoPrivateMessage()
+
+    return result

@@ -22,10 +22,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+__slots__ = ("Database", "TableBase")
 
-if __name__ == '__main__':
+from .database   import Database
+from .table_base import TableBase
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+from isartbot.database.models import *

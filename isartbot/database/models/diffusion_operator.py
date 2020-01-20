@@ -19,13 +19,21 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-import os
-import isartbot
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
-if __name__ == '__main__':
+from isartbot.database import TableBase
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class DiffusionOperator(TableBase):
+
+    __tablename__ = 'diffusion_operators'
+
+    id           = Column('id'        , Integer, primary_key = True, unique = True)
+    discord_id   = Column('discord_id', Integer, nullable    = False)
+
+    diffusion_id = Column(Integer, ForeignKey('diffusions.id'))
+    diffusion    = relationship('Diffusion', backref=backref('operators', cascade='all,delete,delete-orphan'))
+    

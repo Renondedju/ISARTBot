@@ -19,13 +19,24 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-import os
-import isartbot
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship, backref
 
-if __name__ == '__main__':
+from isartbot.database import TableBase
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+class DiffusionSubscription(TableBase):
+
+    __tablename__ = 'diffusion_subscriptions'
+
+    id                 = Column('id'         , Integer, primary_key=True, unique=True)
+    tag                = Column('discord_tag', Text   , default = "")
+    discord_channel_id = Column('channel_id' , Integer, nullable=False)
+
+    diffusion_id       = Column(Integer, ForeignKey('diffusions.id'))
+    server_id          = Column(Integer, ForeignKey('servers.id'   ))
+
+    diffusion          = relationship('Diffusion', backref=backref('subscriptions' , cascade='all,delete,delete-orphan'))
+    server             = relationship('Server'   , backref=backref('diffusion_subs', cascade='all,delete,delete-orphan'))

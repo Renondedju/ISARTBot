@@ -23,7 +23,8 @@ wheels/
 *.egg
 MANIFEST
 
-settings.json
+token.ini
+database.db
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -106,3 +107,4 @@ venv.bak/
 \.vscode/
 
 *.code-workspace
+storage

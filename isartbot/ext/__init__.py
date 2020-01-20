@@ -22,10 +22,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
-
-if __name__ == '__main__':
-
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+from .ext       import *
+from .test      import *
+from .lang      import *
+from .starboard import *
+from .diffusion import *
+from .game      import *
+from .iam       import *
+from .foodtruck import *

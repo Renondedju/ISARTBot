@@ -22,10 +22,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import isartbot
+import discord
+import asyncio
 
-if __name__ == '__main__':
+from isartbot.database          import Server
+from isartbot.exceptions        import VerificationRequired
+from isartbot.checks.developper import developper
 
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    isartbot.Bot()
+async def is_verified(ctx):
+
+    # Fetching server verified role (if any)
+    server        = ctx.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
+    verified_role = discord.utils.get(ctx.guild.roles, id = (server.verified_role_id if server != None else 0))
+
+    if ctx.bot.dev_mode and developper(ctx, ctx.author):
+        return True
+
+    if (verified_role != None and verified_role not in ctx.message.author.roles):
+        raise VerificationRequired(missing_role=verified_role.mention)
+
+    return True

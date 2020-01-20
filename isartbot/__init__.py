@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018 Renondedju
+# Copyright (c) 2018-2020 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .bot            import *
-from .logs           import *
-from .settings       import *
-from .converters     import *
-from .bot_decorators import *
+__title__     = 'Isartbot'
+__authors__   = ('Renondedju', '6xray', 'Torayl', 'Lunatik', 'Ayven-Johan')
+__license__   = 'MIT'
+__version__   = '2.0.0'
+__copyright__ = 'Copyright 2018-2020 Renondedju'
+
+from collections import namedtuple
+
+VersionInfo  = namedtuple('VersionInfo', 'major minor micro releaselevel')
+version_info = VersionInfo(major=2, minor=0, micro=0, releaselevel='live')
+
+from .bot import Bot
