@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018-2019 Renondedju
+# Copyright (c) 2018-2020 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,10 @@
 # SOFTWARE.
 
 __title__     = 'Isartbot'
-__authors__   = ('Renondedju', '6xray', 'Torayl', 'Lunatik')
+__authors__   = ('Renondedju', '6xray', 'Torayl', 'Lunatik', 'Ayven-Johan')
 __license__   = 'MIT'
 __version__   = '2.0.0-dev'
-__copyright__ = 'Copyright 2018-2019 Renondedju'
+__copyright__ = 'Copyright 2018-2020 Renondedju'
 
 from collections import namedtuple
 
