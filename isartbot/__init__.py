@@ -25,12 +25,12 @@
 __title__     = 'Isartbot'
 __authors__   = ('Renondedju', '6xray', 'Torayl', 'Lunatik', 'Ayven-Johan')
 __license__   = 'MIT'
-__version__   = '2.0.0-dev'
+__version__   = '2.0.0'
 __copyright__ = 'Copyright 2018-2020 Renondedju'
 
 from collections import namedtuple
 
 VersionInfo  = namedtuple('VersionInfo', 'major minor micro releaselevel')
-version_info = VersionInfo(major=2, minor=0, micro=0, releaselevel='dev')
+version_info = VersionInfo(major=2, minor=0, micro=0, releaselevel='live')
 
 from .bot import Bot
