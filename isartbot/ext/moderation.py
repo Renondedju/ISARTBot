@@ -126,17 +126,18 @@ class ModerationExt(commands.Cog):
 
         self.bot.logger.warning(f"{member.name} has been banned by {ctx.author.name} for '{reason}'")
 
+    """
     @mod.command(help="mod_as_help", description="mod_as_description", name = "as")
     @commands.check(is_moderator)
     async def _as(self, ctx, member : MemberConverter, *command_str : str):
         
         if (member is None):
-            await Helper.send_error(ctx, ctx.channel, 'mod_as_error')
+            await Helper.send_error(ctx, ctx.channel, 'mod_as_success')
             return
 
         await Helper.send_success(ctx, ctx.channel, 'mod_as_success')
 
-        """prefix = self.bot.clean_prefix
+        prefix = self.bot.clean_prefix
         regex  = r"{0}(\w*)\s.*".format(prefix)
         matches = re.search(regex, command_str)
 
