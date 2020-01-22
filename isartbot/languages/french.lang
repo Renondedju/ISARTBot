@@ -256,10 +256,10 @@ success_ban={0} a été banni par {1} car : {2}.
 
 mod_as_help=
 mod_as_description=
-mod_for_help=
-mod_for_description=
+mod_for_help=Permet la manipulation de rôles pour une grand quantité de membres à la fois
+mod_for_description=Ajoute ou supprime des rôles à un groupe de membres.\nPar exemple `!mod for @LeagueOfLegends add @Tft` ajoutera le rôle @Tft à tous les détenteurs du rôle @LeagueOfLegends.\nLes différentes stratégies possibles sont `add` et `remove`.
 mod_for_success=Utilisez \'{}\' stratégie avec les rôles {} sur {}'.
-mod_for_error=Action devrait être 'add' ou 'remove' !
+mod_for_error=La stratégie devrait être soit `add` soit `remove` !
 
 
 ## Starboard extension
