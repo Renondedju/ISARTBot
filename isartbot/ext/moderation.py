@@ -70,16 +70,23 @@ class ModerationExt(commands.Cog):
 
         messages = []
         if (member is None):
-            messages = await ctx.channel.history(limit=number + 1).flatten()
+            messages = await ctx.channel.history(limit=number).flatten()
 
         else:
-            async for message in ctx.channel.history(limit=number + 1):
+            async for message in ctx.channel.history(limit=number):
                 if (message.author == member):
-                     messages.append(message)
-            messages.append(ctx.message)
+                    messages.append(message)
 
-        await ctx.channel.delete_messages(set(messages))
-        await Helper.send_success(ctx, ctx.channel, "success_prune", format_content=(len(messages),), delete_after=5.0)
+        if (len(messages) > 100):
+            await Helper.send_error(ctx, ctx.channel, "fail_prune_size", format_content=(len(messages),))
+            return
+
+        try: 
+            await ctx.channel.delete_messages(messages)
+        except discord.HTTPException:
+            await Helper.send_error(ctx, ctx.channel, "fail_prune_other")
+        else:
+            await Helper.send_success(ctx, ctx.channel, "success_prune", format_content=(len(messages),), delete_after=5.0)
 
     @mod.command(help="mod_kick_help", description="mod_kick_description")
     @commands.bot_has_permissions(kick_members=True)

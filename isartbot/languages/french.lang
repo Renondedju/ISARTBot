@@ -199,10 +199,10 @@ ext_unload_success_desc=Extension déchargée !
 ext_unload_failure_desc=Impossible de décharger l'extension. Consultez les journaux pour plus d'informations.
 
 # Reload
-ext_reload_help=recharge une extension
+ext_reload_help=Recharge une extension
 ext_reload_description=Recharge l'extension souhaitée.\n<ext>: Nom de l'extension
 ext_reload_success_desc=Extension rechargée !
-ext_reload_failure_desc=Impossible de rechargée l'etension. Consultez les journaux pour plus d'informations.
+ext_reload_failure_desc=Impossible de recharger l'etension. Consultez les journaux pour plus d'informations.
 
 
 ## Lang extension
@@ -246,6 +246,8 @@ success_prune=Les {0} derniers messages ont été supprimés.
 mod_kick_help=Exclut un membre
 mod_kick_description=Exclut un membre.\n<member>: Nom du membre\n[reason]: Raison de l'exclusion
 success_kick={0} a été exclu par {1} car : {2}.
+fail_prune_size=Discord permet uniquement la suppression de 100 messages à la fois, vous avez essayé d'en supprimer {0}.\nRéessayez avec moins de messages !
+fail_prune_other=Discord m'a empêché de supprimer vos messages, probablement parce que ces messages ont été publiés il y a plus de 14 jours.
 
 # Ban
 mod_ban_help=Bannit un membre

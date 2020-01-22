@@ -241,6 +241,8 @@ mod_description=Helps moderating the server.
 mod_prune_help=Deletes a desired amount of messages
 mod_prune_description=Deletes the latest messages in this text channel.\n<number>: Amount of the latest messages to delete\n[member]: Name of the member to restrict the message deletion to. (From the <number> messages, only those from [member] will be deleted)
 success_prune=Last {0} message(s) have been removed.
+fail_prune_size=Discord only allows the deletion of 100 messages at once, you tried to delete {0} of them.\nRetry with less messages !
+fail_prune_other=Discord blocked me from deleting your messages, this is most likely because these messages where posted more than 14 days ago.
 
 # Kick
 mod_kick_help=Kicks a member
