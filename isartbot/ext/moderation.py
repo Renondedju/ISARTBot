@@ -184,7 +184,10 @@ class ModerationExt(commands.Cog):
     async def _for(self, ctx, *args : Union[discord.Member, discord.Role, str]):
         """Removes or adds roles to members of the guild"""
 
-        selectors, action, roles = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
+        try:
+            selectors, action, roles = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
+        except ValueError:
+            raise commands.UserInputError()
 
         if len(action) != 1:
             await Helper.send_error(ctx, ctx.channel, 'mod_for_error')
