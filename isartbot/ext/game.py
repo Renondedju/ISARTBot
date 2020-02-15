@@ -66,11 +66,11 @@ class GameExt (commands.Cog):
 
             # Fetching all required data from the database
             database_games = list(self.bot.database.session.query(Game).all())
-            server_ids     = set([item.server_id for item in database_games])
+            servers        = set([item.server for item in database_games])
 
             # Looping over every server that requires a scan
-            for server_id in server_ids:
-                guild = discord.utils.get(self.bot.guilds, id=server_id)
+            for server in servers:
+                guild = discord.utils.get(self.bot.guilds, id=server.discord_id)
                 
                 # We just got removed from a server while scanning, skipping it.
                 # The next scan will be fine since all data related with this server
@@ -79,9 +79,8 @@ class GameExt (commands.Cog):
                     continue
 
                 # Fetching server verified role (if any)
-                server        = self.bot.database.session.query(Server).filter(Server.discord_id == guild.id).first()
-                verified_role = discord.utils.get(guild.roles, id = (server.verified_role_id if server != None else 0))
-                server_games  = [game for game in database_games if game.server_id == server_id]
+                verified_role = discord.utils.get(guild.roles, id = server.verified_role_id)
+                server_games  = [game for game in database_games if game.server == server]
 
                 # Looping over each members
                 for member in guild.members:
