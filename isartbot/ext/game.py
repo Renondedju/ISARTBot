@@ -122,11 +122,11 @@ class GameExt (commands.Cog):
 
     @commands.group(invoke_without_command=True, pass_context=True,
         help="game_help", description="game_description")
+    @commands.bot_has_permissions(manage_roles = True)
     async def game(self, ctx):
         await ctx.send_help(ctx.command)
     
     @game.command(help="game_add_help", description="game_add_description")
-    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_verified)
     async def add(self, ctx, game: GameConverter):
         """ Adds a game to the user """
@@ -144,7 +144,6 @@ class GameExt (commands.Cog):
             await Helper.send_error  (ctx, ctx.channel, 'game_add_failure', format_content=(game_role.mention,))
 
     @game.command(help="game_remove_help", description="game_remove_description")
-    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_verified)
     async def remove(self, ctx, game: GameConverter):
         """ Adds a game to the user """
@@ -162,7 +161,6 @@ class GameExt (commands.Cog):
             await Helper.send_error  (ctx, ctx.channel, 'game_remove_failure', format_content=(game_role.mention,))
 
     @game.command(help="game_create_help", description="game_create_description")
-    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_moderator)
     async def create(self, ctx, name, *, discord_name = ""):
         """Create a game"""
@@ -200,7 +198,6 @@ class GameExt (commands.Cog):
         await Helper.send_success(ctx, ctx.channel, 'game_create_success', format_content=(game.mention,))
 
     @game.command(help="game_delete_help", description="game_delete_description")
-    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_moderator)
     async def delete(self, ctx, game: GameConverter):
         """Deletes a game"""
