@@ -53,7 +53,7 @@ class HelpCommand(commands.MinimalHelpCommand):
     async def prepare_help_command(self, ctx, command):
         """ Prepares the help command """
 
-        translations = await self.context.bot.get_translations(self.context, ("help_opening_note", "commands_heading", "help_title"))
+        translations = await self.context.bot.get_translations(self.context, ("help_opening_note", "commands_heading", "help_title"), True)
 
         self.opening_note     = translations.pop("help_opening_note", "")
         self.commands_heading = translations.pop("commands_heading" , "")
