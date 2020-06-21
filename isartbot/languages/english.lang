@@ -141,7 +141,7 @@ diffusion_subscription_description=Helps subscribing and unsubscribing to and fr
 diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
 diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to subscribe to\n[diffusion_tag]: Role to mention with every message
 diffusion_subscribe_success=Successfully subscribed to this diffusion!
-diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
+diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion subscription unsubscribe`` to unsubscribe from this diffusion.
 
 # Unsubscribe
 diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel

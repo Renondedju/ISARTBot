@@ -141,7 +141,7 @@ diffusion_subscription_description=Aide à l'abonnement et au désabonnement aux
 diffusion_subscription_subscribe_help=S'abonne à un canal de diffusion
 diffusion_subscription_subscribe_description=S'abonne à un canal de diffusion.\n<diffusion>: Nom de la diffusion\n<channel>: Canal auquel vous abonner\n[diffusion_tag]: Rôle à mentionner avec chaque message
 diffusion_subscribe_success=Souscrit avec succès à cette diffusion !
-diffusion_subscription_already_exists=Cet abonnement existe déjà.\n Utilisez ``{}diffusion unsubscribe`` se désinscrire de cette diffusion.
+diffusion_subscription_already_exists=Cet abonnement existe déjà.\n Utilisez ``{}diffusion subscription unsubscribe`` se désinscrire de cette diffusion.
 
 # Unsubscribe
 diffusion_subscription_unsubscribe_help=Se désabonner d'un canal de diffusion
