@@ -30,7 +30,7 @@ import asyncio
 from discord.ext import commands
 
 from isartbot.helper   import Helper
-from isartbot.checks   import is_moderator
+from isartbot.checks   import is_moderator, denied
 from isartbot.database import Server
 
 class StarboardExt(commands.Cog):
@@ -50,12 +50,12 @@ class StarboardExt(commands.Cog):
     # Commands
     @commands.group(pass_context=True, invoke_without_command=True,
         help="starboard_help", description="starboard_description")
-    @commands.bot_has_permissions(send_messages=True)
     @commands.check(is_moderator)
     async def starboard(self, ctx):
         await ctx.send_help(ctx.command)
 
     @starboard.command(help="starboard_set_help", description="starboard_set_description")
+    @commands.check(is_moderator)
     async def set(self, ctx, channel: discord.TextChannel):
         """ Sets the current starboard channel, if none was set before, this command also enables the starboard """
 
@@ -83,6 +83,7 @@ class StarboardExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @starboard.command(help="starboard_disable_help", description="starboard_disable_description")
+    @commands.check(is_moderator)
     async def disable(self, ctx):
         """ Disables the starboard for the current server, use "!starboard set <channel name>" to re enable it """
 
@@ -102,6 +103,7 @@ class StarboardExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @starboard.command(help="starboard_minimum_help", description="starboard_minimum_description")
+    @commands.check(is_moderator)
     async def minimum(self, ctx, star_count: int):
         """ Sets the minimum star count for the current server's starboard """
 

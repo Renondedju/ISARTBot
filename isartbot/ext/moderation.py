@@ -126,58 +126,6 @@ class ModerationExt(commands.Cog):
 
         self.bot.logger.warning(f"{member.name} has been banned by {ctx.author.name} for '{reason}'")
 
-    """
-    @mod.command(help="mod_as_help", description="mod_as_description", name = "as")
-    @commands.check(is_moderator)
-    async def _as(self, ctx, member : MemberConverter, *command_str : str):
-        
-        if (member is None):
-            await Helper.send_error(ctx, ctx.channel, 'mod_as_success')
-            return
-
-        await Helper.send_success(ctx, ctx.channel, 'mod_as_success')
-
-        prefix = self.bot.clean_prefix
-        regex  = r"{0}(\w*)\s.*".format(prefix)
-        matches = re.search(regex, command_str)
-
-        embedFail = discord.Embed()
-        embedFail.title = "Failed"
-        embedFail.colour = discord.Color.red()
-
-        if not matches:
-            embedFail.description = 'There is no command to invoke.'
-            await ctx.send(embed=embed)
-            return
-
-        command = self.bot.get_command(matches.group(1))
-        if (not await command.can_run(ctx)):
-            embedFail.description = "The checks for this command failed, "
-                                    "maybe you don't have the required rights ?"
-            await ctx.send(embed=embed)
-            return
-
-        for word in re.compile('\w+').findall(command_str.replace(prefix + matches.group(1), '')):
-
-            # if type of 'command' is a discord command, then everything is ready to be executed
-            if type(command) == discord.ext.commands.core.Command:
-                break
-
-            command = command.get_command(word)
-            if command is None:
-                break
-            if (not await command.can_run(ctx)):
-                await self.bot.send_fail(ctx,
-                                "The checks for this subcommand failed, "
-                                "maybe you don't have the required rights?")
-                return
-
-        msg: discord.Message = await ctx.send(command_str)
-        msg.author           = member
-        await self.bot.process_commands(msg)
-
-        return"""
-
     @mod.command(help="mod_for_help", description="mod_for_description", name='for')
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles=True)

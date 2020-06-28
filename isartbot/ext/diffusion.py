@@ -134,6 +134,7 @@ class DiffusionExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @operator.command(help="diffusion_operator_add_help", description="diffusion_operator_add_description")
+    @commands.check(is_super_admin)
     async def add(self, ctx, diffusion: DiffusionConverter, new_operator: discord.Member):
         """ Adds a new diffusion operator to the selected diffusion """
 
@@ -156,6 +157,7 @@ class DiffusionExt(commands.Cog):
         await Helper.send_success(ctx, ctx.channel, "diffusion_operator_added", format_content = (new_operator.mention, diffusion.name))
 
     @operator.command(help="diffusion_operator_remove_help", description="diffusion_operator_remove_description")
+    @commands.check(is_super_admin)
     async def remove(self, ctx, diffusion: DiffusionConverter, old_operator: discord.Member):
         """ Removes a diffusion operator from the selected diffusion """
 
@@ -183,6 +185,7 @@ class DiffusionExt(commands.Cog):
         self.bot.database.session.commit()
 
     @operator.command(name="list", help="diffusion_operator_list_help", description="diffusion_operator_list_description")
+    @commands.check(is_super_admin)
     async def operator_list(self, ctx, diffusion: DiffusionConverter):
         """ Lists all the current operators for a certain diffusion """
 
@@ -273,6 +276,7 @@ class DiffusionExt(commands.Cog):
     @subscription.command(aliases = ["sub", "add", "create"], 
         help       ="diffusion_subscription_subscribe_help", 
         description="diffusion_subscription_subscribe_description")
+    @commands.check(is_moderator)
     async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: discord.Role = None):
         """ Subscribes to a diffusion """
     
@@ -320,6 +324,7 @@ class DiffusionExt(commands.Cog):
     @subscription.command(aliases = ["unsub", "remove", "delete"], 
         help       ="diffusion_subscription_unsubscribe_help",
         description="diffusion_subscription_unsubscribe_description")
+    @commands.check(is_moderator)
     async def unsubscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel):
         """ Unsubscribes off a diffusion """
         
@@ -343,6 +348,7 @@ class DiffusionExt(commands.Cog):
     @subscription.command(name = "list",
         help       ="diffusion_subscription_list_help",
         description="diffusion_subscription_list_description")
+    @commands.check(is_moderator)
     async def subscription_list(self, ctx, channel: discord.TextChannel = None):
         """ Lists all the subscriptions in a channel or server """
         
