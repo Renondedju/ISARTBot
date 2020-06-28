@@ -273,6 +273,10 @@ starboard_disable_help=Désactive le starboard.
 success_starboard_set=Le starboard a été configuré avec succès sur le canal de texte suivant.
 success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur.
 
+starboard_minimum_help=Définit le nombre minimum d'étoiles du starboard.
+starboard_minimum_description=Définit le nombre d'étoiles minimum pour mettre en avant un message dans le starboard.
+starboard_minimum_success=Le nombre d'étoiles minimum est désormais de {0} sur ce serveur.
+starboard_minimum_error=Le nombre minimum d'étoiles doit être compris entre 1 et 100.
 
 ## Test extension
 

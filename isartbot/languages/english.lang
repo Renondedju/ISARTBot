@@ -273,6 +273,11 @@ starboard_disable_help=Disables the starboard.
 success_starboard_set=The starboard has successfully been configured on the following text channel.
 success_starboard_unset=The starboard has successfully been disabled for this server.
 
+starboard_minimum_help=Sets the minimum star count for the starboard.
+starboard_minimum_description=Sets the minimum star count requiered to shows upvoted posts in the starboard.
+starboard_minimum_success=Minimum star count is now {0} for this server.
+starboard_minimum_error=Minimum star count must be between 1 and 100.
+
 ## Test extension
 
 denied_failure=Something went wrong!
