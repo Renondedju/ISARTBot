@@ -237,6 +237,13 @@ lang_key_description=Retrieves the value corresponding to this localization key.
 mod_help=Manages moderation
 mod_description=Helps moderating the server.
 
+# Log
+mod_log_set_help=TODO
+mod_log_set_description=TODO
+success_mod_log_set=TODO
+mod_log_unset_help=TODO
+mod_log_unset_description=TODO
+success_mod_log_unset=TODO
 # Prune
 mod_prune_help=Deletes a desired amount of messages
 mod_prune_description=Deletes the latest messages in this text channel.\n<number>: Amount of the latest messages to delete\n[member]: Name of the member to restrict the message deletion to. (From the <number> messages, only those from [member] will be deleted)

@@ -31,7 +31,8 @@ from typing              import Union
 from itertools           import groupby
 from discord.ext         import commands
 from isartbot.helper     import Helper
-from isartbot.checks     import is_moderator
+from isartbot.checks     import is_moderator, is_admin
+from isartbot.database   import Server
 from isartbot.converters import MemberConverter
 
 class ModerationExt(commands.Cog):
@@ -61,6 +62,54 @@ class ModerationExt(commands.Cog):
     @commands.check(is_moderator)
     async def mod(self, ctx):
         await ctx.send_help(ctx.command)
+
+    @mod.command(help="mod_log_set_help", description="mod_log_set_description")
+    @commands.check(is_admin)
+    async def log_set(self, ctx, channel: discord.TextChannel):
+        """ Sets the current mod log channel, if none was set before, this command also enables the mod logging """
+
+        embed = discord.Embed()
+
+        # Checking if we have enough permissions in order to operate the starboard on the designated channel
+        required_perms = discord.Permissions().none()
+        required_perms.update(send_messages=True)
+
+        if (not required_perms.is_subset(channel.permissions_for(ctx.guild.me))):
+            raise commands.BotMissingPermissions(["send_messages"])
+
+        self.bot.logger.info(f"Mod log channel set to {channel.id} for server named {ctx.guild.name}")
+
+        self.bot.database.session.query(Server).\
+            filter(Server.discord_id == ctx.guild.id).\
+            update({Server.modlog_channel_id : channel.id})
+
+        self.bot.database.session.commit()
+
+        embed.title       =    await ctx.bot.get_translation(ctx, "success_title")
+        embed.description = f"{await ctx.bot.get_translation(ctx, 'success_mod_log_set')}: {channel.mention}"
+        embed.colour      = discord.Color.green()
+
+        await ctx.send(embed=embed)
+
+    @mod.command(help="mod_log_unset_help", description="mod_log_unset_description")
+    @commands.check(is_admin)
+    async def log_unset(self, ctx):
+        """ Disables the mod log for the current server, use "!mod log_set <channel name>" to re enable it """
+
+        self.bot.logger.info(f"Mod log disabled for server named {ctx.guild.name}")
+
+        self.bot.database.session.query(Server).\
+            filter(Server.discord_id == ctx.guild.id).\
+            update({Server.modlog_channel_id : 0})
+
+        self.bot.database.session.commit()
+
+        embed = discord.Embed()
+        embed.title       = await ctx.bot.get_translation(ctx, "success_title")
+        embed.description = await ctx.bot.get_translation(ctx, "success_mod_log_unset")
+        embed.colour      = discord.Color.green()
+
+        await ctx.send(embed=embed)
 
     @mod.command(help="mod_prune_help", description="mod_prune_description")
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)

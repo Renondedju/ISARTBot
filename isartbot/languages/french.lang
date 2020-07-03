@@ -237,6 +237,13 @@ lang_key_description=Récupère la valeur correspondant à cette clé de localis
 mod_help=Gère la modération
 mod_description=Aide à modérer le serveur.
 
+# Log
+mod_log_set_help=TODO
+mod_log_set_description=TODO
+success_mod_log_set=TODO
+mod_log_unset_help=TODO
+mod_log_unset_description=TODO
+success_mod_log_unset=TODO
 # Prune
 mod_prune_help=Supprime la quantité souhaitée de messages
 mod_prune_description=Supprime les derniers messages de cette chaîne de texte.\n<number>: Nombre des derniers messages à supprimer\n[member]: Nom du membre auquel limiter la suppression du message. (Des <number> messages, seuls ceux de [member] seront supprimé)
