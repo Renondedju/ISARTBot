@@ -228,5 +228,24 @@ class ModerationExt(commands.Cog):
             for role in roles:
                 await member.remove_roles(role)
 
+    # Events
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+
+        # Checking if mod log is enabled
+        server = self.bot.database.session.query(Server).filter(Server.discord_id == message.guild.id).first()
+        if (server.modlog_channel_id == 0):
+            return
+        
+        embed = discord.Embed()
+
+        embed.description = message.content
+        embed.title       = "Message deleted"
+        embed.color       = discord.Color.red()
+        embed.add_field (name="channel", value=message.channel.mention, inline=False)
+        embed.set_footer(text=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+
+        await self.bot.get_channel(server.modlog_channel_id).send(embed=embed)
+
 def setup(bot):
     bot.add_cog(ModerationExt(bot))
