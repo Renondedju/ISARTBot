@@ -242,6 +242,15 @@ class ModerationExt(commands.Cog):
         embed.description = message.content
         embed.title       = "Message deleted"
         embed.color       = discord.Color.red()
+
+        # Adding attachments
+        if message.attachments:
+            file = message.attachments[0]
+            if file.url.lower().endswith(('png', 'jpeg', 'jpg', 'gif', 'webp')):
+                embed.set_image(url=file.proxy_url)
+            else:
+                embed.add_field(name='Attachment', value=f'[{file.filename}]({file.proxy_url})', inline=False)
+
         embed.add_field (name="channel", value=message.channel.mention, inline=False)
         embed.set_footer(text=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
 
