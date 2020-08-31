@@ -353,11 +353,9 @@ class StarboardExt(commands.Cog):
                 original_message  = reaction.message
 
             stars_count = await self.count_stars(original_message, starboard_message)
+            server      = self.bot.database.session.query(Server).filter(Server.discord_id == reaction.message.guild.id).first()
 
-            minimum_stars = self.bot.database.session.query(Server.starboard_minimum).\
-                                filter(Server.discord_id == reaction.message.guild.id).first()
-
-            if (stars_count < minimum_stars and starboard_message != None):
+            if (stars_count < server.starboard_minimum and starboard_message != None):
                 await starboard_message.delete()
 
             elif (starboard_message != None):
