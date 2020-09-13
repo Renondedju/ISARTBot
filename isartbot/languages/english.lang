@@ -232,6 +232,19 @@ lang_key_help=Retrieves a localization value from a key
 lang_key_description=Retrieves the value corresponding to this localization key.\n<lang>: Target language\n<key>: Key to retrieve the value from
 
 
+## Live role extension
+
+live_role_help=TODO
+live_role_description=TODO
+live_role_set_help=TODO
+live_role_set_description=TODO
+live_role_disable_help=TODO
+live_role_disable_description=TODO
+
+success_live_role_set=The live role for this server has successfully been set to
+success_live_role_disable=Live roles have successfully been disabled for this server.
+
+
 ## Moderation extension
 
 mod_help=Manages moderation

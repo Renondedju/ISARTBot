@@ -35,6 +35,7 @@ class Server(TableBase):
     lang                 = Column('lang'             , Text   , default     = "en")
     discord_id           = Column('discord_id'       , Integer, unique      = True)
     modlog_channel_id    = Column('modlog_channel_id', Integer, default     = 0)
+    live_role_id         = Column('live_role_id'     , Integer, default     = 0)
     starboard_channel_id = Column('starboard_id'     , Integer, default     = 0)
     starboard_minimum    = Column('starboard_minimum', Integer, default     = 3)
     verified_role_id     = Column('verified_role_id' , Integer, default     = 0)
