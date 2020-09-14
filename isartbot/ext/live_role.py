@@ -38,11 +38,11 @@ class LiveRoleExt(commands.Cog):
     # Command group
     @commands.group(pass_context=True, invoke_without_command=True, help="live_role_help", description="live_role_description")
     @commands.check(is_moderator)
-    async def live_role(self, ctx):
+    async def liverole(self, ctx):
         await ctx.send_help(ctx.command)
 
     # Sets the live role for the current server
-    @live_role.command(help="live_role_set_help", description="live_role_set_description")
+    @liverole.command(help="live_role_set_help", description="live_role_set_description")
     @commands.check(is_moderator)
     async def set(self, ctx, role: discord.Role):
         
@@ -70,7 +70,7 @@ class LiveRoleExt(commands.Cog):
         await ctx.send(embed=embed)
 
     # Disables the live role for the current server
-    @live_role.command(help="live_role_disable_help", description="live_role_disable_description")
+    @liverole.command(help="live_role_disable_help", description="live_role_disable_description")
     @commands.check(is_moderator)
     async def disable(self, ctx):
         
@@ -135,7 +135,7 @@ class LiveRoleExt(commands.Cog):
         if (live_role == None):
             return
 
-        self.bot.logger.info(f"{member.display_name} started streaming !")
+        self.bot.logger.info(f"{member} started streaming in guild named {member.guild.name} !")
         await member.add_roles(live_role)
 
     async def on_stream_stops(self, member : discord.Member):
@@ -144,7 +144,7 @@ class LiveRoleExt(commands.Cog):
         if (live_role == None):
             return
 
-        self.bot.logger.info(f"{member.display_name} stopped streaming !")
+        self.bot.logger.info(f"{member} stopped streaming in guild named {member.guild.name} !")
         await member.remove_roles(live_role)
 
 def setup(bot):

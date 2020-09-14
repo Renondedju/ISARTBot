@@ -234,12 +234,12 @@ lang_key_description=Récupère la valeur correspondant à cette clé de localis
 
 ## Live role extension
 
-live_role_help=TODO
-live_role_description=TODO
-live_role_set_help=TODO
-live_role_set_description=TODO
-live_role_disable_help=TODO
-live_role_disable_description=TODO
+live_role_help=Configure un rôle de live
+live_role_description=Un rôle de live est un rôle assigné automatiquement à tout utilisateur streamant sur Twitch / Youtube ou Discord. Cela est utile pour promouvoir des créateurs.
+live_role_set_help=Configure un rôle de live
+live_role_set_description=Configure un rôle de live et active la fonctionalité. Désacitvez le avec `!liverole disable`
+live_role_disable_help=Désacitve les rôles de live
+live_role_disable_description=Désacitve les rôles de live. Ré-activez les avec la commande `!liverole set <role>`
 
 success_live_role_set=Le rôle de live a été configuré avec succès sur
 success_live_role_disable=Le rôle de live a été désactivé avec succès pour ce serveur.
