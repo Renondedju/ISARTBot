@@ -178,7 +178,7 @@ class GameExt (commands.Cog):
         game = await ctx.guild.create_role(
             name        = name,
             color       = await commands.ColourConverter().convert(ctx, role_color),
-            mentionable = True)
+            mentionable = False)
 
         server = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
 
