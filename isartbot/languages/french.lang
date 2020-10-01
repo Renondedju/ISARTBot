@@ -232,10 +232,32 @@ lang_key_help=Récupère une valeur de localisation à partir d'une clé
 lang_key_description=Récupère la valeur correspondant à cette clé de localisation.\n<lang>: Langue cible\n<key>: Clé associée à la valeur
 
 
+## Live role extension
+
+live_role_help=Configure un rôle de live
+live_role_description=Un rôle de live est un rôle assigné automatiquement à tout utilisateur streamant sur Twitch / Youtube ou Discord. Cela est utile pour promouvoir des créateurs.
+live_role_set_help=Configure un rôle de live
+live_role_set_description=Configure un rôle de live et active la fonctionalité. Désacitvez le avec `!liverole disable`
+live_role_disable_help=Désacitve les rôles de live
+live_role_disable_description=Désacitve les rôles de live. Ré-activez les avec la commande `!liverole set <role>`
+
+success_live_role_set=Le rôle de live a été configuré avec succès sur
+success_live_role_disable=Le rôle de live a été désactivé avec succès pour ce serveur.
+
 ## Moderation extension
 
 mod_help=Gère la modération
 mod_description=Aide à modérer le serveur.
+
+# Log
+mod_log_set_help=TODO
+mod_log_set_description=TODO
+success_mod_log_set=TODO
+mod_log_unset_help=TODO
+mod_log_unset_description=TODO
+success_mod_log_unset=TODO
+
+message_deleted=Message supprimé
 
 # Prune
 mod_prune_help=Supprime la quantité souhaitée de messages
