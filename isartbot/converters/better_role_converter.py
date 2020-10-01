@@ -2,7 +2,7 @@
 
 # MIT License
 
-# Copyright (c) 2018 Renondedju
+# Copyright (c) 2018-2020 Renondedju
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from sqlalchemy import or_, and_
+import re
+import discord
+import asyncio
 
-from discord.ext import commands
+from discord.ext       import commands
+from isartbot.database import Diffusion
 
-from isartbot.database.models import Game
-from isartbot.database.models import Server
+class BetterRoleConverter(commands.IDConverter):
+    """ This role converter does the same job as the default discord role converter except 
+        that it is case insensitive.
+    """
 
-class GameConverter(commands.Converter):
+    async def convert(self, ctx, argument):
+        guild = ctx.guild
+        if not guild:
+            raise NoPrivateMessage()
 
-    async def convert(self, ctx, game_name):
+        # Id or mention
+        match = self._get_id_match(argument) or re.match(r'<@&([0-9]+)>$', argument)
+        if match:
+            result = guild.get_role(int(match.group(1)))
+        else:
+            # Name match
+            result = discord.utils.find(lambda role: role.name.lower() == argument.lower(), guild._roles.values())
 
-        server = ctx.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first() 
-        game   = ctx.bot.database.session.query(Game).filter(and_
-                (
-                    or_(Game.display_name.ilike(f"%{game_name}%"), Game.discord_name.ilike(f"%{game_name}%")),
-                    Game.server == server
-                )).first()
-
-        return game
+        if result is None:
+            raise RoleNotFound(argument)
+        return result

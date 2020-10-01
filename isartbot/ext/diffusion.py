@@ -30,7 +30,7 @@ from discord.ext import commands
 from isartbot.helper     import Helper
 from isartbot.checks     import is_super_admin, is_moderator
 from isartbot.database   import Diffusion, DiffusionOperator, DiffusionSubscription, Server
-from isartbot.converters import DiffusionConverter
+from isartbot.converters import DiffusionConverter, BetterRoleConverter
 
 class DiffusionExt(commands.Cog):
     """ Diffusion channels extension class """
@@ -277,7 +277,7 @@ class DiffusionExt(commands.Cog):
         help       ="diffusion_subscription_subscribe_help", 
         description="diffusion_subscription_subscribe_description")
     @commands.check(is_moderator)
-    async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: discord.Role = None):
+    async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: BetterRoleConverter = None):
         """ Subscribes to a diffusion """
     
         # Checking if the diffusion exists

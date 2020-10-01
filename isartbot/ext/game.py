@@ -128,7 +128,7 @@ class GameExt (commands.Cog):
     
     @game.command(help="game_add_help", description="game_add_description")
     @commands.check(is_verified)
-    async def add(self, ctx, game: GameConverter):
+    async def add(self, ctx, *, game: GameConverter):
         """ Adds a game to the user """
 
         if (game is None):
@@ -145,7 +145,7 @@ class GameExt (commands.Cog):
 
     @game.command(help="game_remove_help", description="game_remove_description")
     @commands.check(is_verified)
-    async def remove(self, ctx, game: GameConverter):
+    async def remove(self, ctx, *, game: GameConverter):
         """ Adds a game to the user """
 
         if (game is None):
@@ -199,7 +199,7 @@ class GameExt (commands.Cog):
 
     @game.command(help="game_delete_help", description="game_delete_description")
     @commands.check(is_moderator)
-    async def delete(self, ctx, game: GameConverter):
+    async def delete(self, ctx, *, game: GameConverter):
         """Deletes a game"""
 
         if (game is None):
