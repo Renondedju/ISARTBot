@@ -251,12 +251,14 @@ mod_help=Manages moderation
 mod_description=Helps moderating the server.
 
 # Log
-mod_log_set_help=TODO
-mod_log_set_description=TODO
-success_mod_log_set=TODO
-mod_log_unset_help=TODO
-mod_log_unset_description=TODO
-success_mod_log_unset=TODO
+mod_log_set_help=Sets a moderation channel
+mod_log_set_description=Sets a channel te receive every moderation events such as deleted messages
+
+mod_log_unset_help=Unsets a moderation channel
+mod_log_unset_description=Unsets the moderation channel
+
+success_mod_log_set=Successfully set the mod log channel to
+success_mod_log_unset=The mod log channel has been unset
 
 message_deleted=Message deleted
 
