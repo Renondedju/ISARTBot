@@ -26,9 +26,10 @@ import asyncio
 import discord
 import logging
 
-from isartbot.database import Server
-from isartbot.checks   import is_moderator
-from discord.ext       import commands
+from discord.ext         import commands
+from isartbot.database   import Server
+from isartbot.checks     import is_moderator
+from isartbot.converters import BetterRoleConverter
 
 class LiveRoleExt(commands.Cog):
 
@@ -44,7 +45,7 @@ class LiveRoleExt(commands.Cog):
     # Sets the live role for the current server
     @liverole.command(help="live_role_set_help", description="live_role_set_description")
     @commands.check(is_moderator)
-    async def set(self, ctx, role: discord.Role):
+    async def set(self, ctx, role: BetterRoleConverter):
         
         embed = discord.Embed()
 
