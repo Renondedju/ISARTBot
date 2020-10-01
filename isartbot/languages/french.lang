@@ -250,12 +250,14 @@ mod_help=Gère la modération
 mod_description=Aide à modérer le serveur.
 
 # Log
-mod_log_set_help=TODO
-mod_log_set_description=TODO
-success_mod_log_set=TODO
-mod_log_unset_help=TODO
-mod_log_unset_description=TODO
-success_mod_log_unset=TODO
+mod_log_set_help=Crée un canal de log
+mod_log_set_description=Crée un canal de log dans lequel apparaitra notemment les messages supprimés
+
+mod_log_unset_help=Supprime le canal de log
+mod_log_unset_description=Supprime le canal de log
+
+success_mod_log_set=Le canal de log à été configuré sur
+success_mod_log_unset=Le canal de log à été désactivé
 
 message_deleted=Message supprimé
 
