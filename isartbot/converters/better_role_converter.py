@@ -22,12 +22,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from isartbot.checks.denied         import denied
-from isartbot.checks.admin          import is_admin
-from isartbot.checks.verified       import is_verified
-from isartbot.checks.block_dms      import block_dms
-from isartbot.checks.moderator      import is_moderator
-from isartbot.checks.developper     import is_developper,  developper
-from isartbot.checks.super_admin    import is_super_admin, super_admin
-from isartbot.checks.log_command    import log_command
-from isartbot.checks.trigger_typing import trigger_typing
+import re
+import discord
+import asyncio
+
+from discord.ext       import commands
+from isartbot.database import Diffusion
+
+class BetterRoleConverter(commands.IDConverter):
+    """ This role converter does the same job as the default discord role converter except 
+        that it is case insensitive.
+    """
+
+    async def convert(self, ctx, argument):
+        guild = ctx.guild
+        if not guild:
+            raise NoPrivateMessage()
+
+        # Id or mention
+        match = self._get_id_match(argument) or re.match(r'<@&([0-9]+)>$', argument)
+        if match:
+            result = guild.get_role(int(match.group(1)))
+        else:
+            # Name match
+            result = discord.utils.find(lambda role: role.name.lower() == argument.lower(), guild._roles.values())
+
+        if result is None:
+            raise RoleNotFound(argument)
+        return result

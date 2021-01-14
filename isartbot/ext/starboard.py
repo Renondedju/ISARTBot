@@ -29,7 +29,8 @@ import asyncio
 
 from discord.ext import commands
 
-from isartbot.checks   import is_moderator
+from isartbot.helper   import Helper
+from isartbot.checks   import is_moderator, denied
 from isartbot.database import Server
 
 class StarboardExt(commands.Cog):
@@ -42,8 +43,6 @@ class StarboardExt(commands.Cog):
         self.bot   = bot
         self.locks = {}
 
-        self.minimum_stars = int(self.bot.settings.get("starboard", "minimum_stars"))
-
         # Sorting the stars (and conveting the keys to integers)
         self.stars = {int(k):v for k,v in self.bot.settings.items("starboard_icons")}
         self.stars = dict(sorted(self.stars.items()))
@@ -51,12 +50,12 @@ class StarboardExt(commands.Cog):
     # Commands
     @commands.group(pass_context=True, invoke_without_command=True,
         help="starboard_help", description="starboard_description")
-    @commands.bot_has_permissions(send_messages=True)
     @commands.check(is_moderator)
     async def starboard(self, ctx):
         await ctx.send_help(ctx.command)
 
     @starboard.command(help="starboard_set_help", description="starboard_set_description")
+    @commands.check(is_moderator)
     async def set(self, ctx, channel: discord.TextChannel):
         """ Sets the current starboard channel, if none was set before, this command also enables the starboard """
 
@@ -84,6 +83,7 @@ class StarboardExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @starboard.command(help="starboard_disable_help", description="starboard_disable_description")
+    @commands.check(is_moderator)
     async def disable(self, ctx):
         """ Disables the starboard for the current server, use "!starboard set <channel name>" to re enable it """
 
@@ -101,6 +101,25 @@ class StarboardExt(commands.Cog):
         embed.colour      = discord.Color.green()
 
         await ctx.send(embed=embed)
+
+    @starboard.command(help="starboard_minimum_help", description="starboard_minimum_description")
+    @commands.check(is_moderator)
+    async def minimum(self, ctx, star_count: int):
+        """ Sets the minimum star count for the current server's starboard """
+
+        if (star_count < 1 or star_count > 100):
+            await Helper.send_error(ctx, ctx.channel, "starboard_minimum_error")
+            return
+
+        self.bot.database.session.query(Server).\
+            filter(Server.discord_id == ctx.guild.id).\
+            update({Server.starboard_minimum : star_count})
+
+        self.bot.database.session.commit()
+
+        self.bot.logger.info(f"Starboard's star count changed to {star_count} for server named {ctx.guild.name}")
+
+        await Helper.send_success(ctx, ctx.channel, "starboard_minimum_success", format_content=(star_count,))
 
     # Methods
     def get_emoji_message(self, message: discord.Message, star_count : int):
@@ -300,7 +319,9 @@ class StarboardExt(commands.Cog):
                 original_message  = reaction.message
 
             stars_count = await self.count_stars(original_message, starboard_message)
-            if (stars_count >= int(self.bot.settings.get('starboard', 'minimum_stars'))):
+            server      = self.bot.database.session.query(Server).filter(Server.discord_id == reaction.message.guild.id).first()
+
+            if (stars_count >= server.starboard_minimum):
 
                 content, embed = self.get_emoji_message(original_message, stars_count)
 
@@ -332,8 +353,9 @@ class StarboardExt(commands.Cog):
                 original_message  = reaction.message
 
             stars_count = await self.count_stars(original_message, starboard_message)
+            server      = self.bot.database.session.query(Server).filter(Server.discord_id == reaction.message.guild.id).first()
 
-            if (stars_count < int(self.bot.settings.get('starboard', 'minimum_stars')) and starboard_message != None):
+            if (stars_count < server.starboard_minimum and starboard_message != None):
                 await starboard_message.delete()
 
             elif (starboard_message != None):

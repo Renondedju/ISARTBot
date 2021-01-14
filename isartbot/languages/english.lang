@@ -141,7 +141,7 @@ diffusion_subscription_description=Helps subscribing and unsubscribing to and fr
 diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
 diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to subscribe to\n[diffusion_tag]: Role to mention with every message
 diffusion_subscribe_success=Successfully subscribed to this diffusion!
-diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
+diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion subscription unsubscribe`` to unsubscribe from this diffusion.
 
 # Unsubscribe
 diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel
@@ -232,15 +232,42 @@ lang_key_help=Retrieves a localization value from a key
 lang_key_description=Retrieves the value corresponding to this localization key.\n<lang>: Target language\n<key>: Key to retrieve the value from
 
 
+## Live role extension
+
+live_role_help=Setups a live role
+live_role_description=A live role is a role assigned when a user streams on Twitch / Youtube or Discord. This can be useful on big servers to promote streamers.
+live_role_set_help=Sets a live role
+live_role_set_description=Sets a live role and enables the live role feature. Disable it with `!liverole disable`
+live_role_disable_help=Disables the live roles
+live_role_disable_description=Disables the live roles. Re-enable it with `!liverole set <role>`
+
+success_live_role_set=The live role for this server has successfully been set to
+success_live_role_disable=Live roles have successfully been disabled for this server.
+
+
 ## Moderation extension
 
 mod_help=Manages moderation
 mod_description=Helps moderating the server.
 
+# Log
+mod_log_set_help=Sets a moderation channel
+mod_log_set_description=Sets a channel te receive every moderation events such as deleted messages
+
+mod_log_unset_help=Unsets a moderation channel
+mod_log_unset_description=Unsets the moderation channel
+
+success_mod_log_set=Successfully set the mod log channel to
+success_mod_log_unset=The mod log channel has been unset
+
+message_deleted=Message deleted
+
 # Prune
 mod_prune_help=Deletes a desired amount of messages
 mod_prune_description=Deletes the latest messages in this text channel.\n<number>: Amount of the latest messages to delete\n[member]: Name of the member to restrict the message deletion to. (From the <number> messages, only those from [member] will be deleted)
 success_prune=Last {0} message(s) have been removed.
+fail_prune_size=Discord only allows the deletion of 100 messages at once, you tried to delete {0} of them.\nRetry with less messages !
+fail_prune_other=Discord blocked me from deleting your messages, this is most likely because these messages where posted more than 14 days ago.
 
 # Kick
 mod_kick_help=Kicks a member
@@ -254,10 +281,10 @@ success_ban={0} was banned by {1} for reason: {2}.
 
 mod_as_help=
 mod_as_description=
-mod_for_help=
-mod_for_description=
+mod_for_help=Allows the manipulation of roles for massive amount of members
+mod_for_description=Adds or remove roles to a group of members.\nFor example `!mod for @LeagueOfLegends add @Tft` will add the role @Tft to all the holders of the @LeagueOfLegends role.\nThe different possible strategies are `add` or `remove`.
 mod_for_success=Used the \'{}\' strategy with the roles {} on {}'.
-mod_for_error=Action should be 'add' or 'remove'!
+mod_for_error=The strategy should either be `add` or `remove`!
 
 
 ## Starboard extension
@@ -270,6 +297,11 @@ starboard_disable_help=Disables the starboard.
 
 success_starboard_set=The starboard has successfully been configured on the following text channel.
 success_starboard_unset=The starboard has successfully been disabled for this server.
+
+starboard_minimum_help=Sets the minimum star count for the starboard.
+starboard_minimum_description=Sets the minimum star count requiered to shows upvoted posts in the starboard.
+starboard_minimum_success=Minimum star count is now {0} for this server.
+starboard_minimum_error=Minimum star count must be between 1 and 100.
 
 ## Test extension
 

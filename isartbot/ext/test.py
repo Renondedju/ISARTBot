@@ -39,10 +39,12 @@ class TestExt(commands.Cog):
             await ctx.send(await ctx.bot.get_translation(ctx, 'test'))
 
     @test.command(help="test_error_help", description="test_error_description")
+    @commands.check(is_developper)
     async def error(self, ctx):
         raise ValueError("Test of unhandled exception")
 
     @test.command(help="test_delay_help", description="test_delay_description")
+    @commands.check(is_developper)
     async def delay(self, ctx):
         await asyncio.sleep(2)
         await ctx.send(await ctx.bot.get_translation(ctx, 'test_wait'))
@@ -53,12 +55,14 @@ class TestExt(commands.Cog):
         await ctx.send(await ctx.bot.get_translation(ctx, 'denied_failure'))
 
     @test.command(help="test_commands_help_help", description="test_commands_help_description")
+    @commands.check(is_developper)
     async def commands_help(self, ctx):
 
         for command in self.extract_commands(ctx.bot.commands):
             await ctx.send_help(command)
 
     @test.command(help="test_groups_help", description="test_groups_description")
+    @commands.check(is_developper)
     async def groups(self, ctx, user: discord.Member = None):
 
         if user is None : user = ctx.author

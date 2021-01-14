@@ -23,13 +23,14 @@
 # SOFTWARE.
 
 import discord
+import requests
 
 from discord.ext import commands
 
 from isartbot.helper     import Helper
 from isartbot.checks     import is_super_admin, is_moderator
 from isartbot.database   import Diffusion, DiffusionOperator, DiffusionSubscription, Server
-from isartbot.converters import DiffusionConverter
+from isartbot.converters import DiffusionConverter, BetterRoleConverter
 
 class DiffusionExt(commands.Cog):
     """ Diffusion channels extension class """
@@ -133,6 +134,7 @@ class DiffusionExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @operator.command(help="diffusion_operator_add_help", description="diffusion_operator_add_description")
+    @commands.check(is_super_admin)
     async def add(self, ctx, diffusion: DiffusionConverter, new_operator: discord.Member):
         """ Adds a new diffusion operator to the selected diffusion """
 
@@ -155,6 +157,7 @@ class DiffusionExt(commands.Cog):
         await Helper.send_success(ctx, ctx.channel, "diffusion_operator_added", format_content = (new_operator.mention, diffusion.name))
 
     @operator.command(help="diffusion_operator_remove_help", description="diffusion_operator_remove_description")
+    @commands.check(is_super_admin)
     async def remove(self, ctx, diffusion: DiffusionConverter, old_operator: discord.Member):
         """ Removes a diffusion operator from the selected diffusion """
 
@@ -182,6 +185,7 @@ class DiffusionExt(commands.Cog):
         self.bot.database.session.commit()
 
     @operator.command(name="list", help="diffusion_operator_list_help", description="diffusion_operator_list_description")
+    @commands.check(is_super_admin)
     async def operator_list(self, ctx, diffusion: DiffusionConverter):
         """ Lists all the current operators for a certain diffusion """
 
@@ -208,7 +212,7 @@ class DiffusionExt(commands.Cog):
         await ctx.send(embed=embed)
 
     @diffusion.command(help="diffusion_diffuse_help", description="diffusion_diffuse_description")
-    async def diffuse(self, ctx, diffusion: DiffusionConverter, *, message: str):
+    async def diffuse(self, ctx, diffusion: DiffusionConverter, message: discord.Message):
         """ Diffuses a messages to all subscribers """
         
         # Checking if the diffusion exists
@@ -239,14 +243,25 @@ class DiffusionExt(commands.Cog):
         # Permission to diffuse your message !
         error_count = 0
         self.bot.logger.warning(f"Diffusing message to channel {diffusion.name} to {len(subscriptions)} subscriptions ...")
-
-        for line in message.split('\n'):
-            self.bot.logger.info(f"{diffusion.name} -> {line}")
+        self.bot.logger.info   (f"{diffusion.name} -> {message.content}")
 
         for index, sub in enumerate(subscriptions):
             try:
+                message_embed = discord.Embed(
+                    title       = f"Diffusion: {diffusion.name}",
+                    description = self.cleanup_message(message, sub),
+                    color       = discord.Color.blurple()
+                )
+
+                message_embed.set_footer(text=f"By {ctx.message.author.name}#{ctx.message.author.discriminator}", icon_url=ctx.message.author.avatar_url)
+
+                # Creating attachments if needed
+                if len(message.attachments) > 0:
+                    message_embed.set_image(url = message.attachments[0].url)
+
                 channel = await self.bot.fetch_channel(sub.discord_channel_id)
-                await channel.send(f"{sub.tag} {message}")
+                await channel.send(content=sub.tag, embed=message_embed)
+
             except Exception as e:
                 error_count += 1
                 self.bot.logger.warning(f"Failed to send diffusion to subscription id: {sub.id}. Error: {e}")
@@ -261,7 +276,8 @@ class DiffusionExt(commands.Cog):
     @subscription.command(aliases = ["sub", "add", "create"], 
         help       ="diffusion_subscription_subscribe_help", 
         description="diffusion_subscription_subscribe_description")
-    async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: discord.Role = None):
+    @commands.check(is_moderator)
+    async def subscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel, diffusion_tag: BetterRoleConverter = None):
         """ Subscribes to a diffusion """
     
         # Checking if the diffusion exists
@@ -308,6 +324,7 @@ class DiffusionExt(commands.Cog):
     @subscription.command(aliases = ["unsub", "remove", "delete"], 
         help       ="diffusion_subscription_unsubscribe_help",
         description="diffusion_subscription_unsubscribe_description")
+    @commands.check(is_moderator)
     async def unsubscribe(self, ctx, diffusion: DiffusionConverter, channel: discord.TextChannel):
         """ Unsubscribes off a diffusion """
         
@@ -331,12 +348,12 @@ class DiffusionExt(commands.Cog):
     @subscription.command(name = "list",
         help       ="diffusion_subscription_list_help",
         description="diffusion_subscription_list_description")
+    @commands.check(is_moderator)
     async def subscription_list(self, ctx, channel: discord.TextChannel = None):
         """ Lists all the subscriptions in a channel or server """
         
-        subscriptions = self.bot.database.session.query(DiffusionSubscription).\
-            filter(DiffusionSubscription.discord_server_id == ctx.guild.id).\
-            all()
+        server = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).one()
+        subscriptions = server.diffusion_subs
 
         if len(subscriptions) > 0:
             descritpiton = '\n'.join([f"\u2022 {sub.diffusion.name} -> {(await self.bot.fetch_channel(sub.discord_channel_id)).mention}" for sub in subscriptions])
@@ -350,6 +367,19 @@ class DiffusionExt(commands.Cog):
         embed.colour      = discord.Color.green()
 
         await ctx.send(embed=embed)
+
+    # Utilities
+
+    def cleanup_message(self, message: discord.Message, subscription):
+        """ Cleans up the content of the message for a specific subscription """
+
+        content = message.content
+
+        for mention in message.role_mentions:
+            if (mention.guild.id != subscription.server.discord_id):
+                content = content.replace(mention.mention, f"@{mention.name}")
+
+        return content
 
     # Error handlers
 
@@ -382,7 +412,6 @@ class DiffusionExt(commands.Cog):
         """ No such subscription error """
 
         await Helper.send_error(ctx, ctx.channel, "diffusion_no_such_subscription", format_content = (ctx.prefix,))
-
 
 def setup(bot):
     bot.add_cog(DiffusionExt(bot))
