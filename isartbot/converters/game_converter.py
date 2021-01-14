@@ -22,8 +22,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from sqlalchemy import or_, and_
-
 from discord.ext import commands
 
 from isartbot.database.models import Game
@@ -34,10 +32,8 @@ class GameConverter(commands.Converter):
     async def convert(self, ctx, game_name):
 
         server = ctx.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first() 
-        game   = ctx.bot.database.session.query(Game).filter(and_
-                (
-                    or_(Game.display_name.ilike(f"%{game_name}%"), Game.discord_name.ilike(f"%{game_name}%")),
-                    Game.server == server
-                )).first()
+        game   = ctx.bot.database.session.query(Game).\
+            filter(Game.display_name.ilike(game_name), Game.server == server).\
+            first()
 
         return game

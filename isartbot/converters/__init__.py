@@ -24,9 +24,8 @@
 
 __slots__ = ("upper_clean", "ClassConverter", "GameConverter", "MemberConverter", "DiffusionConverter")
 
-from .upper_clean           import upper_clean
-from .class_converter       import ClassConverter
-from .game_converter        import GameConverter
-from .member_converter      import MemberConverter
-from .diffusion_converter   import DiffusionConverter
-from .better_role_converter import BetterRoleConverter
+from .upper_clean         import upper_clean
+from .class_converter     import ClassConverter
+from .game_converter      import GameConverter
+from .member_converter    import MemberConverter
+from .diffusion_converter import DiffusionConverter

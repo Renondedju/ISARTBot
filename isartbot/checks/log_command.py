@@ -24,9 +24,8 @@
 
 async def log_command(ctx):
 
-    author   = f"{ctx.author.name}#{ctx.author.discriminator}"
-    category = ctx.channel.category.name if not (ctx.channel.category is None) else "-"
-    channel  = f"{ctx.guild.name}/{category}/{ctx.channel.name}" if not (ctx.guild is None) else "DM"
+    author  = f"{ctx.author.name}#{ctx.author.discriminator}"
+    channel = f"{ctx.guild.name}/{ctx.channel.category.name}/{ctx.channel.name}" if not (ctx.guild is None) else "DM"
 
     ctx.bot.logger.info(f"{author} -> {channel} : {ctx.message.content}")
 

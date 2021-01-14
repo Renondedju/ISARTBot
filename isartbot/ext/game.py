@@ -26,7 +26,7 @@ import discord
 import asyncio
 
 from math                import ceil
-from discord.ext         import tasks, commands
+from discord.ext         import commands
 from isartbot.helper     import Helper
 from isartbot.checks     import is_moderator, is_verified
 from isartbot.database   import Game, Server, SelfAssignableRole
@@ -36,58 +36,75 @@ from isartbot.converters import MemberConverter
 class GameExt (commands.Cog):
 
     def __init__(self, bot):
+
         # Starting the game assignation task
-        self.bot = bot
-        self.game_scan.start()
+        self.bot  = bot
+        self.task = bot.loop.create_task(self.run_game_task())
 
     def cog_unload(self):
-        self.game_scan.cancel()
+        """Called when the game module is unloaded for any reason"""
 
-    @tasks.loop(minutes=5.0)
-    async def game_scan(self):
+        self.task.cancel()
+
+    async def run_game_task(self):
+        """Error handler for the game scan task"""
+        
+        try:
+            await self.game_task()
+        except asyncio.CancelledError: # This error is thrown when the extension is unloaded
+            pass
+        except Exception as e:
+            await self.bot.on_error(e)
+
+    async def game_task(self):
         """Scan for players and auto assigns game roles if possible"""
 
-        # Fetching all required data from the database
-        database_games = list(self.bot.database.session.query(Game).all())
-        servers        = set([item.server for item in database_games])
+        scan_delay = int(self.bot.settings.get("game", "scan_delay"))
+        
+        # Main scan loop
+        while (scan_delay != -1):
 
-        # Looping over every server that requires a scan
-        for server in servers:
-            guild = discord.utils.get(self.bot.guilds, id=server.discord_id)
-            
-            # We just got removed from a server while scanning, skipping it.
-            # The next scan will be fine since all data related with this server
-            # has already been removed from the database
-            if (guild == None):
-                continue
+            # Fetching all required data from the database
+            database_games = list(self.bot.database.session.query(Game).all())
+            server_ids     = set([item.server_id for item in database_games])
 
-            # Fetching server verified role (if any)
-            verified_role = discord.utils.get(guild.roles, id = server.verified_role_id)
-            server_games  = [game for game in database_games if game.server == server]
-
-            # Looping over each members
-            for member in guild.members:
-
-                # Checking for a verified role, this way unauthorized people don't get assigned roles
-                if (verified_role != None):
-                    if (verified_role not in member.roles):
-                        continue
+            # Looping over every server that requires a scan
+            for server_id in server_ids:
+                guild = discord.utils.get(self.bot.guilds, id=server_id)
                 
-                game_role = self.get_game_role_from_activity(member.activity, server_games, guild)
-                if (game_role == None or game_role in member.roles):
+                # We just got removed from a server while scanning, skipping it.
+                # The next scan will be fine since all data related with this server
+                # has already been removed from the database
+                if (guild == None):
                     continue
-                
-                try:
-                    await member.add_roles(game_role, reason="Automatic game scan")
-                    self.bot.logger.info(f"Added the game {game_role.name} to {member} in guild named {guild.name}")
-                except discord.Forbidden: # If discord doesn't let us modify roles, then breaking to the next server
-                    break
-                except:
-                    pass
 
-    @game_scan.before_loop
-    async def pre_game_scan(self):
-        await self.bot.wait_until_ready()
+                # Fetching server verified role (if any)
+                server        = self.bot.database.session.query(Server).filter(Server.discord_id == guild.id).first()
+                verified_role = discord.utils.get(guild.roles, id = (server.verified_role_id if server != None else 0))
+                server_games  = [game for game in database_games if game.server_id == server_id]
+
+                # Looping over each members
+                for member in guild.members:
+
+                    # Checking for a verified role, this way unauthorized people don't get assigned roles
+                    if (verified_role != None):
+                        if (verified_role not in member.roles):
+                            continue
+                    
+                    game_role = self.get_game_role_from_activity(member.activity, server_games, guild)
+                    if (game_role == None or game_role in member.roles):
+                        continue
+                    
+                    try:
+                        await member.add_roles(game_role, reason="Automatic game scan")
+                        self.bot.logger.info(f"Added the game {game_role.name} to {member} in guild named {guild.name}")
+                    except discord.Forbidden: # If discord doesn't let us modify roles, then breaking to the next server
+                        break
+                    except:
+                        pass
+
+            # Waiting for the next scan
+            await asyncio.sleep(scan_delay)
 
     def get_game_role_from_activity(self, activity: discord.Activity, server_games, guild: discord.Guild):
         """Returns a game role from an activity"""
@@ -106,13 +123,13 @@ class GameExt (commands.Cog):
 
     @commands.group(invoke_without_command=True, pass_context=True,
         help="game_help", description="game_description")
-    @commands.bot_has_permissions(manage_roles = True)
     async def game(self, ctx):
         await ctx.send_help(ctx.command)
     
     @game.command(help="game_add_help", description="game_add_description")
+    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_verified)
-    async def add(self, ctx, *, game: GameConverter):
+    async def add(self, ctx, game: GameConverter):
         """ Adds a game to the user """
 
         if (game is None):
@@ -128,8 +145,9 @@ class GameExt (commands.Cog):
             await Helper.send_error  (ctx, ctx.channel, 'game_add_failure', format_content=(game_role.mention,))
 
     @game.command(help="game_remove_help", description="game_remove_description")
+    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_verified)
-    async def remove(self, ctx, *, game: GameConverter):
+    async def remove(self, ctx, game: GameConverter):
         """ Adds a game to the user """
 
         if (game is None):
@@ -145,6 +163,7 @@ class GameExt (commands.Cog):
             await Helper.send_error  (ctx, ctx.channel, 'game_remove_failure', format_content=(game_role.mention,))
 
     @game.command(help="game_create_help", description="game_create_description")
+    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_moderator)
     async def create(self, ctx, name, *, discord_name = ""):
         """Create a game"""
@@ -162,7 +181,7 @@ class GameExt (commands.Cog):
         game = await ctx.guild.create_role(
             name        = name,
             color       = await commands.ColourConverter().convert(ctx, role_color),
-            mentionable = False)
+            mentionable = True)
 
         server = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
 
@@ -182,8 +201,9 @@ class GameExt (commands.Cog):
         await Helper.send_success(ctx, ctx.channel, 'game_create_success', format_content=(game.mention,))
 
     @game.command(help="game_delete_help", description="game_delete_description")
+    @commands.bot_has_permissions(manage_roles = True)
     @commands.check(is_moderator)
-    async def delete(self, ctx, *, game: GameConverter):
+    async def delete(self, ctx, game: GameConverter):
         """Deletes a game"""
 
         if (game is None):

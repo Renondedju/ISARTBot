@@ -45,7 +45,6 @@ class ExtExt(commands.Cog):
         return "isartbot.ext." + ext
 
     @ext.command(name="load", help="ext_load_help", description="ext_load_description")
-    @commands.check(is_super_admin)
     async def _load(self, ctx, *, ext : str):
         """Loads an extension"""
 
@@ -63,7 +62,6 @@ class ExtExt(commands.Cog):
             await Helper.send_success(ctx, ctx.channel, "ext_load_success_desc")
 
     @ext.command(name="unload", help="ext_unload_help", description="ext_unload_description")
-    @commands.check(is_super_admin)
     async def _unload(self, ctx, *, ext : str):
         """Unloads an extension"""
 
@@ -81,7 +79,6 @@ class ExtExt(commands.Cog):
             await Helper.send_success(ctx, ctx.channel, "ext_unload_success_desc")
 
     @ext.command(name='reload', help="ext_reload_help", description="ext_reload_description")
-    @commands.check(is_super_admin)
     async def _reload(self, ctx, *, ext : str):
         """Reloads an extension"""
 

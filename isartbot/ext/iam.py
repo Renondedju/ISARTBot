@@ -25,12 +25,11 @@
 import asyncio
 import discord
 
-from math                import ceil
-from discord.ext         import commands
-from isartbot.helper     import Helper
-from isartbot.checks     import is_admin, is_verified
-from isartbot.database   import SelfAssignableRole, Server
-from isartbot.converters import BetterRoleConverter
+from math              import ceil
+from discord.ext       import commands
+from isartbot.helper   import Helper
+from isartbot.checks   import is_admin, is_verified
+from isartbot.database import SelfAssignableRole, Server
 
 class IamExt(commands.Cog):
 
@@ -56,7 +55,7 @@ class IamExt(commands.Cog):
     @commands.command(pass_context=True, help="iam_help", description="iam_description")
     @commands.bot_has_permissions(send_messages=True, manage_roles=True)
     @commands.check(is_verified)
-    async def iam(self, ctx, *, role: BetterRoleConverter):
+    async def iam(self, ctx, role: discord.Role):
         """ Adds a role to a user if possible """
 
         server        = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
@@ -77,9 +76,9 @@ class IamExt(commands.Cog):
     @commands.command(pass_context=True, help="iamn_help", description="iamn_description")
     @commands.bot_has_permissions(send_messages=True, manage_roles=True)
     @commands.check(is_verified)
-    async def iamn(self, ctx, *, role: BetterRoleConverter):
+    async def iamn(self, ctx, role: discord.Role):
         """ Removes a role from the user """
-
+        
         server        = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
         database_role = self.bot.database.session.query(SelfAssignableRole).\
             filter(SelfAssignableRole.discord_id == role.id, SelfAssignableRole.server == server).first()
@@ -101,7 +100,7 @@ class IamExt(commands.Cog):
 
     @sar.command(aliases=["add"], help="sar_create_help", description="sar_create_description")
     @commands.check(is_admin)
-    async def create(self, ctx, *, role: BetterRoleConverter):
+    async def create(self, ctx, role: discord.Role):
         """ Creates a new self assignable role """
 
         # Looking for invalid roles
@@ -128,7 +127,7 @@ class IamExt(commands.Cog):
 
     @sar.command(aliases=["remove"], help="sar_delete_help", description="sar_delete_description")
     @commands.check(is_admin)
-    async def delete(self, ctx, *, role: BetterRoleConverter):
+    async def delete(self, ctx, role: discord.Role):
         """ Deletes a self assignable role """
 
         server        = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()

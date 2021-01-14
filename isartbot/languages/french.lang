@@ -141,7 +141,7 @@ diffusion_subscription_description=Aide à l'abonnement et au désabonnement aux
 diffusion_subscription_subscribe_help=S'abonne à un canal de diffusion
 diffusion_subscription_subscribe_description=S'abonne à un canal de diffusion.\n<diffusion>: Nom de la diffusion\n<channel>: Canal auquel vous abonner\n[diffusion_tag]: Rôle à mentionner avec chaque message
 diffusion_subscribe_success=Souscrit avec succès à cette diffusion !
-diffusion_subscription_already_exists=Cet abonnement existe déjà.\n Utilisez ``{}diffusion subscription unsubscribe`` se désinscrire de cette diffusion.
+diffusion_subscription_already_exists=Cet abonnement existe déjà.\n Utilisez ``{}diffusion unsubscribe`` se désinscrire de cette diffusion.
 
 # Unsubscribe
 diffusion_subscription_unsubscribe_help=Se désabonner d'un canal de diffusion
@@ -199,10 +199,10 @@ ext_unload_success_desc=Extension déchargée !
 ext_unload_failure_desc=Impossible de décharger l'extension. Consultez les journaux pour plus d'informations.
 
 # Reload
-ext_reload_help=Recharge une extension
+ext_reload_help=recharge une extension
 ext_reload_description=Recharge l'extension souhaitée.\n<ext>: Nom de l'extension
 ext_reload_success_desc=Extension rechargée !
-ext_reload_failure_desc=Impossible de recharger l'etension. Consultez les journaux pour plus d'informations.
+ext_reload_failure_desc=Impossible de rechargée l'etension. Consultez les journaux pour plus d'informations.
 
 
 ## Lang extension
@@ -232,34 +232,10 @@ lang_key_help=Récupère une valeur de localisation à partir d'une clé
 lang_key_description=Récupère la valeur correspondant à cette clé de localisation.\n<lang>: Langue cible\n<key>: Clé associée à la valeur
 
 
-## Live role extension
-
-live_role_help=Configure un rôle de live
-live_role_description=Un rôle de live est un rôle assigné automatiquement à tout utilisateur streamant sur Twitch / Youtube ou Discord. Cela est utile pour promouvoir des créateurs.
-live_role_set_help=Configure un rôle de live
-live_role_set_description=Configure un rôle de live et active la fonctionalité. Désacitvez le avec `!liverole disable`
-live_role_disable_help=Désacitve les rôles de live
-live_role_disable_description=Désacitve les rôles de live. Ré-activez les avec la commande `!liverole set <role>`
-
-success_live_role_set=Le rôle de live a été configuré avec succès sur
-success_live_role_disable=Le rôle de live a été désactivé avec succès pour ce serveur.
-
 ## Moderation extension
 
 mod_help=Gère la modération
 mod_description=Aide à modérer le serveur.
-
-# Log
-mod_log_set_help=Crée un canal de log
-mod_log_set_description=Crée un canal de log dans lequel apparaitra notemment les messages supprimés
-
-mod_log_unset_help=Supprime le canal de log
-mod_log_unset_description=Supprime le canal de log
-
-success_mod_log_set=Le canal de log à été configuré sur
-success_mod_log_unset=Le canal de log à été désactivé
-
-message_deleted=Message supprimé
 
 # Prune
 mod_prune_help=Supprime la quantité souhaitée de messages
@@ -270,8 +246,6 @@ success_prune=Les {0} derniers messages ont été supprimés.
 mod_kick_help=Exclut un membre
 mod_kick_description=Exclut un membre.\n<member>: Nom du membre\n[reason]: Raison de l'exclusion
 success_kick={0} a été exclu par {1} car : {2}.
-fail_prune_size=Discord permet uniquement la suppression de 100 messages à la fois, vous avez essayé d'en supprimer {0}.\nRéessayez avec moins de messages !
-fail_prune_other=Discord m'a empêché de supprimer vos messages, probablement parce que ces messages ont été publiés il y a plus de 14 jours.
 
 # Ban
 mod_ban_help=Bannit un membre
@@ -280,10 +254,10 @@ success_ban={0} a été banni par {1} car : {2}.
 
 mod_as_help=
 mod_as_description=
-mod_for_help=Permet la manipulation de rôles pour une grand quantité de membres à la fois
-mod_for_description=Ajoute ou supprime des rôles à un groupe de membres.\nPar exemple `!mod for @LeagueOfLegends add @Tft` ajoutera le rôle @Tft à tous les détenteurs du rôle @LeagueOfLegends.\nLes différentes stratégies possibles sont `add` et `remove`.
+mod_for_help=
+mod_for_description=
 mod_for_success=Utilisez \'{}\' stratégie avec les rôles {} sur {}'.
-mod_for_error=La stratégie devrait être soit `add` soit `remove` !
+mod_for_error=Action devrait être 'add' ou 'remove' !
 
 
 ## Starboard extension
@@ -297,10 +271,6 @@ starboard_disable_help=Désactive le starboard.
 success_starboard_set=Le starboard a été configuré avec succès sur le canal de texte suivant.
 success_starboard_unset=Le starboard a été désactivé avec succès pour ce serveur.
 
-starboard_minimum_help=Définit le nombre minimum d'étoiles du starboard.
-starboard_minimum_description=Définit le nombre d'étoiles minimum pour mettre en avant un message dans le starboard.
-starboard_minimum_success=Le nombre d'étoiles minimum est désormais de {0} sur ce serveur.
-starboard_minimum_error=Le nombre minimum d'étoiles doit être compris entre 1 et 100.
 
 ## Test extension
 

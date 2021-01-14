@@ -31,8 +31,7 @@ from typing              import Union
 from itertools           import groupby
 from discord.ext         import commands
 from isartbot.helper     import Helper
-from isartbot.checks     import is_moderator, is_admin
-from isartbot.database   import Server
+from isartbot.checks     import is_moderator
 from isartbot.converters import MemberConverter
 
 class ModerationExt(commands.Cog):
@@ -63,54 +62,6 @@ class ModerationExt(commands.Cog):
     async def mod(self, ctx):
         await ctx.send_help(ctx.command)
 
-    @mod.command(help="mod_log_set_help", description="mod_log_set_description")
-    @commands.check(is_admin)
-    async def log_set(self, ctx, channel: discord.TextChannel):
-        """ Sets the current mod log channel, if none was set before, this command also enables the mod logging """
-
-        embed = discord.Embed()
-
-        # Checking if we have enough permissions in order to operate the starboard on the designated channel
-        required_perms = discord.Permissions().none()
-        required_perms.update(send_messages=True)
-
-        if (not required_perms.is_subset(channel.permissions_for(ctx.guild.me))):
-            raise commands.BotMissingPermissions(["send_messages"])
-
-        self.bot.logger.info(f"Mod log channel set to {channel.id} for server named {ctx.guild.name}")
-
-        self.bot.database.session.query(Server).\
-            filter(Server.discord_id == ctx.guild.id).\
-            update({Server.modlog_channel_id : channel.id})
-
-        self.bot.database.session.commit()
-
-        embed.title       =    await ctx.bot.get_translation(ctx, "success_title")
-        embed.description = f"{await ctx.bot.get_translation(ctx, 'success_mod_log_set')}: {channel.mention}"
-        embed.colour      = discord.Color.green()
-
-        await ctx.send(embed=embed)
-
-    @mod.command(help="mod_log_unset_help", description="mod_log_unset_description")
-    @commands.check(is_admin)
-    async def log_unset(self, ctx):
-        """ Disables the mod log for the current server, use "!mod log_set <channel name>" to re enable it """
-
-        self.bot.logger.info(f"Mod log disabled for server named {ctx.guild.name}")
-
-        self.bot.database.session.query(Server).\
-            filter(Server.discord_id == ctx.guild.id).\
-            update({Server.modlog_channel_id : 0})
-
-        self.bot.database.session.commit()
-
-        embed = discord.Embed()
-        embed.title       = await ctx.bot.get_translation(ctx, "success_title")
-        embed.description = await ctx.bot.get_translation(ctx, "success_mod_log_unset")
-        embed.colour      = discord.Color.green()
-
-        await ctx.send(embed=embed)
-
     @mod.command(help="mod_prune_help", description="mod_prune_description")
     @commands.bot_has_permissions(manage_messages=True, read_message_history=True)
     @commands.has_permissions    (manage_messages=True, read_message_history=True)
@@ -119,23 +70,16 @@ class ModerationExt(commands.Cog):
 
         messages = []
         if (member is None):
-            messages = await ctx.channel.history(limit=number).flatten()
+            messages = await ctx.channel.history(limit=number + 1).flatten()
 
         else:
-            async for message in ctx.channel.history(limit=number):
+            async for message in ctx.channel.history(limit=number + 1):
                 if (message.author == member):
-                    messages.append(message)
+                     messages.append(message)
+            messages.append(ctx.message)
 
-        if (len(messages) > 100):
-            await Helper.send_error(ctx, ctx.channel, "fail_prune_size", format_content=(len(messages),))
-            return
-
-        try: 
-            await ctx.channel.delete_messages(messages)
-        except discord.HTTPException:
-            await Helper.send_error(ctx, ctx.channel, "fail_prune_other")
-        else:
-            await Helper.send_success(ctx, ctx.channel, "success_prune", format_content=(len(messages),), delete_after=5.0)
+        await ctx.channel.delete_messages(set(messages))
+        await Helper.send_success(ctx, ctx.channel, "success_prune", format_content=(len(messages),), delete_after=5.0)
 
     @mod.command(help="mod_kick_help", description="mod_kick_description")
     @commands.bot_has_permissions(kick_members=True)
@@ -175,16 +119,64 @@ class ModerationExt(commands.Cog):
 
         self.bot.logger.warning(f"{member.name} has been banned by {ctx.author.name} for '{reason}'")
 
+    @mod.command(help="mod_as_help", description="mod_as_description", name = "as")
+    @commands.check(is_moderator)
+    async def _as(self, ctx, member : MemberConverter, *command_str : str):
+        
+        if (member is None):
+            await Helper.send_error(ctx, ctx.channel, 'mod_as_error')
+            return
+
+        await Helper.send_success(ctx, ctx.channel, 'mod_as_success')
+
+        """prefix = self.bot.clean_prefix
+        regex  = r"{0}(\w*)\s.*".format(prefix)
+        matches = re.search(regex, command_str)
+
+        embedFail = discord.Embed()
+        embedFail.title = "Failed"
+        embedFail.colour = discord.Color.red()
+
+        if not matches:
+            embedFail.description = 'There is no command to invoke.'
+            await ctx.send(embed=embed)
+            return
+
+        command = self.bot.get_command(matches.group(1))
+        if (not await command.can_run(ctx)):
+            embedFail.description = "The checks for this command failed, "
+                                    "maybe you don't have the required rights ?"
+            await ctx.send(embed=embed)
+            return
+
+        for word in re.compile('\w+').findall(command_str.replace(prefix + matches.group(1), '')):
+
+            # if type of 'command' is a discord command, then everything is ready to be executed
+            if type(command) == discord.ext.commands.core.Command:
+                break
+
+            command = command.get_command(word)
+            if command is None:
+                break
+            if (not await command.can_run(ctx)):
+                await self.bot.send_fail(ctx,
+                                "The checks for this subcommand failed, "
+                                "maybe you don't have the required rights?")
+                return
+
+        msg: discord.Message = await ctx.send(command_str)
+        msg.author           = member
+        await self.bot.process_commands(msg)
+
+        return"""
+
     @mod.command(help="mod_for_help", description="mod_for_description", name='for')
     @commands.check(is_moderator)
     @commands.bot_has_permissions(manage_roles=True)
     async def _for(self, ctx, *args : Union[discord.Member, discord.Role, str]):
         """Removes or adds roles to members of the guild"""
 
-        try:
-            selectors, action, roles = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
-        except ValueError:
-            raise commands.UserInputError()
+        selectors, action, roles = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
 
         if len(action) != 1:
             await Helper.send_error(ctx, ctx.channel, 'mod_for_error')
@@ -227,34 +219,6 @@ class ModerationExt(commands.Cog):
         for member in selected_members:
             for role in roles:
                 await member.remove_roles(role)
-
-    # Events
-    @commands.Cog.listener()
-    async def on_message_delete(self, message):
-
-        # Checking if mod log is enabled
-        server = self.bot.database.session.query(Server).filter(Server.discord_id == message.guild.id).first()
-        if (server.modlog_channel_id == 0):
-            return
-        
-        embed = discord.Embed()
-
-        embed.description = message.content
-        embed.title       = "Message deleted"
-        embed.color       = discord.Color.red()
-
-        # Adding attachments
-        if message.attachments:
-            file = message.attachments[0]
-            if file.url.lower().endswith(('png', 'jpeg', 'jpg', 'gif', 'webp')):
-                embed.set_image(url=file.proxy_url)
-            else:
-                embed.add_field(name='Attachment', value=f'[{file.filename}]({file.proxy_url})', inline=False)
-
-        embed.add_field (name="channel", value=message.channel.mention, inline=False)
-        embed.set_footer(text=f"{message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
-
-        await self.bot.get_channel(server.modlog_channel_id).send(embed=embed)
 
 def setup(bot):
     bot.add_cog(ModerationExt(bot))

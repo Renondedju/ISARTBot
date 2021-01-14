@@ -31,14 +31,11 @@ class Server(TableBase):
 
     __tablename__ = 'servers'
 
-    id                   = Column('id'               , Integer, primary_key = True, unique = True)
-    lang                 = Column('lang'             , Text   , default     = "en")
-    discord_id           = Column('discord_id'       , Integer, unique      = True)
-    modlog_channel_id    = Column('modlog_channel_id', Integer, default     = 0)
-    live_role_id         = Column('live_role_id'     , Integer, default     = 0)
-    starboard_channel_id = Column('starboard_id'     , Integer, default     = 0)
-    starboard_minimum    = Column('starboard_minimum', Integer, default     = 3)
-    verified_role_id     = Column('verified_role_id' , Integer, default     = 0)
+    id                   = Column('id'              , Integer, primary_key = True, unique = True)
+    lang                 = Column('lang'            , Text   , default     = "en")
+    discord_id           = Column('discord_id'      , Integer, unique      = True)
+    starboard_channel_id = Column('starboard_id'    , Integer, default     = 0)
+    verified_role_id     = Column('verified_role_id', Integer, default     = 0)
     
     games                 = relationship('Game'                 , cascade='all,delete,delete-orphan')
     diffusion_subs        = relationship('DiffusionSubscription', cascade='all,delete,delete-orphan')
