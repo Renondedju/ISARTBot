@@ -59,15 +59,7 @@ class Bot(commands.Bot):
         self.settings = configparser.ConfigParser(converters={'list': lambda x: [i.strip() for i in x.split(',')]})
         self.settings.read(self.config_file, encoding='utf-8')
 
-        intents = discord.Intents()
-        intents.guild_reactions = True
-        intents.guild_messages  = True
-        intents.presences       = True
-        intents.members         = True
-        intents.emojis          = True
-        intents.guilds          = True
-
-        super().__init__(command_prefix = discord.ext.commands.when_mentioned_or(self.settings.get('common', 'prefix')), intents = intents, *args, **kwargs)
+        super().__init__(command_prefix = discord.ext.commands.when_mentioned_or(self.settings.get('common', 'prefix')), intents = discord.Intents.all(), *args, **kwargs)
 
         self.dev_mode   = self.settings.getboolean('debug', 'developement_mode')
         self.extensions = self.settings['extensions']
