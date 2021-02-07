@@ -126,7 +126,7 @@ class StarboardExt(commands.Cog):
         """ Returns the starboarded version of a message """
 
         emoji   = self.get_star_emoji(star_count)
-        content = f'{emoji} **{star_count}** {message.channel.mention}'
+        content = f'{emoji} **{star_count}**'
 
         embed = discord.Embed(description=message.content)
 
@@ -143,11 +143,12 @@ class StarboardExt(commands.Cog):
             else:
                 embed.add_field(name='Attachment', value=f'[{file.filename}]({file.url})', inline=False)
 
-        embed.timestamp = message.created_at
         embed.colour    = discord.Color.gold()
         embed.set_author(name     = message.author.display_name,
                          url      = message.jump_url,
                          icon_url = message.author.avatar_url_as(format='png'))
+
+        embed.add_field(name="Original", value=f"[Jump!]({message.jump_url})", inline=False)
 
         return content, embed
 
@@ -192,9 +193,10 @@ class StarboardExt(commands.Cog):
             and len(message.embeds) >  0):
 
             # If the author url of the first embed of the message
-            # starts with 'https://discordapp.com/channels/', then it's
+            # starts with 'https://discordapp.com/channels/' or 'https://discord.com/channels/', then it's
             # a starboard message
-            return str(message.embeds[0].author.url).startswith('https://discordapp.com/channels/')
+            link = str(message.embeds[0].author.url)
+            return link.startswith('https://discordapp.com/channels/') or link.startswith('https://discord.com/channels/')
 
         return False
 
@@ -216,6 +218,7 @@ class StarboardExt(commands.Cog):
         return server.starboard_channel_id
 
     async def get_starboard_channel(self, server: discord.Guild) -> discord.TextChannel:
+        """ Returns the starboard channel of a given guild, or None if there is none"""
 
         channel_id = await self.get_starboard_channel_id(server)
 
@@ -232,11 +235,17 @@ class StarboardExt(commands.Cog):
 
         author_url = starboard_message.embeds[0].author.url
 
-        r = r"https:\/\/discordapp\.com\/channels\/\d*\/(\d*)\/(\d*)"
-        match = re.search(r, author_url)
+        regex_old = r"https:\/\/discordapp\.com\/channels\/\d*\/(\d*)\/(\d*)"
+        regex_new = r"https:\/\/discord\.com\/channels\/\d*\/(\d*)\/(\d*)"
 
-        if not match:
-            return None
+        match_old = re.search(regex_old, author_url)
+        match_new = re.search(regex_new, author_url)
+
+        match = match_old
+        if not match_old:
+            match = match_new
+            if not match_new:
+                return None
 
         channel_id = match.group(1)
         message_id = match.group(2)
