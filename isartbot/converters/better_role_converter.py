@@ -26,8 +26,7 @@ import re
 import discord
 import asyncio
 
-from discord.ext       import commands
-from isartbot.database import Diffusion
+from discord.ext import commands
 
 class BetterRoleConverter(commands.IDConverter):
     """ This role converter does the same job as the default discord role converter except 
