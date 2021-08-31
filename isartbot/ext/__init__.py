@@ -22,11 +22,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from .iam       import *
 from .ext       import *
 from .test      import *
 from .lang      import *
-from .starboard import *
-from .diffusion import *
 from .game      import *
-from .iam       import *
+from .liverole  import *
+from .diffusion import *
 from .foodtruck import *
+from .starboard import *

@@ -19,5 +19,22 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
+
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship, backref
+
+from isartbot.database import TableBase
+
+class RolePattern(TableBase):
+
+    __tablename__ = 'role_pattern'
+
+    id              = Column('id'             , Integer, primary_key = True, unique = True)
+    position        = Column('position'       , Integer, nullable    = False)
+    discord_role_id = Column('discord_role_id', Integer, nullable    = False)
+    regex           = Column('regex'          , Text   , nullable    = False)
+
+    server_id = Column(Integer, ForeignKey('servers.id'))
+    server    = relationship('Server', backref=backref('games', cascade='all,delete,delete-orphan'))
