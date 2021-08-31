@@ -29,7 +29,8 @@ from math              import ceil
 from typing            import Tuple
 from discord.ext       import commands
 from dataclasses       import dataclass
-from isartbot.database import Server
+from isartbot.helper   import Helper
+from isartbot.database import Server, RolePattern
 
 
 @dataclass(frozen=True, init=True, repr=True)
@@ -39,7 +40,7 @@ class Pattern:
     role:  discord.Role = None
     regex: str          = ""
 
-
+# TODO: Keep track of deleted roles
 class PatternMatchingRolesExt(commands.Cog):
     """ 
         Checks for nickname changes, and attempts
@@ -56,8 +57,9 @@ class PatternMatchingRolesExt(commands.Cog):
     def get_guild_patterns(self, guild: discord.Guild) -> Tuple[Pattern]:
         """Returns all the role patterns for tha guild"""
         
-        server      = self.bot.database.session.query(Server).filter(Server.discord_id == guild.id).one()
-        db_patterns = server.role_patterns.sort(key = lambda pattern: pattern.position) or []
+        server      = self.bot.database.session.query(Server).filter(Server.discord_id == guild.id).first()
+        db_patterns = server.role_patterns
+        db_patterns.sort(key = lambda pattern: pattern.position)
 
         return [Pattern(guild.get_role(p.discord_role_id), p.regex) for p in db_patterns]
 
@@ -70,8 +72,21 @@ class PatternMatchingRolesExt(commands.Cog):
     @pattern.command(pass_context=True)
     @commands.bot_has_permissions(manage_roles = True)
     @commands.has_permissions    (manage_roles = True)
-    async def create(self, ctx, role: discord.Role, *regex_pattern: str) -> None:
-        pass
+    async def create(self, ctx, role: discord.Role, regex_pattern: str) -> None:
+        """Creates a role assignation pattern"""
+
+        server      = self.bot.database.session.query(Server).filter(Server.discord_id == ctx.guild.id).first()
+        new_pattern = RolePattern(
+            discord_role_id = role.id,
+            position        = len(server.role_patterns),
+            regex           = regex_pattern,
+            server          = server
+        )
+
+        self.bot.database.session.add(new_pattern)
+        self.bot.database.session.commit()
+
+        await Helper.send_success(ctx, ctx.channel, 'pattern_create_success', format_content=(role.mention, regex_pattern))
 
     @pattern.command(pass_context=True)
     @commands.bot_has_permissions(manage_roles = True)
@@ -102,7 +117,7 @@ class PatternMatchingRolesExt(commands.Cog):
         lines = []
         for index in range(max_lines * (page - 1), max_lines * page):
             try:
-                lines.append(f"R\"{patterns[index].regex}\" -> {patterns[index].role.mention}")
+                lines.append(f"**{index}** • `{patterns[index].regex}` -> {patterns[index].role.mention}")
             except IndexError:
                 break
 
@@ -130,11 +145,11 @@ class PatternMatchingRolesExt(commands.Cog):
         roles    = [p.role for p in patterns]
 
         # Iterating over all the patterns for that guild
-        for pattern in await patterns:
+        for pattern in patterns:
             
             # Selecting the first match
-            if re.match(pattern.regex, after.nick):
-                await after.remove_roles(roles)
+            if re.match(str(pattern.regex), str(after.nick)):
+                await after.remove_roles(*roles)
                 await after.add_roles   (pattern.role, reason=f"New pattern matched a username change: {pattern.regex}")
 
                 return
