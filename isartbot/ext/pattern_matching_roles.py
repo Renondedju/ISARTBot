@@ -91,8 +91,27 @@ class PatternMatchingRolesExt(commands.Cog):
     @pattern.command(pass_context=True)
     @commands.bot_has_permissions(manage_roles = True)
     @commands.has_permissions    (manage_roles = True)
-    async def delete(self, ctx, id: int) -> None:
-        pass
+    async def delete(self, ctx, position: int) -> None:
+        """Deletes a pattern"""
+
+        pattern = ctx.bot.database.session.query(RolePattern).filter(RolePattern.position == position).first()
+        
+        if (pattern == None):
+            return await Helper.send_error(ctx, ctx.channel, "pattern_delete_failure")
+            
+        # Asking for confirmation
+        result = await Helper.ask_confirmation(ctx, ctx.channel, "pattern_delete_title",
+            initial_content = "pattern_delete_content", initial_format = (pattern.regex, pattern.role.mention),
+            success_content = "pattern_deleted"       , success_format = (pattern.regex, pattern.role.mention),
+            failure_content = "pattern_delete_aborted")
+
+        if (not result):
+            return
+
+        # Otherwise, deleting the diffusion
+        self.bot.database.session.delete(pattern)
+        self.bot.database.session.commit()
+        
 
     @pattern.command(pass_context=True)
     @commands.bot_has_permissions(manage_roles = True)
@@ -151,6 +170,8 @@ class PatternMatchingRolesExt(commands.Cog):
             if re.match(str(pattern.regex), str(after.nick)):
                 await after.remove_roles(*roles)
                 await after.add_roles   (pattern.role, reason=f"New pattern matched a username change: {pattern.regex}")
+
+                self.bot.logger.info(f"Member named {after.mention} changed nick to {after.nick} and got assigned the role {pattern.role.name} in guild named {after.guild.name}")
 
                 return
 
