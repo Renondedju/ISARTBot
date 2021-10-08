@@ -37,7 +37,7 @@ class BetterRoleConverter(commands.IDConverter):
     async def convert(self, ctx, argument):
         guild = ctx.guild
         if not guild:
-            raise NoPrivateMessage()
+            raise commands.NoPrivateMessage()
 
         # Id or mention
         match = self._get_id_match(argument) or re.match(r'<@&([0-9]+)>$', argument)
@@ -48,5 +48,5 @@ class BetterRoleConverter(commands.IDConverter):
             result = discord.utils.find(lambda role: role.name.lower() == argument.lower(), guild._roles.values())
 
         if result is None:
-            raise RoleNotFound(argument)
+            raise commands.RoleNotFound(argument)
         return result
