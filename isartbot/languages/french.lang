@@ -291,13 +291,4 @@ test_denied_description=Ne devrait jamais s'exécuter.
 foodtruck_help=Imprime une liste des foodtrucks à venir
 foodtruck_description=Imprime la liste de tous les foodtrucks à venir
 foodtruck_list_title=Foodtrucks à venir :
-foodtruck_list_format={delimiters}{date} - [{foodtruck}]({website}) ({specialty}) {delimiters}
 foodtruck_list_empty=Tellement vide ¯\_(ツ)_/¯
-
-# Upload
-
-foodtruck_upload_help=Télécharge une nouvelle base de données foodtruck
-foodtruck_upload_description=Télécharge une nouvelle base de données foodtruck. La base de données doit être un fichier `.csv` contenant les colonnes suivantes:` foodtruck, date, speciality, website`.
-foodtruck_upload_attachment_error=La commande doit être appelée avec (une seule) pièce jointe.
-foodtruck_upload_succeeded=Le nouveau téléchargement de la base de données foodtruck a réussi !
-foodtruck_upload_failed=Échec du téléchargement de la base de données foodtruck. Veuillez réessayer plus tard ou contacter un administrateur pour plus de détails.
