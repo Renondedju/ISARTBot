@@ -39,7 +39,6 @@ from isartbot.help_command import HelpCommand
 from os.path     import abspath
 from discord.ext import commands
 
-
 class Bot(commands.Bot):
     """ Main bot class """
 
