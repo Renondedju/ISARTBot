@@ -41,8 +41,10 @@ class FoodtruckExt(commands.Cog):
 
 		def __str__(self) -> str:
 			delimiters = "**" if self.date == datetime.today().date() else ""
+			link       = self.link or f"https://www.google.com/search?q={self.name}"
+			date       = self.date.strftime("%d/%m")
 
-			return f"{delimiters}{self.date.strftime('%d/%m')} - [{self.name}]({self.link}) ({self.description}) {delimiters}"
+			return f"{delimiters}{date} - [{self.name}]({link}) ({self.description}) {delimiters}"
 
 	def __init__(self, bot):
 		self.bot = bot
@@ -60,20 +62,6 @@ class FoodtruckExt(commands.Cog):
 			color       = discord.Color.green()
 		))
 
-	def get_foodtrucks_link(self, name: str) -> str:
-		"""Returns the link to the foodtruck's socials """
-		
-		# Dictionary of foodtruck's names and their links
-		return {
-			"ida's truck"       : "https://www.facebook.com/IdasFoodtruck",
-			"kay fritay"        : "https://www.facebook.com/kayfritay",
-			"la cocotte mobile" : "https://www.facebook.com/La-cocotte-mobile-247388968767076/",
-			"tuK tuk food truck": "https://www.facebook.com/tuktukfoodtruckthai/",
-			"pizza tony"        : "https://www.facebook.com/lescamionspizzatony/",
-			"le Trotter"        : "https://www.facebook.com/letrotter.fr/",
-			"la mobylette verte": "https://www.facebook.com/mobyletteverte/"
-		}.get(name.lower(), "")
-
 	def get_foodtrucks(self):
 		"""Queries the https://my.isartdigital.com/api/foodtruck endpoint and returns it's parsed json data"""
 	
@@ -83,7 +71,7 @@ class FoodtruckExt(commands.Cog):
 				date        = datetime.strptime(foodtruck['jour'], "%Y-%m-%d").date(),
 				name        = foodtruck['nom'].capitalize(),
 				description = foodtruck['description'],
-				link        = self.get_foodtrucks_link(foodtruck['nom'])) for foodtruck in json.loads(response.read().decode('utf-8'))]
+				link        = foodtruck['lien']) for foodtruck in json.loads(response.read().decode('utf-8'))]
 
 		# Ordering the foodtrucks by date
 		return sorted(foodtrucks, key=lambda foodtruck: foodtruck.date)
