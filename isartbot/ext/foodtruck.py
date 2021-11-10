@@ -22,85 +22,59 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-import csv
+import json
 import discord
-import asyncio
 
-from datetime        import datetime
-from discord.ext     import commands
-from isartbot.checks import is_super_admin
-from isartbot.helper import Helper
+from datetime       import datetime
+from discord.ext    import commands
+from urllib.request import urlopen
+from dataclasses    import dataclass
 
 class FoodtruckExt(commands.Cog):
 
-    def __init__(self, bot):
-        self.bot     = bot
-        self.db_path = self.bot.settings.get("foodtruck", "database") 
+	@dataclass()
+	class Foodtruck:
+		name: str
+		link: str
+		date: datetime
+		description: str
 
-    @commands.group(pass_context=True, invoke_without_command=True,
-        help="foodtruck_help", description="foodtruck_description")
-    async def foodtruck(self, ctx):
-        
-        # if a subcommand is passed
-        if not ctx.invoked_subcommand is None:
-            return
+		def __str__(self) -> str:
+			delimiters = "**" if self.date == datetime.today().date() else ""
+			link       = self.link or f"https://www.google.com/search?q={self.name}"
+			date       = self.date.strftime("%d/%m")
 
-        today      = datetime.today().date()
-        fmt        = await ctx.bot.get_translation(ctx, 'foodtruck_list_format')
-        foodtrucks = self.get_foodtrucks(today)
+			return f"{delimiters}{date} - [{self.name}]({link}) ({self.description}) {delimiters}"
 
-        # Filling the embed content
-        lines = list()
-        for truck in foodtrucks:
-            delimiters = "**" if self.parse_truck_date(truck) == today else ""
-            truck['date'] = truck['date'][:5]
-            lines.append(fmt.format(delimiters=delimiters, **truck))
+	def __init__(self, bot):
+		self.bot = bot
 
-        if (len(foodtrucks) == 0):
-            lines.append(await ctx.bot.get_translation(ctx, 'foodtruck_list_empty'))
+	@commands.command(pass_context=True, help="foodtruck_help", description="foodtruck_description")
+	async def foodtruck(self, ctx):
+		
+		# Getting the foodtrucks
+		lines = [str(foodtruck) for foodtruck in self.get_foodtrucks()] or [await ctx.bot.get_translation(ctx, 'foodtruck_list_empty')]
 
-        embed = discord.Embed()
-        embed.description = '\n'.join(lines)
-        embed.title       = await ctx.bot.get_translation(ctx, 'foodtruck_list_title')
-        embed.color       = discord.Color.green()
+		# Sending the embed
+		await ctx.send(embed= discord.Embed(
+			description = "\n".join(lines),
+			title       = await ctx.bot.get_translation(ctx, 'foodtruck_list_title'),
+			color       = discord.Color.green()
+		))
 
-        await ctx.send(embed=embed)
-        
-    @foodtruck.command(help="foodtruck_upload_help", description="foodtruck_upload_description")
-    @commands.check(is_super_admin)
-    async def upload(self, ctx):
-        """ Uploads a new database to the bot """
+	def get_foodtrucks(self):
+		"""Queries the https://my.isartdigital.com/api/foodtruck endpoint and returns it's parsed json data"""
+	
+		with urlopen("https://my.isartdigital.com/api/foodtruck") as response:
+			# Parsing json into a list of Foodtruck objects
+			foodtrucks = [self.Foodtruck(
+				date        = datetime.strptime(foodtruck['jour'], "%Y-%m-%d").date(),
+				name        = foodtruck['nom'].capitalize(),
+				description = foodtruck['description'],
+				link        = foodtruck['lien']) for foodtruck in json.loads(response.read().decode('utf-8'))]
 
-        if (len(ctx.message.attachments) != 1):
-            await Helper.send_error(ctx, ctx.channel, "foodtruck_upload_attachment_error")
-            return
-
-        try:
-            if (not os.path.exists(os.path.dirname(self.db_path))):
-                os.makedirs(os.path.dirname(self.db_path))
-
-            # Saving the attachment
-            await ctx.message.attachments[0].save(self.db_path)
-            await Helper.send_success(ctx, ctx.channel, "foodtruck_upload_succeeded")
-        except:
-            await Helper.send_error(ctx, ctx.channel, "foodtruck_upload_failed")
-
-    # Methods
-    def get_foodtrucks(self, target_date):
-
-        foodtrucks = list()
-        with open(self.db_path, newline='', encoding="utf-8") as csv_file:
-            for truck in csv.DictReader(csv_file):
-                delta = (self.parse_truck_date(truck) - target_date).days
-                
-                if (delta >= 0 and delta <= 7):
-                    foodtrucks.append(truck)
-        
-        return foodtrucks
-
-    def parse_truck_date(self, truck):
-        return datetime.strptime(truck['date'], "%d/%m/%Y").date()
+		# Ordering the foodtrucks by date
+		return sorted(foodtrucks, key=lambda foodtruck: foodtruck.date)
 
 def setup(bot):
-    bot.add_cog(FoodtruckExt(bot))
+	bot.add_cog(FoodtruckExt(bot))

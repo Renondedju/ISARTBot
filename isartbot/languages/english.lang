@@ -291,13 +291,4 @@ test_denied_description=Should never execute.
 foodtruck_help=Prints a list of upcoming foodtrucks
 foodtruck_description=Prints the list of every upcoming foodtrucks
 foodtruck_list_title=Upcoming foodtrucks:
-foodtruck_list_format={delimiters}{date} - [{foodtruck}]({website}) ({specialty}) {delimiters}
 foodtruck_list_empty=Such empty ¯\_(ツ)_/¯
-
-# Upload
-
-foodtruck_upload_help=Uploads a new foodtruck database
-foodtruck_upload_description=Uploads a new foodtruck database. The database must be a `.csv` file containing the following columns: `foodtruck, date, specialty, website`.
-foodtruck_upload_attachment_error=The command needs to be called with (only) one attachment.
-foodtruck_upload_succeeded=New foodtruck database upload succeeded ! 
-foodtruck_upload_failed=Foodtruck database upload failed, please try again later or contact an administrator for more details.
