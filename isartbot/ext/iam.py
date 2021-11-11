@@ -176,6 +176,5 @@ class IamExt(commands.Cog):
 
         await ctx.send(embed=embed)
 
-
 def setup(bot):
     bot.add_cog(IamExt(bot))
