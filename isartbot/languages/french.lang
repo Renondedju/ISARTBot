@@ -286,9 +286,18 @@ test_delay_description=Attendez 2 secondes.
 test_denied_help=Ne devrait jamais montrer
 test_denied_description=Ne devrait jamais s'exécuter.
 
+
 ## Foodtruck
 
 foodtruck_help=Imprime une liste des foodtrucks à venir
 foodtruck_description=Imprime la liste de tous les foodtrucks à venir
 foodtruck_list_title=Foodtrucks à venir :
 foodtruck_list_empty=Tellement vide ¯\_(ツ)_/¯
+
+## Reservation
+
+reservation_help=ToDo aide
+reservation_description=ToDo description
+reservation_list_help=Affiche la liste de toutes les réservations ainsi que leur status
+reservation_list_description=Affiche la liste de toutes les réservations ainsi que leur status.\n[page]: Page à afficher
+reservation_list_title=Liste des réservations

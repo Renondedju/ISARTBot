@@ -286,9 +286,19 @@ test_delay_description=Waits for 2 seconds.
 test_denied_help=Should never show
 test_denied_description=Should never execute.
 
+
 ## Foodtruck
 
 foodtruck_help=Prints a list of upcoming foodtrucks
 foodtruck_description=Prints the list of every upcoming foodtrucks
 foodtruck_list_title=Upcoming foodtrucks:
 foodtruck_list_empty=Such empty ¯\_(ツ)_/¯
+
+
+## Reservation
+
+reservation_help=ToDo help
+reservation_description=ToDo description
+reservation_list_help=Prints the list of all current reservations and their status
+reservation_list_description=Prints the list of all current reservations and their status.\n[page]: Page to be displayed
+reservation_list_title=Reservation list
