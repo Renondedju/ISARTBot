@@ -23,10 +23,14 @@
 # SOFTWARE.
 
 import discord
+import json
+import httplib2
 
-from datetime       import datetime
-from dataclasses    import dataclass
-from discord.ext    import tasks, commands
+from datetime                       import datetime
+from dataclasses                    import dataclass
+from discord.ext                    import tasks, commands
+from googleapiclient.discovery      import build
+from google_auth_oauthlib.flow      import InstalledAppFlow
 
 class ReservationExt(commands.Cog):
 
@@ -38,10 +42,26 @@ class ReservationExt(commands.Cog):
     """ Helps to create and check room reservation """
     def __init__(self, bot):
         self.bot = bot
+        
+        self.creds = self.load_credentials()
+
+        self.calendar_service = build('calendar', 'v3', credentials=self.creds)
+        self.gmail_service = build('gmail', 'v1', credentials=self.creds)
+
         self.reservation_scan.start()
 
     def cog_unload(self):
         self.reservation_scan.cancel()
+
+    def load_credentials(self):
+        scopes = json.loads(self.bot.settings.get('reservation', 'google_api_scopes'))
+        credential_file_name = self.bot.settings.get('reservation', 'google_credentials')
+
+        print(scopes)
+
+        flow = InstalledAppFlow.from_client_secrets_file(credential_file_name, scopes)
+
+        return flow.run_local_server(port=0)
 
     @tasks.loop(minutes=10.0)
     async def reservation_scan(self):
