@@ -112,7 +112,7 @@ class ReservationExt(commands.Cog):
         await ctx.send_help(ctx.command)
 
     @reservation.command(help="reservation_list_help", description="reservation_list_description")
-    async def list(self, ctx, page=1):
+    async def list(self, ctx):
         """" Lists all current reservations on the Google Calendar with their status """
 
         if (self.calendar_service == None):
@@ -125,10 +125,8 @@ class ReservationExt(commands.Cog):
 
         event_list = []
 
-        regex = "([(].*[)]|\b" + self.bot.settings.get('reservation', 'unavailable') + "\b)"
-
         for event in events['items']:
-            splitted_summary = re.split(regex, event['summary'])
+            splitted_summary = re.split("([(].*[)])", event['summary'])
 
             name = splitted_summary[0]
             date = datetime.strptime(event['start']['dateTime'], '%Y-%m-%dT%H:%M:%S+01:00')
@@ -150,9 +148,11 @@ class ReservationExt(commands.Cog):
 
     @reservation.command(help="reservation_notify_help", description="reservation_notify_description")
     async def notify(self, ctx):
-        """" Sends a mail for validation if the last one is old enough. Remember that a mail is already sent regularly. """
+        """" Sends a mail for validation. Remember that a mail is already sent regularly. """
         
-        await Helper.send_success(ctx, ctx.channel, 'reservation_notify_success')
+        await Helper.ask_confirmation(ctx, ctx.channel, 'reservation_notify_confirmation_title',
+            initial_content='reservation_notify_confirmation_description', success_content='reservation_notify_success',
+            failure_content='reservation_notify_aborted')
 
 def setup(bot):
     bot.add_cog(ReservationExt(bot))

@@ -298,6 +298,11 @@ foodtruck_list_empty=Tellement vide ¯\_(ツ)_/¯
 
 reservation_help=ToDo aide
 reservation_description=ToDo description
-reservation_list_help=Affiche la liste de toutes les réservations ainsi que leur status
-reservation_list_description=Affiche la liste de toutes les réservations ainsi que leur status.\n[page]: Page à afficher
+reservation_list_help=Affiche la liste de toutes les réservations ainsi que leur status.
+reservation_list_description=Affiche la liste de toutes les réservations ainsi que leur status.
 reservation_list_title=Liste des réservations
+reservation_list_error=Impossible de récupérer la liste depuis l'API Calendar. Merci de relancer l'extension pour essayer de corriger le problème.
+reservation_notify_confirmation_title=Envoyer un mail pour validation
+reservation_notify_confirmation_description=Êtes-vous sûr(e) de vouloir envoyer un mail à Émilie ? 
+reservation_notify_success=Mail envoyé à Émilie !
+reservation_notify_aborted=Le mail n'a pas été envoyé à Émilie.
