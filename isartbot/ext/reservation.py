@@ -25,20 +25,25 @@
 import re
 import os
 import json
+import base64
 import discord
 
 from datetime                       import datetime, timedelta
 from dataclasses                    import dataclass
 from discord.ext                    import tasks, commands
-from sqlalchemy.sql.expression import true
+from email.mime.text                import MIMEText
+from isartbot.checks                import is_club_manager
 from isartbot.helper                import Helper
+from email.mime.multipart           import MIMEMultipart
 from googleapiclient.discovery      import build
 from google.oauth2.credentials      import Credentials
 from google_auth_oauthlib.flow      import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 class ReservationExt(commands.Cog):
-    """ Helps to create and check room reservation """
+    """ Assists club managers for room reservation """
+
+    __slots__ = ("bot", "creds", "calendar_service", "gmail_service", "event_statuses")
 
     @dataclass
     class Reservation:
@@ -52,6 +57,10 @@ class ReservationExt(commands.Cog):
             
             return f"{date} - {self.name} ({self.location}) - {self.status}"
 
+        def get_mail_format(self):
+            date = self.date.strftime("le %d/%m à %Hh%M")
+
+            return f"- {self.name}{date} ({self.location})"
 
     def __init__(self, bot):
         self.bot = bot
@@ -63,12 +72,15 @@ class ReservationExt(commands.Cog):
 
         self.event_statuses = self.build_event_statuses()
 
+        self.reservation_scan.change_interval(hours=self.bot.settings.getint('reservation', 'mailing_delay') * 24 )
         self.reservation_scan.start()
 
     def cog_unload(self):
         self.reservation_scan.cancel()
 
     def load_credentials(self):
+        """" Loads Google credentials and writes them in a file for future loadings """
+
         creds = None
         google_token_file_name = self.bot.settings.get('reservation', 'google_token')
 
@@ -91,16 +103,44 @@ class ReservationExt(commands.Cog):
         return creds
 
     def build_event_statuses(self):
+        """" Associates a reservation status with an icon """
+
         event_statuses = {}
         
         for (key, icon) in self.bot.settings.items('reservation_icons'):
-            event_statuses['(' + self.bot.settings.get('reservation', key) + ')'] = icon
+            event_statuses[self.bot.settings.get('reservation', key)] = icon
 
         return event_statuses
 
     @tasks.loop(hours=4 * 24.0)
     async def reservation_scan(self):
-        return
+        """ Sends a mail containing all pending reservations """
+
+        if self.gmail_service == None:
+            return
+
+        event_list = await self.get_events_from_calendar()
+        pending_status = self.bot.settings.get('reservation_icons', 'pending')
+        reservation_lines = '\n'.join([event.get_mail_format() for event in event_list if event.status == pending_status])
+
+        mail_template_path = self.bot.settings.get('reservation', 'mail_template')
+
+        if os.path.exists(mail_template_path):
+            with open(mail_template_path, encoding='utf-8') as mail_template_file:
+                mail_content = mail_template_file.read().format(reservation_lines)
+
+                mime_message = MIMEMultipart()
+                mime_message['subject'] = self.bot.settings.get('reservation', 'mail_title')
+                mime_message['to'] = self.bot.settings.get('reservation', 'destination_mail')
+                mime_message.attach(MIMEText(mail_content, 'plain'))
+
+                message = {'raw': base64.urlsafe_b64encode(mime_message.as_bytes()).decode(encoding='utf-8')}
+
+                try:
+                    self.gmail_service.users().messages().send(userId=self.bot.settings.get('reservation', 'sender_mail'), 
+                        body=message).execute()
+                except:
+                    self.bot.logger.info("Failed to send the mail for validation")
 
     @reservation_scan.before_loop
     async def pre_reservation_scan(self):
@@ -108,15 +148,65 @@ class ReservationExt(commands.Cog):
 
     @commands.group(invoke_without_command=True, pass_context=True,
         help="reservation_help", description="reservation_description")
+    @commands.check(is_club_manager)
     async def reservation(self, ctx):
         await ctx.send_help(ctx.command)
 
     @reservation.command(help="reservation_list_help", description="reservation_list_description")
+    @commands.check(is_club_manager)
     async def list(self, ctx):
         """" Lists all current reservations on the Google Calendar with their status """
 
         if (self.calendar_service == None):
             await Helper.send_error(ctx, ctx.channel, 'reservation_list_error')
+
+        event_list = await self.get_events_from_calendar()
+
+        await ctx.send(embed=discord.Embed(
+            description = '\n'.join([str(event) for event in event_list]),
+            title = await ctx.bot.get_translation(ctx, 'reservation_list_title'),
+            color = discord.Color.green()
+        ))
+
+    @reservation.command(help="reservation_notify_help", description="reservation_notify_description")
+    @commands.check(is_club_manager)
+    async def notify(self, ctx):
+        """" Sends a mail containing all pending reservations. Remember that a mail is already sent regularly. """
+        
+        if self.gmail_service == None:
+            await Helper.send_error(ctx, ctx.channel, 'reservation_notify_error')
+
+        await Helper.ask_confirmation(ctx, ctx.channel, 'reservation_notify_confirmation_title',
+            initial_content='reservation_notify_confirmation_description', success_content='reservation_notify_success',
+            failure_content='reservation_notify_aborted')
+
+        event_list = await self.get_events_from_calendar()
+        pending_status = self.bot.settings.get('reservation_icons', 'pending')
+        reservation_lines = '\n'.join([event.get_mail_format() for event in event_list if event.status == pending_status])
+
+        mail_template_path = self.bot.settings.get('reservation', 'mail_template')
+
+        if os.path.exists(mail_template_path):
+            with open(mail_template_path, encoding='utf-8') as mail_template_file:
+                mail_content = mail_template_file.read().format(reservation_lines)
+
+                mime_message = MIMEMultipart()
+                mime_message['subject'] = self.bot.settings.get('reservation', 'mail_title')
+                mime_message['to'] = self.bot.settings.get('reservation', 'destination_mail')
+                mime_message.attach(MIMEText(mail_content, 'plain'))
+
+                message = {'raw': base64.urlsafe_b64encode(mime_message.as_bytes()).decode(encoding='utf-8')}
+
+                try:
+                    self.gmail_service.users().messages().send(userId=self.bot.settings.get('reservation', 'sender_mail'), 
+                        body=message).execute()
+                except:
+                    await Helper.send_error(ctx, ctx.channel, 'reservation_notify_send_error')
+        else:
+            await Helper.send_error(ctx, ctx.channel, 'reservation_notify_template_error')
+
+    async def get_events_from_calendar(self):
+        """ Returns all current reservations """
 
         now = datetime.utcnow()
 
@@ -140,19 +230,7 @@ class ReservationExt(commands.Cog):
                 location = location
             ))
 
-        await ctx.send(embed=discord.Embed(
-            description = '\n'.join([str(event) for event in event_list]),
-            title = await ctx.bot.get_translation(ctx, 'reservation_list_title'),
-            color = discord.Color.green()
-        ))
-
-    @reservation.command(help="reservation_notify_help", description="reservation_notify_description")
-    async def notify(self, ctx):
-        """" Sends a mail for validation. Remember that a mail is already sent regularly. """
-        
-        await Helper.ask_confirmation(ctx, ctx.channel, 'reservation_notify_confirmation_title',
-            initial_content='reservation_notify_confirmation_description', success_content='reservation_notify_success',
-            failure_content='reservation_notify_aborted')
+        return event_list
 
 def setup(bot):
     bot.add_cog(ReservationExt(bot))

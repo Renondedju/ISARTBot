@@ -22,6 +22,7 @@ super_admin_status=super administrateur
 developper_status=developpeur
 admin_status=administrateur
 denied_status=dieu
+club_manager_status=responsable club
 
 command_not_found=Cette commande n'existe pas.
 no_subcommand=Cette commande n'a pas de sous-commande.
@@ -296,13 +297,18 @@ foodtruck_list_empty=Tellement vide ¯\_(ツ)_/¯
 
 ## Reservation
 
-reservation_help=ToDo aide
-reservation_description=ToDo description
+reservation_help=Assiste les responsables de club dans les réservations de salles.
+reservation_description=Assiste les responsables de club dans les réservations de salles.
 reservation_list_help=Affiche la liste de toutes les réservations ainsi que leur status.
 reservation_list_description=Affiche la liste de toutes les réservations ainsi que leur status.
 reservation_list_title=Liste des réservations
 reservation_list_error=Impossible de récupérer la liste depuis l'API Calendar. Merci de relancer l'extension pour essayer de corriger le problème.
+reservation_notify_help=Envoie un mail contant les réservations à confirmer.
+reservation_notify_description=Envoie un mail contant les réservations à confirmer. Merci de n'utiliser cette commande qu'en cas de nécéssité puisqu'un mail est déjà envoyé régulièrement.
 reservation_notify_confirmation_title=Envoyer un mail pour validation
 reservation_notify_confirmation_description=Êtes-vous sûr(e) de vouloir envoyer un mail à Émilie ? 
 reservation_notify_success=Mail envoyé à Émilie !
 reservation_notify_aborted=Le mail n'a pas été envoyé à Émilie.
+reservation_notify_error=Impossible d'accéder à l'API Gmail. Merci de relancer l'extension pour essayer de corriger le problème.
+reservation_notify_send_error=Impossible d'envoyer le mail. Merci de relancer l'extension pour essayer de corriger le problème.
+reservation_notify_template_error=Impossible d'envoyer le mail : le template est introuvable.
