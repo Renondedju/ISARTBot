@@ -140,7 +140,9 @@ class ReservationExt(commands.Cog):
                     self.gmail_service.users().messages().send(userId=self.bot.settings.get('reservation', 'sender_mail'), 
                         body=message).execute()
                 except:
-                    self.bot.logger.info("Failed to send the mail for validation")
+                    self.bot.logger.error("Failed to send the mail for validation")
+        else:
+            self.bot.logger.error("Failed to send the mail for validation : template is not found")
 
     @reservation_scan.before_loop
     async def pre_reservation_scan(self):
