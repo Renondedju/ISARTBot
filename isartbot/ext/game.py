@@ -31,7 +31,6 @@ from isartbot.helper     import Helper
 from isartbot.checks     import is_moderator, is_verified
 from isartbot.database   import Game, Server, SelfAssignableRole
 from isartbot.converters import GameConverter
-from isartbot.converters import MemberConverter
 
 class GameExt (commands.Cog):
 

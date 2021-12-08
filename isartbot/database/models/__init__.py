@@ -27,3 +27,4 @@ __slots__ = ("Server", "SelfAssignableRole", "Game")
 from .game                   import Game
 from .server                 import Server
 from .self_assignable_role   import SelfAssignableRole
+from .auto_moderable_channel import AutoModerableChannel

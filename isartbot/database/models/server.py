@@ -40,5 +40,6 @@ class Server(TableBase):
     starboard_minimum    = Column('starboard_minimum', Integer, default     = 3)
     verified_role_id     = Column('verified_role_id' , Integer, default     = 0)
     
-    games                 = relationship('Game'              , cascade='all,delete,delete-orphan')
-    self_assignable_roles = relationship('SelfAssignableRole', cascade='all,delete,delete-orphan')
+    auto_moderable_channels = relationship('AutoModerableChannel', cascade='all,delete,delete-orphan')
+    games                   = relationship('Game'                , cascade='all,delete,delete-orphan')
+    self_assignable_roles   = relationship('SelfAssignableRole'  , cascade='all,delete,delete-orphan')

@@ -19,14 +19,20 @@
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN TH
 # SOFTWARE.
 
-from .iam             import *
-from .ext             import *
-from .test            import *
-from .lang            import *
-from .game            import *
-from .starboard       import *
-from .foodtruck       import *
-from .auto_moderation import *
+from sqlalchemy     import Column, Integer, Text, ForeignKey
+from sqlalchemy.orm import relationship, backref
+
+from isartbot.database import TableBase
+
+class AutoModerableChannel(TableBase):
+
+    __tablename__ = 'auto_moderable_channels'
+
+    id         = Column('id'             , Integer, primary_key = True, unique = True)
+    discord_id = Column('discord_role_id', Integer, nullable    = False)
+
+    server_id = Column(Integer, ForeignKey('servers.id'))
+    server    = relationship('Server', backref=backref('auto_moderable_channels', cascade='all,delete,delete-orphan'))
