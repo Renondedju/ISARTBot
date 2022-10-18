@@ -181,25 +181,12 @@ class ModerationExt(commands.Cog):
     async def _for(self, ctx, *args : Union[discord.Member, discord.Role, str]):
         """Removes or adds roles to members of the guild"""
 
-        try:
-            selectors, action, roles = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
-        except ValueError:
-            raise commands.UserInputError()
-
-        if len(action) != 1:
-            await Helper.send_error(ctx, ctx.channel, 'mod_for_error')
-            return
-
-        action = action[0].lower()
-
-        if action not in ['add', 'remove']:
-            await Helper.send_error(ctx, ctx.channel, 'mod_for_error')
-            return
-
+        commands  		 = [list(items) for _, items in groupby(args, key=lambda x: isinstance(x, str))]
+        strategies       = {'add' : self.for_add, 'remove' : self.for_remove, 'with' : self.for_with}
         selected_members = set()
 
         # Adding members to the set
-        for selection in selectors:
+        for selection in commands[0]:
             if isinstance(selection, discord.Member):
                 selected_members.add(selection)
                 continue
@@ -207,26 +194,39 @@ class ModerationExt(commands.Cog):
             for member in selection.members:
                 selected_members.add(member)
 
-        # Creating add and remove strategies
-        strategies = {'add' : self.for_add, 'remove' : self.for_remove}
+        value = 1
+        while value < len(commands):
+            action = commands[value][0]
+            selected_members = await strategies[action](selected_members, commands[value + 1])
+            value += 2
 
-        await strategies[action](selected_members, roles)
-
-        await Helper.send_success(ctx, ctx.channel, 'mod_for_success', 
-            format_content=(action, ' '.join([role.mention for role in roles]), ' '.join([selector.mention for selector in selectors])))
+        await ctx.send("Done")
 
     # For strategies
-    async def for_add(self, selected_members, roles):
+    async def for_with(self, selected_members, roles) -> set():
+        new_set = set()
+
+        for member in selected_members:
+            if all(item in member.roles for item in roles):
+                new_set.add(member)
+
+        return new_set
+
+    async def for_add(self, selected_members, roles) -> set():
         """ Add strategy, adds every roles passed to every of the selected members """
         for member in selected_members:
             for role in roles:
                 await member.add_roles(role)
 
-    async def for_remove(self, selected_members, roles):
+        return selected_members
+
+    async def for_remove(self, selected_members, roles) -> set():
         """ Remove strategy, removes every roles passed of every of the selected members """
         for member in selected_members:
             for role in roles:
                 await member.remove_roles(role)
+
+        return selected_members
 
     # Events
     @commands.Cog.listener()
