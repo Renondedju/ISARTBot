@@ -1,3 +1,4 @@
+pony
+watchfiles
 discord.py
 emoji
-sqlalchemy
