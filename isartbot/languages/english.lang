@@ -98,89 +98,6 @@ game_list_description=Gives you the list of all the available games that have co
 game_list_title=Games list
 game_list_footer=Page {} out of {}
 
-
-### Diffusion extension
-
-diffusion_help=Manages diffusion
-diffusion_description=Helps managing diffusion channels, subscriptions and operators
-diffusion_doesnt_exist=This diffusion doesn't exist.\nPlease use ``{}diffusion list`` to get a list of all the existing diffusions.
-
-# Diffuse
-diffusion_diffuse_help=Diffuses a message
-diffusion_diffuse_description=Diffuses a message to a diffusion channel.\n<diffusion>: Name of the diffusion channel\n<message>: Id of the message to diffuse
-diffusion_diffuse_confirmation_title=Diffusion
-diffusion_diffuse_confirmation=You are about to diffuse a message to {} subscriptions, are you sure?\nOnce this process started, there is no way to cancel it!
-diffusion_diffuse_confirmation_start=Diffuse your message to the "{}" channel.\n{} out of {} subscriptions have been notified so far.\nPlease wait, this process can take a while.
-diffusion_diffuse_confirmation_abort=Diffusion cancelled.
-diffusion_diffuse_confirmation_done=Diffusion done!\n{} error(s) occurred.
-
-# Create
-diffusion_create_help=Creates a diffusion channel
-diffusion_create_description=Creates a diffusion channel.\n<diffusion_name>: Unique name of the diffusion channel
-diffusion_created=The diffusion named "{}" has successfully been created.
-diffusion_already_exists=This diffusion already exists! Please choose a unique diffusion name.
-
-# Delete
-diffusion_delete_help=Deletes a diffusion channel
-diffusion_delete_description=Deletes a diffusion channel.\n<diffusion>: Name of the diffusion channel to delete
-diffusion_delete_title=Delete a diffusion?
-diffusion_delete_aborted=Aborted deletion.
-diffusion_delete_content=Are you sure to want to delete the diffusion named "{}"?\nThis will also delete all subscriptions to this diffusion.
-diffusion_deleted=The diffusion named "{}" has successfully been deleted.
-
-# List
-diffusion_list_help=Lists all the diffusions
-diffusion_list_description=Shows the list of all the available diffusions.
-diffusion_list_title=Available diffusions
-
-## Subscription
-diffusion_subscription_help=Helps managing subscriptions to diffusion channels
-diffusion_subscription_description=Helps subscribing and unsubscribing to and from diffusion channels.
-
-# Subscribe
-diffusion_subscription_subscribe_help=Subscribes to a diffusion channel
-diffusion_subscription_subscribe_description=Subscribes to a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to subscribe to\n[diffusion_tag]: Role to mention with every message
-diffusion_subscribe_success=Successfully subscribed to this diffusion!
-diffusion_subscription_already_exists=This subscription already exists.\nUse ``{}diffusion unsubscribe`` to unsubscribe from this diffusion.
-
-# Unsubscribe
-diffusion_subscription_unsubscribe_help=Unsubscribes from a diffusion channel
-diffusion_subscription_unsubscribe_description=Unsubscribes from a diffusion channel.\n<diffusion>: Name of the diffusion\n<channel>: Channel to unsubscribe from
-diffusion_unsubscribe_success=Successfully unsubscribed from this diffusion!
-diffusion_no_such_subscription=There is no subscription to unsubscribe from.\nUse ``{}diffusion subscribe`` to subscribe to a diffusion first.
-
-# List
-diffusion_subscription_list_help=Lists all the subscriptions to a channel
-diffusion_subscription_list_description=Lists all the subscriptions to a channel.\n[channel]: Name of the channel to list the subscriptions of
-diffusion_subscription_list_empty=This server does not have any subscription!
-diffusion_subscription_list_title=Subscription list for this server
-
-## Operator
-diffusion_operator_help=Helps managing operators
-diffusion_operator_description=Helps adding and removing operators to or from a diffusion.
-
-# Add
-diffusion_operator_add_help=Adds an operator to a diffusion
-diffusion_operator_add_description=Adds an operator to a diffusion.\n<diffusion>: Name of the diffusion\n<new_operator>: Name or tag of the operator to add
-diffusion_operator_added={} is now an operator of the diffusion named "{}".
-diffusion_already_operator={} is already an operator of the diffusion named "{}".
-
-# Remove
-diffusion_operator_remove_help=Removes an operator from a diffusion
-diffusion_operator_remove_description=Removes an operator from a diffusion.\n<diffusion>: Name of the diffusion\n<old_operator>: Name or tag of the operator to remove
-diffusion_operator_remove_title=Remove operator?
-diffusion_operator_remove_content=Do you really want to remove {} from the "{}" diffusion operators?
-diffusion_operator_removed={} is no more an operator of the diffusion named "{}".
-diffusion_operator_remove_content_failure=Operation aborted.
-diffusion_not_operator={} isn't an operator of the diffusion named "{}".
-
-# List
-diffusion_operator_list_help=Lists all the operators of a diffusion
-diffusion_operator_list_description=Shows the list of all the operators of a diffusion.\n<diffusion>: Diffusion to list the operators of
-diffusion_operator_list_title=Operators of "{}" diffusion.
-diffusion_operator_list_no_operator=There is no operators for this diffusion.
-
-
 ## Ext extension
 
 ext_help=Manages (un/re)loading of extensions
@@ -232,15 +149,42 @@ lang_key_help=Retrieves a localization value from a key
 lang_key_description=Retrieves the value corresponding to this localization key.\n<lang>: Target language\n<key>: Key to retrieve the value from
 
 
+## Live role extension
+
+live_role_help=Setups a live role
+live_role_description=A live role is a role assigned when a user streams on Twitch / Youtube or Discord. This can be useful on big servers to promote streamers.
+live_role_set_help=Sets a live role
+live_role_set_description=Sets a live role and enables the live role feature. Disable it with `!liverole disable`
+live_role_disable_help=Disables the live roles
+live_role_disable_description=Disables the live roles. Re-enable it with `!liverole set <role>`
+
+success_live_role_set=The live role for this server has successfully been set to
+success_live_role_disable=Live roles have successfully been disabled for this server.
+
+
 ## Moderation extension
 
 mod_help=Manages moderation
 mod_description=Helps moderating the server.
 
+# Log
+mod_log_set_help=Sets a moderation channel
+mod_log_set_description=Sets a channel te receive every moderation events such as deleted messages
+
+mod_log_unset_help=Unsets a moderation channel
+mod_log_unset_description=Unsets the moderation channel
+
+success_mod_log_set=Successfully set the mod log channel to
+success_mod_log_unset=The mod log channel has been unset
+
+message_deleted=Message deleted
+
 # Prune
 mod_prune_help=Deletes a desired amount of messages
 mod_prune_description=Deletes the latest messages in this text channel.\n<number>: Amount of the latest messages to delete\n[member]: Name of the member to restrict the message deletion to. (From the <number> messages, only those from [member] will be deleted)
 success_prune=Last {0} message(s) have been removed.
+fail_prune_size=Discord only allows the deletion of 100 messages at once, you tried to delete {0} of them.\nRetry with less messages !
+fail_prune_other=Discord blocked me from deleting your messages, this is most likely because these messages where posted more than 14 days ago.
 
 # Kick
 mod_kick_help=Kicks a member
@@ -254,10 +198,10 @@ success_ban={0} was banned by {1} for reason: {2}.
 
 mod_as_help=
 mod_as_description=
-mod_for_help=
-mod_for_description=
+mod_for_help=Allows the manipulation of roles for massive amount of members
+mod_for_description=Adds or remove roles to a group of members.\nFor example `!mod for @LeagueOfLegends add @Tft` will add the role @Tft to all the holders of the @LeagueOfLegends role.\nThe different possible strategies are `add` or `remove`.
 mod_for_success=Used the \'{}\' strategy with the roles {} on {}'.
-mod_for_error=Action should be 'add' or 'remove'!
+mod_for_error=The strategy should either be `add` or `remove`!
 
 
 ## Starboard extension
@@ -270,6 +214,11 @@ starboard_disable_help=Disables the starboard.
 
 success_starboard_set=The starboard has successfully been configured on the following text channel.
 success_starboard_unset=The starboard has successfully been disabled for this server.
+
+starboard_minimum_help=Sets the minimum star count for the starboard.
+starboard_minimum_description=Sets the minimum star count requiered to shows upvoted posts in the starboard.
+starboard_minimum_success=Minimum star count is now {0} for this server.
+starboard_minimum_error=Minimum star count must be between 1 and 100.
 
 ## Test extension
 
@@ -342,13 +291,4 @@ test_denied_description=Should never execute.
 foodtruck_help=Prints a list of upcoming foodtrucks
 foodtruck_description=Prints the list of every upcoming foodtrucks
 foodtruck_list_title=Upcoming foodtrucks:
-foodtruck_list_format={delimiters}{date} - [{foodtruck}]({website}) ({specialty}) {delimiters}
 foodtruck_list_empty=Such empty ¯\_(ツ)_/¯
-
-# Upload
-
-foodtruck_upload_help=Uploads a new foodtruck database
-foodtruck_upload_description=Uploads a new foodtruck database. The database must be a `.csv` file containing the following columns: `foodtruck, date, specialty, website`.
-foodtruck_upload_attachment_error=The command needs to be called with (only) one attachment.
-foodtruck_upload_succeeded=New foodtruck database upload succeeded ! 
-foodtruck_upload_failed=Foodtruck database upload failed, please try again later or contact an administrator for more details.
