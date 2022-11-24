@@ -22,6 +22,7 @@ super_admin_status=super administrator
 developper_status=developer
 admin_status=administrator
 denied_status=god
+club_manager_status=club manager
 
 command_not_found=This command does not exist.
 no_subcommand=This command has no subcommand.
@@ -286,9 +287,29 @@ test_delay_description=Waits for 2 seconds.
 test_denied_help=Should never show
 test_denied_description=Should never execute.
 
+
 ## Foodtruck
 
 foodtruck_help=Prints a list of upcoming foodtrucks
 foodtruck_description=Prints the list of every upcoming foodtrucks
 foodtruck_list_title=Upcoming foodtrucks:
 foodtruck_list_empty=Such empty ¯\_(ツ)_/¯
+
+
+## Reservation
+
+reservation_help=Assists club managers for room reservation.
+reservation_description=Assists club managers for room reservation.
+reservation_list_help=Prints the list of all current reservations and their status.
+reservation_list_description=Prints the list of all current reservations and their status.
+reservation_list_title=Reservation list
+reservation_list_error=Couldn't retrieve the list from the Calendar API. Please reload the extension to try fixing the issue.
+reservation_notify_help=Sends a mail containing all pending reservation.
+reservation_notify_description=Sends a mail containing all pending reservation. Please use it in absolute necessity since a mail is already sent regularly.
+reservation_notify_confirmation_title=Send a mail for validation
+reservation_notify_confirmation_description=Are you sure you want to send a mail to Emilie? 
+reservation_notify_success=Mail sent to Emilie!
+reservation_notify_aborted=Mail not sent to Emilie.
+reservation_notify_error=Unable to access the Gmail API. Please reload the extension to try fixing the issue.
+reservation_notify_send_error=Unable to send the mail. Please reload the extension to try fixing the issue.
+reservation_notify_template_error=Unable to send the mail: the template is not found.

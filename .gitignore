@@ -25,6 +25,8 @@ MANIFEST
 
 token.ini
 database.db
+google_credentials.json
+google_token.json
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
