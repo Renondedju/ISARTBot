@@ -1,3 +1,5 @@
+import time
+
 from typing               import Union
 from discord              import *
 from discord.ext.commands import Cog
@@ -17,7 +19,7 @@ class DatabaseExtension(Extension):
 	async def on_database_sync(self) -> None:
 		"""Synchs the database with the current state of the bot"""
 
-		self.logger.info("Syncing database")
+		start = time.time()
 
 		# Removing guilds that should no longer be tracked
 		with models.db_session:
@@ -48,6 +50,9 @@ class DatabaseExtension(Extension):
 					for role in models.Role.select(lambda r: r.guild.discord_id == guild.id):
 						if role.discord_id not in [r.id for r in guild.roles]:
 							role.delete()
+
+		# Log the time it took to sync the database in milliseconds
+		self.logger.info(f"Synced database in {round((time.time() - start) * 1000)}ms")
 
 	# Guild events
 	@Extension.listener()
