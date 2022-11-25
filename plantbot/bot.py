@@ -86,13 +86,15 @@ class PlantBot(commands.Bot):
 	async def sync_tree(self) -> None:
 		"""Syncs the debug guild"""
 
+		start_time = time.time()
+
 		if self.debug_guild:
 			self.tree.copy_global_to(guild=self.debug_guild)
 			await self.tree.sync(guild=self.debug_guild)
 		else:
-			await self.tree.sync()
+			await asyncio.gather(*[self.tree.sync(guild=guild) for guild in self.guilds], self.tree.sync())
 
-		self.logger.warning("Synced command tree")
+		self.logger.info(f"Synced command tree in {round((time.time() - start_time) * 1000)}ms")
 
 	def dispatch_db_event(self, name: str, *args, **kwargs) -> None:
 		"""Dispatches a database event"""
