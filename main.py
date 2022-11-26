@@ -16,7 +16,7 @@ def main():
 		Arguments:
 
 			--debug-guild: The ID of the debug guild. If set, debug extensions will be loaded.
-			--db_path: The path to the database file.
+			--db_file: The path to the database file.
 			--db_provider: The database provider.
 			--log_file: The path to the log file.
 			--safe_mode: If set, the bot will not load any extensions.
@@ -38,7 +38,7 @@ def main():
 	# Parsing arguments
 	parser = argparse.ArgumentParser(description="The plant discord bot 🌿")
 	
-	parser.add_argument("--db_path"    , type=str , default="database.sqlite", help="Path to the database file")
+	parser.add_argument("--db_file"    , type=str , default="database.sqlite", help="Path to the database file")
 	parser.add_argument("--logging"    ,                                       help="Enables logging", action="store_true")
 	parser.add_argument("--safe_mode"  ,                                       help="Disables all extensions", action="store_true")
 	parser.add_argument("--log_file"   , type=str                            , help="Sets the log file path")
@@ -57,13 +57,16 @@ def main():
 	if (token := os.getenv("PLANTBOT_TOKEN")) is None:
 		return logger.error("No token provided, please set the PLANTBOT_TOKEN environment variable")
 
-	# Setup database and starting the bot
-	database.bind(provider=args.db_provider, filename=args.db_path, create_db=True)
-	database.generate_mapping(create_tables=True)
-	plantbot.run(token = token,
-		debug_guild = args.debug_guild,
-		safe_mode   = args.safe_mode
-	)
+	try:
+		# Setup database and starting the bot
+		database.bind(provider=args.db_provider, filename=args.db_file, create_db=True)
+		database.generate_mapping(create_tables=True)
+		plantbot.run(token = token,
+			debug_guild = args.debug_guild,
+			safe_mode   = args.safe_mode
+		)
+	except Exception as e:
+		logger.exception(e)
 
 if __name__ == '__main__':
 	main()

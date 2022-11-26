@@ -4,7 +4,6 @@ import logging
 
 from plantbot.bot    	      import PlantBot
 from plantbot.database.models import *
-from plantbot.guilds 		  import isart_student_guild
 from discord 	              import app_commands
 from discord.ext              import commands
 
@@ -28,11 +27,11 @@ class Report(commands.Cog):
 		self.bot.tree.add_command(self.ctx_report_mods)
 		self.bot.tree.add_command(self.ctx_report_ethic)
 
-	@app_commands.guilds(isart_student_guild.id)
+	@app_commands.guilds(420328186291945472, 459705492453851156)
 	async def report_mods(self, interaction: discord.Interaction, message: discord.Message):
 		await interaction.response.send_modal(ReportModal(self.bot, message, ReportTeam.Moderators))
 
-	@app_commands.guilds(isart_student_guild.id)
+	@app_commands.guilds(420328186291945472, 459705492453851156)
 	async def report_ethic(self, interaction: discord.Interaction, message: discord.Message):
 		await interaction.response.send_modal(ReportModal(self.bot, message, ReportTeam.Ethic))
 

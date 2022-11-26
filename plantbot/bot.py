@@ -165,13 +165,11 @@ class PlantBot(commands.Bot):
 		await asyncio.gather(*[self.load_extension(e.identifier) for e in extensions if     e.is_core and should_load(e)])
 		await asyncio.gather(*[self.load_extension(e.identifier) for e in extensions if not e.is_core and should_load(e)])
 
-		# Syncing database and the command tree
-		asyncio.create_task(self.sync_tree())
-
 		self.logger.info(f"Setup completed in {int((time.time() - start) * 1000)} ms")
 		
 	async def on_ready(self) -> None:
 		"""Called when the bot is ready"""
 
 		self.logger.info(f"Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})")
+		asyncio.create_task(self.sync_tree())
 		self.dispatch('database_sync')
